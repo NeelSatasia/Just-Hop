@@ -19,7 +19,5 @@ public class Ball extends Rectangle {
 	public void draw(Graphics g) {
 		g.setColor(this.brickColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
-		g.setColor(Color.BLACK);
-		g.drawRect(this.x-1, this.y-1, this.width+1, this.height+1);
 	}
 }

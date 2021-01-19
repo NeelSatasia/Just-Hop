@@ -22,8 +22,8 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	
 	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.RED);;
 	
-	private double brickFallingSpeed = 1;
-	private double ballFallingSpeed = 4;
+	private int brickFallingSpeed = 1;
+	private int ballFallingSpeed = 4;
 	
 	private int ballHorizontalDirection = 0;
 	
@@ -35,6 +35,8 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	private int ballJumpSpeed = 0;
 	
 	private int changeSpeedTimer = 0;
+	
+	private int currentIndex = 0;
 	
 	public BrickAnimation() {
 		
@@ -71,11 +73,11 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		ball.draw(g);
-		
-		if(collisionCheck()) {
+		collisionCheck();
+		if(currentIndex >= 0) {
 			ballFallingSpeed = brickFallingSpeed;
 		} else if(isBallJumping == false) {
-			ballFallingSpeed += 0.50;
+			ballFallingSpeed++;
 		}
 	}
 
@@ -84,7 +86,7 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		for(int i = 0; i < bricks.length; i++) {
 			if(bricksYPositions[i] > 1000) {
 				changeSpeedTimer++;
-				if(changeSpeedTimer == 25) {
+				if(changeSpeedTimer == 10) {
 					brickFallingSpeed = (int)(Math.random() * 2) + 1;
 					changeSpeedTimer = 0;
 				}
@@ -143,14 +145,12 @@ public class BrickAnimation extends JPanel implements ActionListener {
 			}
 		}
 		
-		
-		for(int i = 0; i < bricks.length; i++) {
-			if(collisionCheck()) {
-				if(bricks[i].intersects(ball)) {
-					ballY = (int)(bricksYPositions[i] - ball.getHeight());
-				}
+		/*for(int i = 0; i < bricks.length; i++) {
+			if(collisionCheck() && isBallJumping == false && isBallFalling == false) {
+				ballY = (int)(bricksYPositions[i] - ball.getHeight());
+				break;
 			}
-		}
+		}*/
 		
 		if(isBallInTheAir == true && collisionCheck()) {
 			ballHorizontalDirection = 0;
@@ -160,6 +160,10 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		ballX += ballHorizontalDirection;
 		ballY += ballFallingSpeed;
 		
+		if(currentIndex > -1) {
+			ballY = (int)(bricksYPositions[currentIndex] - ball.getHeight());
+		}
+		//ball.getY() + ball.getHeight() >= bricks[i].getY()
 		repaint();
 	}
 	
@@ -207,13 +211,15 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	public boolean collisionCheck() {
 		for(int i = 0; i < bricks.length; i++) {
 			if(bricks[i].intersects(ball)) {
-				if(ball.getY() + ball.getHeight() >= bricks[i].getY() && (ball.getX() + ball.getWidth() > bricks[i].getX() && ball.getX() < bricks[i].getX() + bricks[i].getWidth())) {
-					bricks[i].changeColor(Color.RED);
+				if(ballY >= (int)(bricksYPositions[i] - ball.getHeight()) && (ball.getX() + ball.getWidth() > bricks[i].getX() && ball.getX() < bricks[i].getX() + bricks[i].getWidth())) {
 					isBallFalling = false;
+					currentIndex = i;
 					return true;
 				}
 			}
 		}
+		
+		currentIndex = -1;
 		return false;
 	}
 	
@@ -232,11 +238,12 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	}
 	
 	public void jump() {
-		if(collisionCheck() == true) {
+		if(currentIndex > -1) {
 			isBallJumping = true;
 			ballJumpYDistance = 150;
 			ballJumpSpeed = 5;
 			ballFallingSpeed = 0;
+			currentIndex = -1;
 		}
 	}
 

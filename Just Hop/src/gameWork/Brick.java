@@ -20,8 +20,4 @@ public class Brick extends Rectangle {
 		g.setColor(this.brickColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
 	}
-	
-	public void changeColor(Color color) {
-		this.brickColor = color;
-	}
 }
