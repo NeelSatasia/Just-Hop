@@ -7,13 +7,14 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.*;
 
-public class BrickAnimation extends JPanel implements ActionListener {
+public class GamePanel extends JPanel implements ActionListener {
 	
 	Timer timer = new Timer(5, this);
 	
-	private Brick[] bricks = new Brick[10];
-	private int[] bricksXPositions = new int[10];
-	private int[] bricksYPositions = new int[10];
+	private Block[] blocks = new Block[10];
+	private int[] blocksXPositions = new int[10];
+	private int[] blocksYPositions = new int[10];
+	private int[] blocksWidth = new int[10];
 	
 	private int brickYPositioner = -25;
 	
@@ -22,8 +23,8 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	
 	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.RED);;
 	
-	private int brickFallingSpeed = 1;
-	private int ballFallingSpeed = 4;
+	private int blockFallingSpeed = 1;
+	private int ballFallingSpeed = 7;
 	
 	private int ballHorizontalDirection = 0;
 	
@@ -38,17 +39,18 @@ public class BrickAnimation extends JPanel implements ActionListener {
 	
 	private int currentIndex = 0;
 	
-	public BrickAnimation() {
+	public GamePanel() {
 		
 		changeBrickXPositions();
 		
-		for(int i = 0; i < bricks.length; i++) {
-			bricksYPositions[i] += brickYPositioner;
-			brickYPositioner = bricksYPositions[i] + 100;
+		for(int i = 0; i < blocks.length; i++) {
+			blocksYPositions[i] += brickYPositioner;
+			brickYPositioner = blocksYPositions[i] + 100;
+			blocksWidth[i] = (int)(Math.random() * 31) + 30;
 		}
 		
-		ballX = (int) (bricksXPositions[0] + (30 - ball.getHeight()/2));
-		ballY = (int) (bricksYPositions[0] - ball.getHeight());
+		ballX = (int) (blocksXPositions[0] + (30 - ball.getHeight()/2));
+		ballY = (int) (blocksYPositions[0] - ball.getHeight());
 		
 		ball.setLocation(ballX, ballY);
 		
@@ -65,33 +67,37 @@ public class BrickAnimation extends JPanel implements ActionListener {
 			timer.stop();
 		}
 		
-		for(int i = 0; i < bricks.length; i++) {
-			bricks[i] = new Brick(bricksXPositions[i], bricksYPositions[i], 60, 5, Color.BLACK);
-			bricks[i].draw(g);
+		for(int i = 0; i < blocks.length; i++) {
+			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.BLACK);
+			blocks[i].draw(g);
 		}
 		
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		ball.draw(g);
+		
 		collisionCheck();
-		if(currentIndex >= 0) {
-			ballFallingSpeed = brickFallingSpeed;
+		
+		if(currentIndex > -1) {
+			ballFallingSpeed = blockFallingSpeed;
 		} else if(isBallJumping == false) {
-			ballFallingSpeed++;
+			if(ballFallingSpeed < 15) {
+				ballFallingSpeed++;
+			}
 		}
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		for(int i = 0; i < bricks.length; i++) {
-			if(bricksYPositions[i] > 1000) {
+		for(int i = 0; i < blocks.length; i++) {
+			if(blocksYPositions[i] > 1000) {
 				changeSpeedTimer++;
 				if(changeSpeedTimer == 10) {
-					brickFallingSpeed = (int)(Math.random() * 2) + 1;
+					blockFallingSpeed = (int)(Math.random() * 2) + 1;
 					changeSpeedTimer = 0;
 				}
 				
-				bricksYPositions[i] = -25;
+				blocksYPositions[i] = -25;
 				int brickXPosition = (int)(Math.random() * 3);
 				switch(brickXPosition) {
 					case 0:
@@ -104,7 +110,7 @@ public class BrickAnimation extends JPanel implements ActionListener {
 						brickXPosition = 500;
 						break;
 				}
-				if((i + 1 == bricksYPositions.length && bricksXPositions[0] == brickXPosition) || (i + 1 < bricksXPositions.length && bricksXPositions[i+1] == brickXPosition)) {
+				if((i + 1 == blocksYPositions.length && blocksXPositions[0] == brickXPosition) || (i + 1 < blocksXPositions.length && blocksXPositions[i+1] == brickXPosition)) {
 					if(brickXPosition == 200) {
 						brickXPosition += 150;
 					} else if(brickXPosition == 500) {
@@ -121,14 +127,18 @@ public class BrickAnimation extends JPanel implements ActionListener {
 						}
 					}
 				} 
-				if((i + 1 == bricks.length && (brickXPosition != 350 && bricksXPositions[0] != 350)) || (i + 1 < bricks.length && (brickXPosition != 350 && bricksXPositions[i+1] != 350))) {
+				if((i + 1 == blocks.length && (brickXPosition != 350 && blocksXPositions[0] != 350)) || (i + 1 < blocks.length && (brickXPosition != 350 && blocksXPositions[i+1] != 350))) {
 					brickXPosition = 350;
 				}
 				
-				bricksXPositions[i] = brickXPosition;
+				blocksXPositions[i] = brickXPosition;
+				
+				int brickWidthSize = (int)(Math.random() * 31) + 30;
+				blocksWidth[i] = brickWidthSize;
+				blocks[i].setSize(brickWidthSize, 5);
 			}
 			
-			bricksYPositions[i] += brickFallingSpeed;
+			blocksYPositions[i] += blockFallingSpeed;
 		}
 		
 		if(isBallJumping == true) {
@@ -141,18 +151,11 @@ public class BrickAnimation extends JPanel implements ActionListener {
 			} else {
 				isBallJumping = false;
 				isBallFalling = true;
-				ballFallingSpeed = 4;
+				ballFallingSpeed = 7;
 			}
 		}
 		
-		/*for(int i = 0; i < bricks.length; i++) {
-			if(collisionCheck() && isBallJumping == false && isBallFalling == false) {
-				ballY = (int)(bricksYPositions[i] - ball.getHeight());
-				break;
-			}
-		}*/
-		
-		if(isBallInTheAir == true && collisionCheck()) {
+		if(isBallInTheAir == true && (currentIndex > -1 && ball.intersects(blocks[currentIndex]))) {
 			ballHorizontalDirection = 0;
 			isBallInTheAir = false;
 		}
@@ -161,14 +164,14 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		ballY += ballFallingSpeed;
 		
 		if(currentIndex > -1) {
-			ballY = (int)(bricksYPositions[currentIndex] - ball.getHeight());
+			ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
 		}
-		//ball.getY() + ball.getHeight() >= bricks[i].getY()
+		
 		repaint();
 	}
 	
 	public void changeBrickXPositions() {
-		for(int i = 0; i < bricksXPositions.length; i++) {
+		for(int i = 0; i < blocksXPositions.length; i++) {
 			int brickXPosition = (int)(Math.random() * 3);
 			switch(brickXPosition) {
 				case 0:
@@ -182,7 +185,7 @@ public class BrickAnimation extends JPanel implements ActionListener {
 					break;
 			}
 			
-			if(i - 1 >= 0 && brickXPosition == bricksXPositions[i-1]) {
+			if(i - 1 >= 0 && brickXPosition == blocksXPositions[i-1]) {
 				if(brickXPosition == 200) {
 					brickXPosition += 150;
 				} else if(brickXPosition == 500) {
@@ -199,19 +202,19 @@ public class BrickAnimation extends JPanel implements ActionListener {
 					}
 				}
 			}
-			if(i - 1 >= 0 && (brickXPosition != 350 && bricksXPositions[i-1] != 350)) {
+			if(i - 1 >= 0 && (brickXPosition != 350 && blocksXPositions[i-1] != 350)) {
 				brickXPosition = 350;
 			}
 			
 			
-			bricksXPositions[i] = brickXPosition;
+			blocksXPositions[i] = brickXPosition;
 		}
 	}
 		
 	public boolean collisionCheck() {
-		for(int i = 0; i < bricks.length; i++) {
-			if(bricks[i].intersects(ball)) {
-				if(ballY >= (int)(bricksYPositions[i] - ball.getHeight()) && (ball.getX() + ball.getWidth() > bricks[i].getX() && ball.getX() < bricks[i].getX() + bricks[i].getWidth())) {
+		for(int i = 0; i < blocks.length; i++) {
+			if(blocks[i].intersects(ball)) {
+				if(ballY >= (int)(blocksYPositions[i] - ball.getHeight()) && (ball.getX() + ball.getWidth() > blocks[i].getX() && ball.getX() < blocks[i].getX() + blocks[i].getWidth())) {
 					isBallFalling = false;
 					currentIndex = i;
 					return true;
@@ -223,7 +226,7 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		return false;
 	}
 	
-	public void changeHorizontalDirection(String direction) {
+	public void changeBallHorizontalDirection(String direction) {
 		switch(direction) {
 			case "left":
 				ballHorizontalDirection = -4;
@@ -237,8 +240,8 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		}
 	}
 	
-	public void jump() {
-		if(currentIndex > -1) {
+	public void makeBallJump() {
+		if(isBallJumping == false && isBallFalling == false) {
 			isBallJumping = true;
 			ballJumpYDistance = 150;
 			ballJumpSpeed = 5;
@@ -251,7 +254,7 @@ public class BrickAnimation extends JPanel implements ActionListener {
 		return isBallJumping;
 	}
 	
-	public void isInTheAir(boolean isTrue) {
+	public void isBallInTheAir(boolean isTrue) {
 		isBallInTheAir = isTrue;
 	}
 

@@ -1,6 +1,5 @@
 package gameWork;
 
-import java.awt.*;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,7 +7,7 @@ import java.awt.event.KeyListener;
 public class PlayGame {
 	
 	private JFrame gameFrame;
-	private BrickAnimation bricks;
+	private GamePanel gamePanel;
 	private KeyListener ballControlKeys;
 	
 	public PlayGame() {
@@ -17,32 +16,32 @@ public class PlayGame {
 		gameFrame.setBounds(50, 50, 800, 600);
 		gameFrame.setVisible(true);
 		
-		bricks = new BrickAnimation();
-		gameFrame.add(bricks);
+		gamePanel = new GamePanel();
+		gameFrame.add(gamePanel);
 		
-		bricks.revalidate();
-		bricks.repaint();
+		gamePanel.revalidate();
+		gamePanel.repaint();
 		
 		ballControlKeys = new KeyListener() {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-					bricks.changeHorizontalDirection("right");
+					gamePanel.changeBallHorizontalDirection("right");
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-					bricks.changeHorizontalDirection("left");
+					gamePanel.changeBallHorizontalDirection("left");
 				}
 				if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
-					bricks.jump();
+					gamePanel.makeBallJump();
 				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(bricks.isBallJumping() || bricks.isBallFalling()) {
-					bricks.isInTheAir(true);
+				if(gamePanel.isBallJumping() || gamePanel.isBallFalling()) {
+					gamePanel.isBallInTheAir(true);
 				} else {
-					bricks.changeHorizontalDirection("none");
+					gamePanel.changeBallHorizontalDirection("none");
 				}
 			}
 

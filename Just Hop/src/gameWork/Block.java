@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-public class Brick extends Rectangle {
+public class Block extends Rectangle {
 	
 	Color brickColor;
 	
-	public Brick(int x, int y, int w, int h, Color color) {
+	public Block(int x, int y, int w, int h, Color color) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
