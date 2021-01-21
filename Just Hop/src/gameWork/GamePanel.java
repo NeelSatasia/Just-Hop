@@ -11,17 +11,17 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	Timer timer = new Timer(5, this);
 	
+	private int ballX = 300;
+	private int ballY = 200;
+	
+	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.RED);
+	
 	private Block[] blocks = new Block[10];
 	private int[] blocksXPositions = new int[10];
 	private int[] blocksYPositions = new int[10];
 	private int[] blocksWidth = new int[10];
 	
 	private int brickYPositioner = -25;
-	
-	private int ballX = 300;
-	private int ballY = 200;
-	
-	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.RED);;
 	
 	private int blockFallingSpeed = 1;
 	private int ballFallingSpeed = 7;
@@ -67,23 +67,24 @@ public class GamePanel extends JPanel implements ActionListener {
 			timer.stop();
 		}
 		
+		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
+		
 		for(int i = 0; i < blocks.length; i++) {
 			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.BLACK);
 			blocks[i].draw(g);
 		}
 		
-		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
+		
 		
 		ball.draw(g);
 		
 		collisionCheck();
 		
-		if(currentIndex > -1) {
+		if(currentIndex > -1 && ballX + ball.getWidth() > blocksXPositions[currentIndex] && ballX < blocksXPositions[currentIndex] + blocksWidth[currentIndex]) {
 			ballFallingSpeed = blockFallingSpeed;
 		} else if(isBallJumping == false) {
-			if(ballFallingSpeed < 15) {
-				ballFallingSpeed++;
-			}
+			currentIndex = -1;
+			ballFallingSpeed = 7;
 		}
 	}
 
@@ -222,7 +223,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		}
 		
-		currentIndex = -1;
 		return false;
 	}
 	
