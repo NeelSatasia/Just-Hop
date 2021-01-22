@@ -53,5 +53,7 @@ public class PlayGame {
 		};
 		
 		gameFrame.addKeyListener(ballControlKeys);
+		
+		gameFrame.setResizable(false);
 	}
 }
