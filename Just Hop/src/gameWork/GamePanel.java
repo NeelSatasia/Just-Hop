@@ -14,7 +14,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int ballX = 300;
 	private int ballY = 200;
 	
-	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.RED);
+	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.WHITE);
 	
 	private Block[] blocks = new Block[10];
 	private int[] blocksXPositions = new int[10];
@@ -38,6 +38,15 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int changeSpeedTimer = 0;
 	
 	private int currentIndex = 0;
+	private int previousCurrentIndex = 0;
+	
+	private boolean didScore = false;
+	private int score = 0;
+	
+	private boolean frictionlessMode = false;
+	private boolean randomBlockSizeMode = false;
+	private boolean blockVisibilityMode = false;
+	private boolean hotBlockMode = false;
 	
 	public GamePanel() {
 		
@@ -46,7 +55,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < blocks.length; i++) {
 			blocksYPositions[i] += brickYPositioner;
 			brickYPositioner = blocksYPositions[i] + 100;
+			if(randomBlockSizeMode) {
 			blocksWidth[i] = (int)(Math.random() * 31) + 30;
+			} else {
+				blocksWidth[i] = 60;
+			}
 		}
 		
 		ballX = (int) (blocksXPositions[0] + (30 - ball.getHeight()/2));
@@ -61,7 +74,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		super.paintComponent(g);
 		
 		this.setLayout(null);
-		this.setBackground(Color.WHITE);
+		this.setBackground(Color.BLACK);
 		
 		if(ballY > 600) {
 			timer.stop();
@@ -70,7 +83,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		for(int i = 0; i < blocks.length; i++) {
-			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.BLACK);
+			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.WHITE);
 			blocks[i].draw(g);
 		}
 		
@@ -79,6 +92,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		if(collisionCheck()) {
 			ballFallingSpeed = blockFallingSpeed;
 			ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+			if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
+				score++;
+				didScore = true;
+				System.out.println(score);
+			}
 		} else if(isBallJumping == false) {
 			isBallFalling = true;
 			currentIndex = -1;
@@ -134,9 +152,11 @@ public class GamePanel extends JPanel implements ActionListener {
 					blockXPosition = 350;
 				}
 				
-				int brickWidthSize = (int)(Math.random() * 31) + 30;
-				blocksWidth[i] = brickWidthSize;
-				blocks[i].setSize(brickWidthSize, 5);
+				if(randomBlockSizeMode) {
+					int brickWidthSize = (int)(Math.random() * 31) + 30;
+					blocksWidth[i] = brickWidthSize;
+					blocks[i].setSize(brickWidthSize, 5);
+				}
 				
 				blocksXPositions[i] = blockXPosition;
 			}
@@ -159,7 +179,16 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		if(isBallInTheAir == true && isBallJumping == false && isBallFalling == false) {
-			ballHorizontalDirection = 0;
+			if(frictionlessMode) {
+				if(ballHorizontalDirection == -4) {
+					ballHorizontalDirection = -1;
+				} else if(ballHorizontalDirection == 4) {
+					ballHorizontalDirection = 1;
+				}
+			} else {
+				ballHorizontalDirection = 0;
+			}
+			
 			isBallInTheAir = false;
 		}
 		
@@ -242,6 +271,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			ballJumpYDistance = 150;
 			ballJumpSpeed = 5;
 			ballFallingSpeed = 0;
+			previousCurrentIndex = currentIndex;
+			didScore = false;
 			currentIndex = -1;
 		}
 	}
