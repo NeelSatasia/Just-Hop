@@ -1,6 +1,7 @@
 package gameWork;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int ballX = 300;
 	private int ballY = 200;
 	
-	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.WHITE);
+	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.BLACK);
 	
 	private Block[] blocks = new Block[10];
 	private int[] blocksXPositions = new int[10];
@@ -46,9 +47,16 @@ public class GamePanel extends JPanel implements ActionListener {
 	private boolean frictionlessMode = false;
 	private boolean randomBlockSizeMode = false;
 	private boolean blockVisibilityMode = false;
-	private boolean hotBlockMode = false;
+	//private boolean hotBlockMode = false;
+	
+	private JLabel scoreLabel = new JLabel("Score: " + score);
+	
+	private int colorTransparency = 100;
 	
 	public GamePanel() {
+		
+		this.setLayout(null);
+		this.setBackground(Color.WHITE);
 		
 		changeBrickXPositions();
 		
@@ -67,14 +75,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		ball.setLocation(ballX, ballY);
 		
+		this.add(scoreLabel);
+		scoreLabel.setBounds(10, 10, 100, 30);
+		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		
 		timer.start();
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
-		this.setLayout(null);
-		this.setBackground(Color.BLACK);
 		
 		if(ballY > 600) {
 			timer.stop();
@@ -83,7 +92,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		for(int i = 0; i < blocks.length; i++) {
-			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.WHITE);
+			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, colorTransparency));
 			blocks[i].draw(g);
 		}
 		
@@ -95,7 +104,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
 				score++;
 				didScore = true;
-				System.out.println(score);
+				scoreLabel.setText("Score: " + score);
 			}
 		} else if(isBallJumping == false) {
 			isBallFalling = true;
@@ -195,6 +204,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		ballX += ballHorizontalDirection;
 		ballY += ballFallingSpeed;
 		
+		//colorTransparency++;
+		
 		repaint();
 	}
 	
@@ -288,4 +299,18 @@ public class GamePanel extends JPanel implements ActionListener {
 	public boolean isBallFalling() {
 		return isBallFalling;
 	}
+
+	public boolean isRandomBlockSizeMode() {
+		return randomBlockSizeMode;
+	}
+
+	public boolean isBlockVisibilityMode() {
+		return blockVisibilityMode;
+	}
+
+	
+	public boolean isFrictionlessMode() {
+		return frictionlessMode;
+	}
+
 }
