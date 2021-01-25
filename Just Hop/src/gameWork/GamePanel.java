@@ -18,9 +18,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.BLACK);
 	
 	private Block[] blocks = new Block[10];
-	private int[] blocksXPositions = new int[10];
-	private int[] blocksYPositions = new int[10];
-	private int[] blocksWidth = new int[10];
+	private int[] blocksXPositions = new int[blocks.length];
+	private int[] blocksYPositions = new int[blocks.length];
+	private int[] blocksWidth = new int[blocks.length];
 	
 	private int brickYPositioner = -25;
 	
@@ -45,13 +45,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int score = 0;
 	
 	private boolean frictionlessMode = false;
-	private boolean randomBlockSizeMode = false;
-	private boolean blockVisibilityMode = false;
+	private boolean randomBlockSizeMode = true;
 	//private boolean hotBlockMode = false;
 	
 	private JLabel scoreLabel = new JLabel("Score: " + score);
-	
-	private int colorTransparency = 100;
 	
 	public GamePanel() {
 		
@@ -70,8 +67,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		}
 		
-		ballX = (int) (blocksXPositions[0] + (30 - ball.getHeight()/2));
-		ballY = (int) (blocksYPositions[0] - ball.getHeight());
+		ballX = (int) (blocksXPositions[3] + (30 - ball.getHeight()/2));
+		ballY = (int) (blocksYPositions[3] - ball.getHeight());
 		
 		ball.setLocation(ballX, ballY);
 		
@@ -92,7 +89,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		for(int i = 0; i < blocks.length; i++) {
-			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, colorTransparency));
+			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.BLACK);
 			blocks[i].draw(g);
 		}
 		
@@ -204,8 +201,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		ballX += ballHorizontalDirection;
 		ballY += ballFallingSpeed;
 		
-		//colorTransparency++;
-		
 		repaint();
 	}
 	
@@ -304,11 +299,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		return randomBlockSizeMode;
 	}
 
-	public boolean isBlockVisibilityMode() {
-		return blockVisibilityMode;
-	}
-
-	
 	public boolean isFrictionlessMode() {
 		return frictionlessMode;
 	}
