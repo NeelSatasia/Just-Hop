@@ -21,6 +21,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int[] blocksXPositions = new int[blocks.length];
 	private int[] blocksYPositions = new int[blocks.length];
 	private int[] blocksWidth = new int[blocks.length];
+	private int[] blocksColorTransparency = new int[blocks.length];
 	
 	private int brickYPositioner = -25;
 	
@@ -44,9 +45,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	private boolean didScore = false;
 	private int score = 0;
 	
-	private boolean frictionlessMode = false;
+	private boolean frictionlessMode = true;
 	private boolean randomBlockSizeMode = true;
-	//private boolean hotBlockMode = false;
+	private boolean blocksVisibilityMode = true;
 	
 	private JLabel scoreLabel = new JLabel("Score: " + score);
 	
@@ -65,6 +66,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			} else {
 				blocksWidth[i] = 60;
 			}
+			
+			blocksColorTransparency[i] = 255;
 		}
 		
 		ballX = (int) (blocksXPositions[3] + (30 - ball.getHeight()/2));
@@ -73,7 +76,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setLocation(ballX, ballY);
 		
 		this.add(scoreLabel);
-		scoreLabel.setBounds(10, 10, 100, 30);
+		scoreLabel.setBounds(10, 10, 150, 30);
 		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
 		
 		timer.start();
@@ -89,7 +92,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		for(int i = 0; i < blocks.length; i++) {
-			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, Color.BLACK);
+			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
 			blocks[i].draw(g);
 		}
 		
@@ -116,6 +119,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] > 100 * blocks.length) {
+				blocksColorTransparency[i] = 255;
+				
 				changeSpeedTimer++;
 				if(changeSpeedTimer == 10) {
 					blockFallingSpeed = (int)(Math.random() * 2) + 1;
@@ -247,9 +252,18 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
-			if(ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]) && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
+			if(blocksColorTransparency[i] > 0 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]) && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
 				isBallFalling = false;
 				currentIndex = i;
+				if(blocksVisibilityMode) {
+					if(blockFallingSpeed == 1 && blocksColorTransparency[i] - 2 >= 0) {
+						blocksColorTransparency[i] -= 2;
+					} else if(blockFallingSpeed == 2 && blocksColorTransparency[i] - 7 >= 0) {
+						blocksColorTransparency[i] -= 7;
+					} else if (blocksColorTransparency[i] - 1 >= 0) {
+						blocksColorTransparency[i]--;
+					}
+				}
 				return true;
 			}
 		}
