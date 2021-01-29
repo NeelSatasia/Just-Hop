@@ -37,7 +37,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int ballJumpYDistance = 0;
 	private int ballJumpSpeed = 0;
 	
-	private int changeSpeedTimer = 0;
+	private int changeBlocksSpeedTimer = 0;
 	
 	private int currentIndex = 0;
 	private int previousCurrentIndex = 0;
@@ -45,9 +45,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	private boolean didScore = false;
 	private int score = 0;
 	
-	private boolean frictionlessMode = true;
-	private boolean randomBlockSizeMode = true;
-	private boolean blocksVisibilityMode = true;
+	private boolean frictionlessMode = false;
+	private boolean randomBlockSizeMode = false;
+	private boolean breakableBlocksMode = false;
 	
 	private JLabel scoreLabel = new JLabel("Score: " + score);
 	
@@ -61,6 +61,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < blocks.length; i++) {
 			blocksYPositions[i] += brickYPositioner;
 			brickYPositioner = blocksYPositions[i] + 100;
+			
 			if(randomBlockSizeMode) {
 			blocksWidth[i] = (int)(Math.random() * 31) + 30;
 			} else {
@@ -121,10 +122,10 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(blocksYPositions[i] > 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;
 				
-				changeSpeedTimer++;
-				if(changeSpeedTimer == 10) {
-					blockFallingSpeed = (int)(Math.random() * 2) + 1;
-					changeSpeedTimer = 0;
+				changeBlocksSpeedTimer++;
+				if(changeBlocksSpeedTimer == 10) {
+					blockFallingSpeed = (int)(Math.random() * 3) + 1;
+					changeBlocksSpeedTimer = 0;
 				}
 				
 				blocksYPositions[i] = -25;
@@ -255,7 +256,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(blocksColorTransparency[i] > 0 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]) && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
 				isBallFalling = false;
 				currentIndex = i;
-				if(blocksVisibilityMode) {
+				
+				if(breakableBlocksMode) {
 					if(blockFallingSpeed == 1 && blocksColorTransparency[i] - 2 >= 0) {
 						blocksColorTransparency[i] -= 2;
 					} else if(blockFallingSpeed == 2 && blocksColorTransparency[i] - 7 >= 0) {
@@ -288,7 +290,19 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void makeBallJump() {
 		if(isBallJumping == false && isBallFalling == false) {
 			isBallJumping = true;
-			ballJumpYDistance = 150;
+			
+			switch(blockFallingSpeed) {
+				case 1:
+					ballJumpYDistance = 150;
+					break;
+				case 2:
+					ballJumpYDistance = 140;
+					break;
+				case 3:
+					ballJumpYDistance = 120;
+					break;
+			}
+			
 			ballJumpSpeed = 5;
 			ballFallingSpeed = 0;
 			previousCurrentIndex = currentIndex;
