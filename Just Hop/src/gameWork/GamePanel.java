@@ -17,7 +17,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.BLACK);
 	
-	private Block[] blocks = new Block[10];
+	private Blocks[] blocks = new Blocks[10];
 	private int[] blocksXPositions = new int[blocks.length];
 	private int[] blocksYPositions = new int[blocks.length];
 	private int[] blocksWidth = new int[blocks.length];
@@ -45,9 +45,13 @@ public class GamePanel extends JPanel implements ActionListener {
 	private boolean didScore = false;
 	private int score = 0;
 	
+	private int ballHealth = 100;
+	
+	private int differentTypesOfBlocks = 2;
+	
 	private boolean frictionlessMode = false;
 	private boolean randomBlockSizeMode = false;
-	private boolean breakableBlocksMode = false;
+	private boolean breakableBlocksMode = true;
 	
 	private JLabel scoreLabel = new JLabel("Score: " + score);
 	
@@ -69,6 +73,16 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 			
 			blocksColorTransparency[i] = 255;
+			
+			int randBlock = (int)(Math.random() * differentTypesOfBlocks);
+			switch(randBlock) {
+				case 0:
+					blocks[i] = new RegularBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+					break;
+				case 1:
+					blocks[i] = new HalfRedBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+					break;
+			}
 		}
 		
 		ballX = (int) (blocksXPositions[3] + (30 - ball.getHeight()/2));
@@ -93,7 +107,23 @@ public class GamePanel extends JPanel implements ActionListener {
 		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 		
 		for(int i = 0; i < blocks.length; i++) {
-			blocks[i] = new Block(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+			if(blocks[i].getY() >= 100 * blocks.length) {
+				int randBlock = (int)(Math.random() * differentTypesOfBlocks);
+				switch(randBlock) {
+					case 0:
+						blocks[i] = new RegularBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+						break;
+					case 1:
+						blocks[i] = new HalfRedBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+						break;
+				}
+			} else {
+				if(blocks[i] instanceof RegularBlock) {
+					blocks[i] = new RegularBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+				} else if(blocks[i] instanceof HalfRedBlock) {
+					blocks[i] = new HalfRedBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+				}
+			}
 			blocks[i].draw(g);
 		}
 		
@@ -119,7 +149,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for(int i = 0; i < blocks.length; i++) {
-			if(blocksYPositions[i] > 100 * blocks.length) {
+			if(blocksYPositions[i] >= 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;
 				
 				changeBlocksSpeedTimer++;

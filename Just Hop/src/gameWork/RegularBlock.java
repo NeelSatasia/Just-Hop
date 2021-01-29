@@ -4,11 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-public class Block extends Rectangle {
+public class RegularBlock extends Blocks{
 	
 	Color brickColor;
 	
-	public Block(int x, int y, int w, int h, Color color) {
+	public RegularBlock(int x, int y, int w, int h, Color color) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
@@ -16,6 +16,7 @@ public class Block extends Rectangle {
 		this.brickColor = color;
 	}	
 	
+	@Override
 	public void draw(Graphics g) {
 		g.setColor(this.brickColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
