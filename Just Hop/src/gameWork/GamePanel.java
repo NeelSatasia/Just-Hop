@@ -62,6 +62,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int ballHealthLosingSpeed = 0;
 	private boolean isBallLosingHealth = false;
 	
+	private boolean isBallNextToObject = false;
+	
 	public GamePanel() {
 		
 		this.setLayout(null);
@@ -170,12 +172,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(ballFallingSpeed < 15) {
 				ballFallingSpeed++;
 			}
-		}
-		
-		if(isBallLosingHealth && ballHealthLosingSpeed == 200) {
-			ballHealthLosingSpeed = 0;
-			ballHealth -= 5;
-			ballHealthLabel.setText("Health: " + ballHealth);
 		}
 	}
 	
@@ -319,6 +315,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 		
+	
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksColorTransparency[i] > 0 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]) && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
@@ -345,21 +342,26 @@ public class GamePanel extends JPanel implements ActionListener {
 							ballHealthLabel.setText("Health: " + ballHealth);
 						}
 						isBallLosingHealth = true;
+						if(ballHealthLosingSpeed == 200) {
+							ballHealth -= 5;
+							ballHealthLabel.setText("Health: " + ballHealth);
+							ballHealthLosingSpeed = 0;
+						}
 					} else {
 						ball.changeColor(Color.BLACK);
 						isBallLosingHealth = false;
+						ballHealthLosingSpeed = 0;
 					}
 				}
 				return true;
 			}
 		}
-		
-		if(isBallLosingHealth) {
+			
+		if(isBallLosingHealth == true) {
 			isBallLosingHealth = false;
-			ballHealthLosingSpeed = 0;
 			ball.changeColor(Color.BLACK);
+			ballHealthLosingSpeed = 0;
 		}
-		
 		return false;
 	}
 	
@@ -369,7 +371,9 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHorizontalDirection = -4;
 				break;
 			case "right":
-				ballHorizontalDirection = 4;
+				if(isBallNextToObject == false) {
+					ballHorizontalDirection = 4;
+				}
 				break;
 			case "none":
 				ballHorizontalDirection = 0;
@@ -418,19 +422,32 @@ public class GamePanel extends JPanel implements ActionListener {
 		return frictionlessMode;
 	}
 	
-	public void generateRandomBlock(int location) {
+	public void generateRandomBlock(int index) {
 		int randBlock = (int)(Math.random() * differentTypesOfBlocks);
 		switch(randBlock) {
 			case 0:
-				blocks[location] = new RegularBlock(blocksXPositions[location], blocksYPositions[location], blocksWidth[location], 5, new Color(0, 0, 0, blocksColorTransparency[location]));
+				blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
 				break;
 			case 1:
-				blocks[location] = new HalfRedBlock(blocksXPositions[location], blocksYPositions[location], blocksWidth[location], 5, new Color(0, 0, 0, blocksColorTransparency[location]));
+				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
 				break;
 			case 2:
-				blocks[location] = new SpikyBlock(blocksXPositions[location], blocksYPositions[location], blocksWidth[location], 5, new Color(0, 0, 0, blocksColorTransparency[location]));
+				blocks[index] = new SpikyBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
 				break;
 		}
 	}
 
+	public void changeBlockColorTransparency(int index) {
+		if(breakableBlocksMode) {
+			if(blocks[index] instanceof RegularBlock || (blocks[index] instanceof HalfRedBlock && ball.getX() < blocksXPositions[index] + blocksWidth[index]/2)) {
+				if(blockFallingSpeed == 1 && blocksColorTransparency[index] - 2 >= 0) {
+					blocksColorTransparency[index] -= 2;
+				} else if(blockFallingSpeed == 2 && blocksColorTransparency[index] - 7 >= 0) {
+					blocksColorTransparency[index] -= 7;
+				} else if (blocksColorTransparency[index] - 1 >= 0) {
+					blocksColorTransparency[index]--;
+				}
+			}
+		}
+	}
 }
