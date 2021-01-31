@@ -23,8 +23,8 @@ public class SpikyBlock extends Blocks{
 		g.fillRect(this.x+this.width-5, this.y-25, 5, 25);
 		
 		
-		g.fillPolygon(new int[] {this.x + (this.width/2 + 4), this.x + this.width - 5, this.x + this.width - 5}, new int[] {this.y - 5, this.y, this.y - 10}, 3);
-		g.fillPolygon(new int[] {this.x + (this.width/2 + 4), this.x + this.width - 5, this.x + this.width - 5}, new int[] {this.y - 15, this.y - 10, this.y - 20}, 3);
+		g.fillPolygon(new int[] {this.x + (this.width/2 + 5), this.x + this.width - 5, this.x + this.width - 5}, new int[] {this.y - 5, this.y, this.y - 10}, 3);
+		g.fillPolygon(new int[] {this.x + (this.width/2 + 5), this.x + this.width - 5, this.x + this.width - 5}, new int[] {this.y - 15, this.y - 10, this.y - 20}, 3);
 	}
 }
 
