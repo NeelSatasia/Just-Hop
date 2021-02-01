@@ -62,8 +62,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	private int ballHealthLosingSpeed = 0;
 	private boolean isBallLosingHealth = false;
 	
-	private boolean isBallNextToObject = false;
-	
 	public GamePanel() {
 		
 		this.setLayout(null);
@@ -160,7 +158,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(collisionCheck()) {
 			ballFallingSpeed = blockFallingSpeed;
-			ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
 			if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
 				score++;
 				didScore = true;
@@ -318,50 +315,26 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
-			if(blocksColorTransparency[i] > 0 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]) && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
-				isBallFalling = false;
-				currentIndex = i;
+			if(blocksColorTransparency[i] > 0 && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
 				
-				if(breakableBlocksMode) {
-					if(blocks[i] instanceof RegularBlock || (blocks[i] instanceof HalfRedBlock && ball.getX() < blocksXPositions[i] + blocksWidth[i]/2)) {
-						if(blockFallingSpeed == 1 && blocksColorTransparency[i] - 2 >= 0) {
-							blocksColorTransparency[i] -= 2;
-						} else if(blockFallingSpeed == 2 && blocksColorTransparency[i] - 7 >= 0) {
-							blocksColorTransparency[i] -= 7;
-						} else if (blocksColorTransparency[i] - 1 >= 0) {
-							blocksColorTransparency[i]--;
-						}
-					}
-				}
-				
-				if(blocks[i] instanceof HalfRedBlock) {
-					if(ball.getX() + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2 + 5) {
-						ball.changeColor(Color.RED);
-						if(isBallLosingHealth == false) {
-							ballHealth -= 5;
-							ballHealthLabel.setText("Health: " + ballHealth);
-						}
-						isBallLosingHealth = true;
-						if(ballHealthLosingSpeed == 200) {
-							ballHealth -= 5;
-							ballHealthLabel.setText("Health: " + ballHealth);
-							ballHealthLosingSpeed = 0;
-						}
+				if((blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i])) {
+					if((blocks[i] instanceof HalfRedBlock) && ball.getX() + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2 + 5) {
+						ballLoseHealth(true);
 					} else {
-						ball.changeColor(Color.BLACK);
-						isBallLosingHealth = false;
-						ballHealthLosingSpeed = 0;
+						ballLoseHealth(false);
 					}
+					isBallFalling = false;
+					currentIndex = i;
+					ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+					return true;
 				}
-				return true;
 			}
 		}
 			
 		if(isBallLosingHealth == true) {
-			isBallLosingHealth = false;
-			ball.changeColor(Color.BLACK);
-			ballHealthLosingSpeed = 0;
+			ballLoseHealth(false);
 		}
+		
 		return false;
 	}
 	
@@ -371,9 +344,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHorizontalDirection = -4;
 				break;
 			case "right":
-				if(isBallNextToObject == false) {
-					ballHorizontalDirection = 4;
-				}
+				ballHorizontalDirection = 4;
 				break;
 			case "none":
 				ballHorizontalDirection = 0;
@@ -439,15 +410,32 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void changeBlockColorTransparency(int index) {
 		if(breakableBlocksMode) {
-			if(blocks[index] instanceof RegularBlock || (blocks[index] instanceof HalfRedBlock && ball.getX() < blocksXPositions[index] + blocksWidth[index]/2)) {
-				if(blockFallingSpeed == 1 && blocksColorTransparency[index] - 2 >= 0) {
-					blocksColorTransparency[index] -= 2;
-				} else if(blockFallingSpeed == 2 && blocksColorTransparency[index] - 7 >= 0) {
-					blocksColorTransparency[index] -= 7;
-				} else if (blocksColorTransparency[index] - 1 >= 0) {
-					blocksColorTransparency[index]--;
-				}
+			if(blockFallingSpeed == 1 && blocksColorTransparency[index] - 2 >= 0) {
+				blocksColorTransparency[index] -= 2;
+			} else if(blockFallingSpeed == 2 && blocksColorTransparency[index] - 7 >= 0) {
+				blocksColorTransparency[index] -= 7;
+			} else if (blocksColorTransparency[index] - 1 >= 0) {
+				blocksColorTransparency[index]--;
 			}
+		}
+	}
+	
+	public void ballLoseHealth(boolean shouldLose) {
+		if(shouldLose == true) {
+			ball.changeColor(Color.RED);
+			if(isBallLosingHealth == false) {
+				ballHealth -= 5;
+				ballHealthLabel.setText("Health: " + ballHealth);
+				isBallLosingHealth = true;
+			} else if(ballHealthLosingSpeed == 200) {
+				ballHealth -= 5;
+				ballHealthLabel.setText("Health: " + ballHealth);
+				ballHealthLosingSpeed = 0;
+			}
+		} else {
+			ball.changeColor(Color.BLACK);
+			isBallLosingHealth = false;
+			ballHealthLosingSpeed = 0;
 		}
 	}
 }
