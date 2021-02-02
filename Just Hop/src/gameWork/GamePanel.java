@@ -103,7 +103,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if(ballY > 600) {
+		if(ballY > 600 || ballHealth == 0) {
 			timer.stop();
 		}
 		
@@ -141,8 +141,8 @@ public class GamePanel extends JPanel implements ActionListener {
 					blocks[i] = new RegularBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
 				} else if(blocks[i] instanceof HalfRedBlock) {
 					blocks[i] = new HalfRedBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
-				} else if(blocks[i] instanceof SpikyBlock) {
-					blocks[i] = new SpikyBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
+				} else if(blocks[i] instanceof ShooterBlock) {
+					blocks[i] = new ShooterBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
 				}
 				
 				if(trickBlockIndex > -1 && trickBlockIndex == i) {
@@ -317,7 +317,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksColorTransparency[i] > 0 && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
 				
-				if((blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i])) {
+				if((blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock || blocks[i] instanceof ShooterBlock) && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i])) {
 					if((blocks[i] instanceof HalfRedBlock) && ball.getX() + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2 + 5) {
 						ballLoseHealth(true);
 					} else {
@@ -403,7 +403,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
 				break;
 			case 2:
-				blocks[index] = new SpikyBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
+				blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
 				break;
 		}
 	}
