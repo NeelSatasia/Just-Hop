@@ -6,7 +6,9 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Bullet extends Rectangle implements ActionListener {
+import javax.swing.Timer;
+
+public class Bullet extends Rectangle {
 	
 	private int bulletX = 0;
 	private int bulletY = 0;
@@ -19,11 +21,5 @@ public class Bullet extends Rectangle implements ActionListener {
 	public void draw(Graphics g) {
 		g.setColor(Color.BLUE);
 		g.fillArc(bulletX, bulletY, 10, 10, 0, 360);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		bulletX += 5;
-		bulletY += 5;
 	}
 }

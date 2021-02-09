@@ -137,18 +137,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				generateRandomBlock(i);
 				
 			} else {
-				if(blocks[i] instanceof RegularBlock) {
-					blocks[i] = new RegularBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
-				} else if(blocks[i] instanceof HalfRedBlock) {
-					blocks[i] = new HalfRedBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
-				} else if(blocks[i] instanceof ShooterBlock) {
-					blocks[i] = new ShooterBlock(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
-				}
-				
-				if(trickBlockIndex > -1 && trickBlockIndex == i) {
-					trickBlock = new RegularBlock((int)trickBlock.getX(), blocksYPositions[i], blocksWidth[i], 5, new Color(0, 0, 0, blocksColorTransparency[i]));
-					trickBlock.draw(g);
-				}
+				blocks[i].setBounds(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5);
 			}
 			
 			blocks[i].draw(g);
@@ -311,7 +300,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			blocksXPositions[i] = brickXPosition;
 		}
 	}
-		
+	
 	
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {

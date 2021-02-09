@@ -13,6 +13,8 @@ public class ShooterBlock extends Blocks implements ActionListener {
 	
 	Color brickColor;
 	
+	private int bulletY = 200;
+	
 	public ShooterBlock(int x, int y, int w, int h, Color color) {
 		this.x = x;
 		this.y = y;
@@ -30,11 +32,16 @@ public class ShooterBlock extends Blocks implements ActionListener {
 		
 		g.setColor(Color.BLUE);
 		g.fillRect(this.x+(this.width/2)-8, this.y+this.height, 15, 15);
+		
+		Bullet bullet = new Bullet(200, 200);
+		bullet.draw(g);
+		
+		bullet.setLocation(200, bulletY);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
+		bulletY += 5;
 	}
 }
 
