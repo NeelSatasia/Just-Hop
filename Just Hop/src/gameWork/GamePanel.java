@@ -12,55 +12,54 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	Timer timer = new Timer(5, this);
 	
-	private int ballX = 300;
-	private int ballY = 200;
+	int ballX = 300;
+	int ballY = 200;
 	
-	private Ball ball = new Ball(ballX, ballY, 20, 20, Color.BLACK);
+	Ball ball = new Ball(ballX, ballY, 20, 20, Color.BLACK);
 	
-	private Blocks[] blocks = new Blocks[10];
-	private int[] blocksXPositions = new int[blocks.length];
-	private int[] blocksYPositions = new int[blocks.length];
-	private int[] blocksWidth = new int[blocks.length];
-	private int[] blocksColorTransparency = new int[blocks.length];
+	Blocks[] blocks = new Blocks[10];
+	int[] blocksXPositions = new int[blocks.length];
+	int[] blocksYPositions = new int[blocks.length];
+	int[] blocksWidth = new int[blocks.length];
+	int[] blocksColorTransparency = new int[blocks.length];
 	
-	private int blockYPositioner = -25;
+	int blockYPositioner = -25;
 	
-	private int blockFallingSpeed = 1;
-	private int ballFallingSpeed = 4;
+	int blockFallingSpeed = 1;
+	int ballFallingSpeed = 4;
 	
-	private int ballHorizontalDirection = 0;
+	int ballHorizontalDirection = 0;
 	
-	private boolean isBallJumping = false;
-	private boolean isBallFalling = false;
-	private boolean isBallInTheAir = false;
+	boolean isBallJumping = false;
+	boolean isBallFalling = false;
+	boolean isBallInTheAir = false;
 	
-	private int ballJumpYDistance = 0;
-	private int ballJumpSpeed = 0;
+	int ballJumpYDistance = 0;
+	int ballJumpSpeed = 0;
 	
-	private int changeBlocksSpeedTimer = 0;
+	int changeBlocksSpeedTimer = 0;
 	
-	private int currentIndex = 0;
+	int currentIndex = 0;
 	private int previousCurrentIndex = 0;
 	
-	private boolean didScore = false;
-	private int score = 0;
-	private JLabel scoreLabel = new JLabel("Score: " + score);
+	boolean didScore = false;
+	int score = 0;
+	JLabel scoreLabel = new JLabel("Score: " + score);
 	
-	private int ballHealth = 100;
-	private JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
+	int ballHealth = 100;
+	JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
 	
-	private int differentTypesOfBlocks = 3;
+	int differentTypesOfBlocks = 3;
 	
-	private boolean frictionlessMode = false;
-	private boolean randomBlockSizeMode = false;
-	private boolean breakableBlocksMode = false;
-	private boolean trickedMode = false;
+	boolean trickedMode = false;
 	
-	private Blocks trickBlock;
-	private int trickBlockIndex = -1;
+	Blocks trickBlock;
+	int trickBlockIndex = -1;
 	
-	private int ballHealthLosingSpeed = 0;
-	private boolean isBallLosingHealth = false;
+	int ballHealthLosingSpeed = 0;
+	boolean isBallLosingHealth = false;
+	
+	JCheckBox[] modes = new JCheckBox[3];
 	
 	public GamePanel() {
 		
@@ -69,22 +68,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		changeBrickXPositions();
 		
-		for(int i = 0; i < blocks.length; i++) {
-			blocksYPositions[i] += blockYPositioner;
-			blockYPositioner = blocksYPositions[i] + 100;
-			
-			if(randomBlockSizeMode) {
-				blocksWidth[i] = (int)(Math.random() * 16) + 45;
-			} else {
-				blocksWidth[i] = 60;
-			}
-			
-			blocksColorTransparency[i] = 255;
-			
-			generateRandomBlock(i);
-		}
-		
-		ballX = (int) (blocksXPositions[3] + (30 - ball.getHeight()/2) - 5);
+		ballX = (int) (blocksXPositions[3]);
 		ballY = (int) (blocksYPositions[3] - ball.getHeight());
 		
 		ball.setLocation(ballX, ballY);
@@ -97,6 +81,43 @@ public class GamePanel extends JPanel implements ActionListener {
 		ballHealthLabel.setBounds(10, 40, 150, 30);
 		ballHealthLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
 		
+		modes[0] = new JCheckBox("Blocks With Random Sizes");
+		modes[1] = new JCheckBox("Slippery Blocks");
+		modes[2] = new JCheckBox("Transparent Blocks");
+		
+		for(int i = 0; i < modes.length; i++) {
+			modes[i].setFocusable(false);
+			modes[i].setFont(new Font("Consolas", Font.PLAIN, 10));
+			
+			int j = i;
+			modes[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(e.getSource() == modes[j]) {
+						if(modes[j].isSelected()) {
+							modes[j].setSelected(true);
+						} else {
+							modes[j].setSelected(false);
+						}
+					}
+				}
+			});
+		}
+		
+		for(int i = 0; i < blocks.length; i++) {
+			blocksYPositions[i] += blockYPositioner;
+			blockYPositioner = blocksYPositions[i] + 100;
+			
+			if(modes[0].isSelected()) {
+				blocksWidth[i] = (int)(Math.random() * 31) + 30;
+			} else {
+				blocksWidth[i] = 60;
+			}
+			
+			blocksColorTransparency[i] = 255;
+			
+			generateRandomBlock(i);
+		}
+		
 		timer.start();
 	}
 	
@@ -105,64 +126,147 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(ballY > 600 || ballHealth == 0) {
 			timer.stop();
-		}
-		
-		ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
-		
-		for(int i = 0; i < blocks.length; i++) {
-			if(trickBlockIndex == -1 && blocksXPositions[i] == 350) {
-				int trickBlockRandNum = (int)(Math.random() * 6);
-				int nextIndex = -1;
-				if(i - 1 >= 0) {
-					nextIndex = i - 1;
-				} else {
-					nextIndex = blocks.length - 1;
-				}
-				trickBlockIndex = nextIndex;
-				int trickBlockXPosition = -1;
-				
-				if(blocksXPositions[nextIndex] == 200) {
-					trickBlockXPosition = 500;
-				} else {
-					trickBlockXPosition = 200;
-				}
-				
-				if(trickBlockRandNum >= 0 && trickBlockRandNum < 6) {
-					trickBlock = new RegularBlock(trickBlockXPosition, blocksYPositions[trickBlockIndex], blocksWidth[trickBlockIndex], 5, new Color(0, 0, 0, blocksColorTransparency[trickBlockIndex]));
-					trickBlock.draw(g);
-				}
+			
+			JButton gameOverButton = new JButton("Try Again");
+			this.add(gameOverButton);
+			gameOverButton.setBounds(370, 285, 60, 30);
+			gameOverButton.setEnabled(true);
+			gameOverButton.setBorder(null);
+			gameOverButton.setBackground(Color.BLACK);
+			gameOverButton.setForeground(Color.WHITE);
+			gameOverButton.setFocusable(false);
+			
+			int modesListY = 320;
+			
+			for(int i = 0; i < modes.length; i++) {
+				this.add(modes[i]);
+				modes[i].setBounds(310, modesListY, 190, 20);
+				modesListY += 25;
 			}
 			
-			if(blocks[i].getY() >= 100 * blocks.length) {
-				generateRandomBlock(i);
+			gameOverButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gameOverButton.hide();
+					remove(gameOverButton);
+					
+					for(int i = 0; i < modes.length; i++) {
+						remove(modes[i]);
+					}
+					
+					score = 0;
+					ballHealth = 100;
+					
+					changeBrickXPositions();
+					
+					blockYPositioner = -25;
+					
+					for(int i = 0; i < blocks.length; i++) {
+						blocksYPositions[i] = 0;
+						blocksYPositions[i] += blockYPositioner;
+						blockYPositioner = blocksYPositions[i] + 100;
+						
+						if(modes[0].isSelected()) {
+							blocksWidth[i] = (int)(Math.random() * 31) + 30;
+						} else {
+							blocksWidth[i] = 60;
+						}
+						
+						blocksColorTransparency[i] = 255;
+						
+						generateRandomBlock(i);
+						blocks[i].draw(g);
+					}
+					
+					ballX = (int) (blocksXPositions[3]);
+					ballY = (int) (blocksYPositions[3] - ball.getHeight());
+					
+					ball.setLocation(ballX, ballY);
+					
+					timer.restart();
+				}
+			});
+		} else {
+			
+			ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
+			
+			for(int i = 0; i < blocks.length; i++) {
+				if(trickBlockIndex == -1 && blocksXPositions[i] == 350) {
+					int trickBlockRandNum = (int)(Math.random() * 6);
+					int nextIndex = -1;
+					if(i - 1 >= 0) {
+						nextIndex = i - 1;
+					} else {
+						nextIndex = blocks.length - 1;
+					}
+					trickBlockIndex = nextIndex;
+					int trickBlockXPosition = -1;
+					
+					if(blocksXPositions[nextIndex] == 200) {
+						trickBlockXPosition = 500;
+					} else {
+						trickBlockXPosition = 200;
+					}
+					
+					if(trickBlockRandNum >= 0 && trickBlockRandNum < 6) {
+						trickBlock = new RegularBlock(trickBlockXPosition, blocksYPositions[trickBlockIndex], blocksWidth[trickBlockIndex], 5);
+						trickBlock.draw(g);
+					}
+				}
 				
-			} else {
-				blocks[i].setBounds(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5);
+				if(blocks[i].getY() >= 100 * blocks.length) {
+					generateRandomBlock(i);
+					
+				} else {
+					blocks[i].setBounds(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5);
+					
+					if(blocks[i] instanceof HalfRedBlock) {
+						blocks[i].changeColorTransparency(new Color(0, 0, 0, blocksColorTransparency[i]), new Color(255, 0, 0, blocksColorTransparency[i]));
+					} else {
+						blocks[i].changeColorTransparency(new Color(0, 0, 0, blocksColorTransparency[i]));
+					}
+					
+					if(blocks[i] instanceof UpsideDownTBlock) {
+						blocks[i].changeBlockTPositionX();
+					}
+				}
+				
+				blocks[i].draw(g);
 			}
 			
-			blocks[i].draw(g);
-		}
-		
-		ball.draw(g);
-		
-		if(collisionCheck()) {
-			ballFallingSpeed = blockFallingSpeed;
-			if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
-				score++;
-				didScore = true;
-				scoreLabel.setText("Score: " + score);
-			}
-		} else if(isBallJumping == false) {
-			isBallFalling = true;
-			currentIndex = -1;
-			if(ballFallingSpeed < 15) {
-				ballFallingSpeed++;
+			ball.draw(g);
+			
+			if(collisionCheck()) {
+				ballFallingSpeed = blockFallingSpeed;
+				if(blocks[currentIndex] instanceof UpsideDownTBlock) {
+					int TBarXPosition = blocks[currentIndex].blockTPositionX();
+					
+					if(ballX + ball.getWidth() == TBarXPosition) {
+						ballX--;
+						ball.setLocation(ballX, ballY);
+					} else if(ballX == TBarXPosition + 5) {
+						ballX++;
+						ball.setLocation(ballX, ballY);
+					}
+					
+				}
+				if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
+					score++;
+					didScore = true;
+					scoreLabel.setText("Score: " + score);
+				}
+			} else if(isBallJumping == false) {
+				isBallFalling = true;
+				currentIndex = -1;
+				if(ballFallingSpeed < 15) {
+					ballFallingSpeed++;
+				}
 			}
 		}
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] >= 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;
@@ -209,7 +313,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					blockXPosition = 350;
 				}
 				
-				if(randomBlockSizeMode) {
+				if(modes[0].isSelected()) {
 					int brickWidthSize = (int)(Math.random() * 16) + 45;
 					blocksWidth[i] = brickWidthSize;
 					blocks[i].setSize(brickWidthSize, 5);
@@ -237,7 +341,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		if(isBallInTheAir == true && isBallJumping == false && isBallFalling == false) {
-			if(frictionlessMode) {
+			if(modes[1].isSelected()) {
 				if(ballHorizontalDirection == -4) {
 					ballHorizontalDirection = -1;
 				} else if(ballHorizontalDirection == 4) {
@@ -252,6 +356,31 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(isBallLosingHealth) {
 			ballHealthLosingSpeed += 5;
+		}
+		
+		if(currentIndex > -1 || previousCurrentIndex > -1) {
+			int index = -1;
+			if(currentIndex > -1) {
+				index = currentIndex;
+			} else {
+				index = previousCurrentIndex;
+			}
+			if(blocks[index] instanceof UpsideDownTBlock) {
+				int num = blocks[index].blockTPositionX();
+				if(ballHorizontalDirection == -4) {
+					if(ballX >= num + 5) {
+						if(ballX + ballHorizontalDirection <= num + 5) {
+							ballHorizontalDirection = 0;
+						}
+					}
+				} else if(ballHorizontalDirection == 4) {
+					if(ballX + ball.getWidth() <= num) {
+						if(ballX + ball.getWidth() + ballHorizontalDirection >= num) {
+							ballHorizontalDirection = 0;
+						}
+					}
+				}
+			}
 		}
 		
 		ballX += ballHorizontalDirection;
@@ -304,24 +433,47 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
-			if(blocksColorTransparency[i] > 0 && (ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i])) {
-				
-				if((blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock || blocks[i] instanceof ShooterBlock) && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i])) {
-					if((blocks[i] instanceof HalfRedBlock) && ball.getX() + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2 + 5) {
-						ballLoseHealth(true);
-					} else {
-						ballLoseHealth(false);
+			if(blocksColorTransparency[i] > 0) {
+				if(blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) {
+					
+					if((ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i]) && (ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]))) {
+						
+						changeBlockColorTransparency(i);
+						
+						if((blocks[i] instanceof HalfRedBlock) && ball.getX() + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2 + 5) {
+							ballLoseHealth(true);
+						} else {
+							ballLoseHealth(false);
+						}
+						
+						isBallFalling = false;
+						currentIndex = i;
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+						return true;
 					}
-					isBallFalling = false;
-					currentIndex = i;
-					ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
-					return true;
+				} else if(blocks[i] instanceof UpsideDownTBlock) {
+					int num = blocks[i].blockTPositionX();
+					if(ballX + ball.getWidth() >= num && ballX < num + 5 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight() - 25) && ballY <= (int)(blocksYPositions[i] - 25)) {
+						isBallFalling = false;
+						currentIndex = i;
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 25);
+						return true;
+					} else if((ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i]) && (ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]))) {
+						isBallFalling = false;
+						currentIndex = i;
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+						return true;
+					}
 				}
 			}
 		}
 			
 		if(isBallLosingHealth == true) {
 			ballLoseHealth(false);
+		}
+		
+		if(currentIndex > -1) {
+			previousCurrentIndex = currentIndex;
 		}
 		
 		return false;
@@ -373,32 +525,24 @@ public class GamePanel extends JPanel implements ActionListener {
 	public boolean isBallFalling() {
 		return isBallFalling;
 	}
-
-	public boolean isRandomBlockSizeMode() {
-		return randomBlockSizeMode;
-	}
-
-	public boolean isFrictionlessMode() {
-		return frictionlessMode;
-	}
 	
 	public void generateRandomBlock(int index) {
 		int randBlock = (int)(Math.random() * differentTypesOfBlocks);
 		switch(randBlock) {
 			case 0:
-				blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
+				blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
 				break;
 			case 1:
-				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
+				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
 				break;
 			case 2:
-				blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5, new Color(0, 0, 0, blocksColorTransparency[index]));
-				break;
+				blocks[index] = new UpsideDownTBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
+				break;	
 		}
 	}
 
 	public void changeBlockColorTransparency(int index) {
-		if(breakableBlocksMode) {
+		if(modes[2].isSelected()) {
 			if(blockFallingSpeed == 1 && blocksColorTransparency[index] - 2 >= 0) {
 				blocksColorTransparency[index] -= 2;
 			} else if(blockFallingSpeed == 2 && blocksColorTransparency[index] - 7 >= 0) {
@@ -427,4 +571,9 @@ public class GamePanel extends JPanel implements ActionListener {
 			ballHealthLosingSpeed = 0;
 		}
 	}
+	
+	public boolean isFrictionlessMode() {
+		return modes[1].isSelected();
+	}
+	
 }

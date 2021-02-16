@@ -3,21 +3,25 @@ package gameWork;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class RegularBlock extends Blocks{
+public class RegularBlock extends Blocks {
 	
-	Color brickColor;
+	Color blockColor;
 	
-	public RegularBlock(int x, int y, int w, int h, Color color) {
+	public RegularBlock(int x, int y, int w, int h) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
 		this.height = h;
-		this.brickColor = color;
+		this.blockColor = Color.BLACK;
 	}	
 	
 	@Override
 	public void draw(Graphics g) {
-		g.setColor(this.brickColor);
+		g.setColor(this.blockColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
+	}
+	
+	public void changeColorTransparency(Color brickColor2) {
+		blockColor = brickColor2;
 	}
 }
