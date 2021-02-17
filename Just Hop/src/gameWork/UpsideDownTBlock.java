@@ -13,7 +13,7 @@ public class UpsideDownTBlock extends Blocks {
 	
 	double TBarXPosition = 0;
 	
-	boolean isBarTRight = false;
+	boolean isTBarRight = false;
 	
 	public UpsideDownTBlock(int x, int y, int w, int h) {
 		this.x = x;
@@ -41,12 +41,12 @@ public class UpsideDownTBlock extends Blocks {
 	@Override
 	public void changeBlockTPositionX() {
 		if(TBarXPosition == this.x) {
-			isBarTRight = true;
+			isTBarRight = true;
 		} else if(TBarXPosition == this.x + this.width - 5) {
-			isBarTRight = false;
+			isTBarRight = false;
 		}
 		
-		if(isBarTRight == true) {
+		if(isTBarRight == true) {
 			TBarXPosition += 0.5;
 		} else {
 			TBarXPosition -= 0.5;
@@ -56,6 +56,11 @@ public class UpsideDownTBlock extends Blocks {
 	@Override
 	public int blockTPositionX() {
 		return (int) TBarXPosition;
+	}
+	
+	@Override
+	public boolean isTBarRight() {
+		return isTBarRight;
 	}
 }
 

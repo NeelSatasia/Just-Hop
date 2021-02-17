@@ -16,10 +16,20 @@ public class Blocks extends Rectangle{
 	public void changeColorTransparency(Color color, Color color2) {
 	}
 	
+	public boolean isRedOnRightSide() {
+		return false;
+	}
+	
 	public void changeBlockTPositionX() {
 	}
 
 	public int blockTPositionX() {
 		return 0;
 	}
+
+	public boolean isTBarRight() {
+		return false;
+	}
+
+	
 }
