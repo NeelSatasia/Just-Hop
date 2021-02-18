@@ -30,7 +30,7 @@ public class UpsideDownTBlock extends Blocks {
 		g.setColor(this.blockColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
 		
-		g.fillRect((int) TBarXPosition, this.y - 25, 5, 25);
+		g.fillRect((int) TBarXPosition, this.y - 40, 5, 40);
 	}
 	
 	@Override

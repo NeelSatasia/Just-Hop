@@ -60,6 +60,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballHealthLosingSpeed = 0;
 	boolean isBallLosingHealth = false;
 	
+	boolean isBallCollidingTBar = false;
+	
 	JCheckBox[] modes = new JCheckBox[3];
 	
 	public GamePanel() {
@@ -240,14 +242,16 @@ public class GamePanel extends JPanel implements ActionListener {
 			ball.draw(g);
 			
 			if(collisionCheck()) {
-				ballFallingSpeed = blockFallingSpeed;
+				if(isBallJumping == false && isBallFalling == false) {
+					ballFallingSpeed = blockFallingSpeed;
+				}
 				if(blocks[currentIndex] instanceof UpsideDownTBlock) {
 					int TBarXPosition = blocks[currentIndex].blockTPositionX();
 					if(ballY + ball.getHeight() > blocksYPositions[currentIndex] - 25) {
 						if(ballX + ball.getWidth() == TBarXPosition) {
 							ballX--;
 							ball.setLocation(ballX, ballY);
-						} else if(ballX == TBarXPosition + 5) {
+						} else if(ballX >= TBarXPosition && ballX == TBarXPosition + 5) {
 							ballX++;
 							ball.setLocation(ballX, ballY);
 						}
@@ -469,13 +473,29 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				} else if(blocks[i] instanceof UpsideDownTBlock) {
 					int num = blocks[i].blockTPositionX();
-					if(ballX + ball.getWidth() > num && ballX < num + 5 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight() - 25) && ballY <= (int)(blocksYPositions[i] - 25)) {
+					
+					
+					
+					if(ballHorizontalDirection == 4 && ballX + ball.getWidth() <= num && ballX + ball.getWidth() + ballHorizontalDirection >= num && ballY + ball.getHeight() > blocksYPositions[i] - 40 && ballY + ball.getHeight() <= blocksYPositions[i]) {
+						ballHorizontalDirection = -1;
+						ballX = num - (int) ball.getWidth();
+						ball.setLocation(ballX, ballY);
+					} else if(ballHorizontalDirection == -4 && ballX >= num + 5 && ballX + ballHorizontalDirection <= num + 5 && ballY + ball.getHeight() > blocksYPositions[i] - 40 && ballY + ball.getHeight() <= blocksYPositions[i]) {
+						ballHorizontalDirection = 1;
+						ballX = num + 5;
+						ball.setLocation(ballX, ballY);
+						isBallFalling = false;
+						currentIndex = i;
+						return true;
+					}
+					
+					if(ballX + ball.getWidth() > num && ballX < num + 5 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight() - 40) && ballY <= (int)(blocksYPositions[i] - 40)) {
 						changeBlockColorTransparency(i);
 						isBallFalling = false;
 						currentIndex = i;
-						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 25);
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 40);
 						return true;
-					} else if((ball.getX() + ball.getWidth() > blocksXPositions[i] && ball.getX() < blocksXPositions[i] + blocksWidth[i]) && (ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]))) {
+					} else if((ballX + ball.getWidth() > blocksXPositions[i] && ballX < blocksXPositions[i] + blocksWidth[i]) && (ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight()) && ballY <= (int)(blocksYPositions[i]))) {
 						changeBlockColorTransparency(i);
 						isBallFalling = false;
 						currentIndex = i;
@@ -518,7 +538,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			
 			switch(blockFallingSpeed) {
 				case 1:
-					ballJumpYDistance = 150;
+					ballJumpYDistance = 135;
 					break;
 				case 2:
 					ballJumpYDistance = 140;
