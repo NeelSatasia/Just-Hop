@@ -9,7 +9,7 @@ public class UpsideDownTBlock extends Blocks {
 	
 	double TBarXPosition = 0;
 	
-	boolean isTBarRight = false;
+	boolean isTBarRight = true;
 	
 	int TBarHeight = 25;
 	

@@ -15,7 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballX = 300;
 	int ballY = 200;
 	
-	Ball ball = new Ball(ballX, ballY, 15, 15, Color.BLACK);
+	Ball ball = new Ball(ballX, ballY, 15, 15, new Color(0, 179, 89));
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -26,7 +26,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int blockYPositioner = -25;
 	
 	int blockFallingSpeed = 1;
-	int ballFallingSpeed = 4;
+	int ballFallingSpeed = blockFallingSpeed;
 	
 	int ballHorizontalDirection = 0;
 	
@@ -58,6 +58,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	int ballHealthLosingSpeed = 0;
 	boolean isBallLosingHealth = false;
+	
+	boolean stopBallSlowly = false;
+	double slowingDownSpeed = 0.0;
 	
 	JCheckBox[] modes = new JCheckBox[3];
 	
@@ -159,6 +162,19 @@ public class GamePanel extends JPanel implements ActionListener {
 					ballHealth = 100;
 					ballHealthLabel.setText("Health: " + ballHealth);
 					
+					ballHorizontalDirection = 0;
+					ballFallingSpeed = blockFallingSpeed;
+					slowingDownSpeed = 0.0;
+					ballJumpYDistance = 0;
+					ballJumpSpeed = 0;
+					ballHealthLosingSpeed = 0;
+					
+					isBallLosingHealth = false;
+					isBallJumping = false;
+					isBallFalling = false;
+					isBallInTheAir = false;
+					stopBallSlowly = false;
+					
 					changeBrickXPositions();
 					
 					blockYPositioner = -25;
@@ -248,7 +264,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballX + ball.getWidth() == TBarXPosition) {
 							ballX--;
 							ball.setLocation(ballX, ballY);
-						} else if(ballX >= TBarXPosition && ballX == TBarXPosition + 5) {
+						} else if(ballX == TBarXPosition + 5) {
 							ballX++;
 							ball.setLocation(ballX, ballY);
 						}
@@ -347,16 +363,44 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(isBallInTheAir == true && isBallJumping == false && isBallFalling == false) {
 			if(modes[1].isSelected()) {
-				if(ballHorizontalDirection == -4) {
-					ballHorizontalDirection = -1;
-				} else if(ballHorizontalDirection == 4) {
-					ballHorizontalDirection = 1;
-				}
+				stopBallSlowly = true;
 			} else {
 				ballHorizontalDirection = 0;
 			}
 			
 			isBallInTheAir = false;
+		}
+		
+		if(stopBallSlowly) {
+			if(isBallJumping == false && isBallFalling == false) {
+				slowingDownSpeed += 0.5;
+				if(ballHorizontalDirection > 0 && ballHorizontalDirection <= 4) {
+					ballHorizontalDirection -= (int) slowingDownSpeed;
+				} else if(ballHorizontalDirection < 0 && ballHorizontalDirection >= -4) {
+					ballHorizontalDirection += (int) slowingDownSpeed;
+				}
+				if(slowingDownSpeed == 1.0) {
+					slowingDownSpeed = 0.0;
+				}
+				if(ballHorizontalDirection == 0) {
+					stopBallSlowly = false;
+					slowingDownSpeed = 0.0;
+				}
+			} else {
+				slowingDownSpeed += 0.2;
+				if(ballHorizontalDirection > 0) {
+					ballHorizontalDirection -= (int) slowingDownSpeed;
+				} else if(ballHorizontalDirection < 0) {
+					ballHorizontalDirection += (int) slowingDownSpeed;
+				}
+				if(slowingDownSpeed == 1.0) {
+					slowingDownSpeed = 0.0;
+				}
+				if(ballHorizontalDirection == 3 || ballHorizontalDirection == -3) {
+					stopBallSlowly = false;
+					slowingDownSpeed = 0.0;
+				}
+			}
 		}
 		
 		if(isBallLosingHealth) {
@@ -467,12 +511,14 @@ public class GamePanel extends JPanel implements ActionListener {
 				} else if(blocks[i] instanceof UpsideDownTBlock) {
 					int num = blocks[i].blockTPositionX();
 					
-					if(ballHorizontalDirection == 4 && ballX + ball.getWidth() <= num && ballX + ball.getWidth() + ballHorizontalDirection >= num && ballY + ball.getHeight() > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						ballHorizontalDirection = -1;
-						ballX = num - (int) ball.getWidth();
-					} else if(ballHorizontalDirection == -4 && ballX >= num + 5 && ballX + ballHorizontalDirection <= num + 5 && ballY + ball.getHeight() > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						ballHorizontalDirection = 1;
-						ballX = num + 5;
+					if(isBallJumping || isBallFalling) {
+						if(ballHorizontalDirection == 4 && ballX + ball.getWidth() <= num && ballX + ball.getWidth() + ballHorizontalDirection >= num && ballY + ball.getHeight() > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() < blocksYPositions[i]) {
+							ballHorizontalDirection = -1;
+							ballX = num - (int) ball.getWidth();
+						} else if(ballHorizontalDirection == -4 && ballX >= num + 5 && ballX + ballHorizontalDirection <= num + 5 && ballY + ball.getHeight() > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() < blocksYPositions[i]) {
+							ballHorizontalDirection = 1;
+							ballX = num + 5;
+						}
 					}
 					
 					if(ballX + ball.getWidth() > num && ballX < num + 5 && ballY + ballFallingSpeed > (int)(blocksYPositions[i] - ball.getHeight() - blocks[i].TBarHeight()) && ballY <= (int)(blocksYPositions[i] - blocks[i].TBarHeight())) {
@@ -535,6 +581,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			previousCurrentIndex = currentIndex;
 			didScore = false;
 			currentIndex = -1;
+			
+			stopBallSlowly = true;
 		}
 	}
 
@@ -590,7 +638,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHealthLosingSpeed = 0;
 			}
 		} else {
-			ball.changeColor(Color.BLACK);
+			ball.changeColor(new Color(0, 179, 89));
 			isBallLosingHealth = false;
 			ballHealthLosingSpeed = 0;
 		}
@@ -600,4 +648,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		return modes[1].isSelected();
 	}
 	
+	public void stopBallSlowly(boolean x) {
+		stopBallSlowly = x;
+	}
+
+	public int getBallHorizontalDirection() {
+		return ballHorizontalDirection;
+	}
 }

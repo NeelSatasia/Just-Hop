@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 
 public class Blocks extends Rectangle{
 	
+	//different blocks' different features
 	
 	public void draw(Graphics g) {
 	}
