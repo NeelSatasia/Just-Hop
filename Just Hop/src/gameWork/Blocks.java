@@ -31,5 +31,7 @@ public class Blocks extends Rectangle{
 		return false;
 	}
 
-	
+	public int TBarHeight() {
+		return 0;
+	}
 }

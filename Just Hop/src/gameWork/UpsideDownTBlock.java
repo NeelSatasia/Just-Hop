@@ -2,10 +2,6 @@ package gameWork;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Timer;
 
 public class UpsideDownTBlock extends Blocks {
 	
@@ -14,6 +10,8 @@ public class UpsideDownTBlock extends Blocks {
 	double TBarXPosition = 0;
 	
 	boolean isTBarRight = false;
+	
+	int TBarHeight = 25;
 	
 	public UpsideDownTBlock(int x, int y, int w, int h) {
 		this.x = x;
@@ -30,7 +28,7 @@ public class UpsideDownTBlock extends Blocks {
 		g.setColor(this.blockColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
 		
-		g.fillRect((int) TBarXPosition, this.y - 40, 5, 40);
+		g.fillRect((int) TBarXPosition, this.y - TBarHeight, 5, TBarHeight);
 	}
 	
 	@Override
@@ -61,6 +59,11 @@ public class UpsideDownTBlock extends Blocks {
 	@Override
 	public boolean isTBarRight() {
 		return isTBarRight;
+	}
+	
+	@Override
+	public int TBarHeight() {
+		return TBarHeight;
 	}
 }
 
