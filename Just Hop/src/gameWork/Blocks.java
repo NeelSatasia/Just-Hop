@@ -21,10 +21,10 @@ public class Blocks extends Rectangle{
 		return false;
 	}
 	
-	public void changeBlockTPositionX() {
+	public void changeTBarXPosition() {
 	}
 
-	public int blockTPositionX() {
+	public int TBarXPosition() {
 		return 0;
 	}
 

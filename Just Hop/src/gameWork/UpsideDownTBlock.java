@@ -37,7 +37,7 @@ public class UpsideDownTBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeBlockTPositionX() {
+	public void changeTBarXPosition() {
 		if(TBarXPosition == this.x) {
 			isTBarRight = true;
 		} else if(TBarXPosition == this.x + this.width - 5) {
@@ -52,7 +52,7 @@ public class UpsideDownTBlock extends Blocks {
 	}
 	
 	@Override
-	public int blockTPositionX() {
+	public int TBarXPosition() {
 		return (int) TBarXPosition;
 	}
 	

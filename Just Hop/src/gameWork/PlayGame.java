@@ -38,9 +38,9 @@ public class PlayGame {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(gamePanel.isBallJumping() || gamePanel.isBallFalling() || gamePanel.isFrictionlessMode()) {
+				if(gamePanel.isFrictionlessMode()) {
 					gamePanel.stopBallSlowly(true);
-				} else {
+				} else if (gamePanel.isBallJumping == false && gamePanel.isBallFalling == false) {
 					gamePanel.changeBallHorizontalDirection("none");
 				}
 			}
