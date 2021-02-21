@@ -40,11 +40,6 @@ public class PlayGame {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(gamePanel.isFrictionlessMode()) {
-					gamePanel.stopBallSlowly(true);
-				} /*else if (gamePanel.isBallJumping == false && gamePanel.isBallFalling == false) {
-					gamePanel.changeBallHorizontalDirection("none");
-				}*/
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
 					gamePanel.horizontalKeysAction(false);
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {

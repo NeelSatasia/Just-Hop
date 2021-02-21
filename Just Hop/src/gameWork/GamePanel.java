@@ -32,7 +32,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean isBallJumping = false;
 	boolean isBallFalling = false;
-	boolean wasBallInTheAir = false;
 	
 	int ballJumpYDistance = 0;
 	int ballJumpSpeed = 0;
@@ -174,7 +173,6 @@ public class GamePanel extends JPanel implements ActionListener {
 					isBallLosingHealth = false;
 					isBallJumping = false;
 					isBallFalling = false;
-					wasBallInTheAir = false;
 					stopBallSlowly = false;
 					
 					changeBrickXPositions();
@@ -276,7 +274,6 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			} else if(isBallJumping == false) {
 				isBallFalling = true;
-				wasBallInTheAir = true;
 				currentIndex = -1;
 				if(ballFallingSpeed < 15) {
 					ballFallingSpeed++;
@@ -367,8 +364,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			} else if(isHorizontalKeysDown == false) {
 				ballHorizontalDirection = 0;
 			}
-			
-			wasBallInTheAir = false;
 		}
 		
 		if(stopBallSlowly) {
@@ -579,8 +574,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			previousCurrentIndex = currentIndex;
 			didScore = false;
 			currentIndex = -1;
-			
-			wasBallInTheAir = true;
 		}
 	}
 
