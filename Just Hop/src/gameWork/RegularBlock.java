@@ -21,7 +21,7 @@ public class RegularBlock extends Blocks {
 		g.fillRect(this.x, this.y, this.width, this.height);
 	}
 	
-	public void changeColorTransparency(Color brickColor2) {
-		blockColor = brickColor2;
+	public void changeColorTransparency(Color color, Color color2) {
+		blockColor = color;
 	}
 }

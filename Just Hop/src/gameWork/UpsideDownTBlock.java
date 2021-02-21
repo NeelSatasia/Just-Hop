@@ -32,7 +32,7 @@ public class UpsideDownTBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeColorTransparency(Color color) {
+	public void changeColorTransparency(Color color, Color color2) {
 		blockColor = color;
 	}
 	

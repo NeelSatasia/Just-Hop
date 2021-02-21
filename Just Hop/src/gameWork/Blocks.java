@@ -11,9 +11,6 @@ public class Blocks extends Rectangle{
 	public void draw(Graphics g) {
 	}
 	
-	public void changeColorTransparency(Color color) {
-	}
-	
 	public void changeColorTransparency(Color color, Color color2) {
 	}
 	
