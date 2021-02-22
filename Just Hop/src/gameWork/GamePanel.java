@@ -50,18 +50,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	int differentTypesOfBlocks = 3;
 	
-	boolean trickedMode = false;
-	
-	Blocks trickBlock;
-	int trickBlockIndex = -1;
-	
 	int ballHealthLosingSpeed = 0;
 	boolean isBallLosingHealth = false;
 	
 	boolean stopBallSlowly = false;
 	double slowingDownSpeed = 0.0;
 	
-	boolean isHorizontalKeysDown = false;
+	boolean isRightKeyDown = false;
+	boolean isLeftKeyDown = false;
 	
 	JCheckBox[] modes = new JCheckBox[3];
 	
@@ -210,29 +206,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
 			
 			for(int i = 0; i < blocks.length; i++) {
-				if(trickBlockIndex == -1 && blocksXPositions[i] == 350) {
-					int trickBlockRandNum = (int)(Math.random() * 6);
-					int nextIndex = -1;
-					if(i - 1 >= 0) {
-						nextIndex = i - 1;
-					} else {
-						nextIndex = blocks.length - 1;
-					}
-					trickBlockIndex = nextIndex;
-					int trickBlockXPosition = -1;
-					
-					if(blocksXPositions[nextIndex] == 200) {
-						trickBlockXPosition = 500;
-					} else {
-						trickBlockXPosition = 200;
-					}
-					
-					if(trickBlockRandNum >= 0 && trickBlockRandNum < 6) {
-						trickBlock = new RegularBlock(trickBlockXPosition, blocksYPositions[trickBlockIndex], blocksWidth[trickBlockIndex], 5);
-						trickBlock.draw(g);
-					}
-				}
-				
 				if(blocks[i].getY() >= 100 * blocks.length) {
 					generateRandomBlock(i);
 					
@@ -241,7 +214,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					blocks[i].changeColorTransparency(new Color(0, 0, 0, blocksColorTransparency[i]), new Color(255, 0, 0, blocksColorTransparency[i]));
 					
-					if(blocks[i] instanceof UpsideDownTBlock) {
+					if(blocks[i] instanceof WiperBlock) {
 						blocks[i].changeTBarXPosition();
 					}
 				}
@@ -250,40 +223,40 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 			
 			ball.draw(g);
-			
-			if(collisionCheck()) {
-				if(isBallJumping == false && isBallFalling == false) {
-					ballFallingSpeed = blockFallingSpeed;
-				}
-				if(blocks[currentIndex] instanceof UpsideDownTBlock) {
-					int TBarXPosition = blocks[currentIndex].TBarXPosition();
-					if(ballY + ball.getHeight() > blocksYPositions[currentIndex] - blocks[currentIndex].TBarHeight()) {
-						if(ballX + ball.getWidth() == TBarXPosition) {
-							ballX--;
-							ball.setLocation(ballX, ballY);
-						} else if(ballX == TBarXPosition + 5) {
-							ballX++;
-							ball.setLocation(ballX, ballY);
-						}
-					}
-				}
-				if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
-					score++;
-					didScore = true;
-					scoreLabel.setText("Score: " + score);
-				}
-			} else if(isBallJumping == false) {
-				isBallFalling = true;
-				currentIndex = -1;
-				if(ballFallingSpeed < 15) {
-					ballFallingSpeed++;
-				}
-			}
 		}
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		if(collisionCheck()) {
+			if(isBallJumping == false && isBallFalling == false) {
+				ballFallingSpeed = blockFallingSpeed;
+			}
+			/*if(blocks[currentIndex] instanceof WiperBlock) {
+				int TBarXPosition = blocks[currentIndex].TBarXPosition();
+				if(ballY + ball.getHeight() > blocksYPositions[currentIndex] - blocks[currentIndex].TBarHeight()) {
+					if(ballX + ball.getWidth() == TBarXPosition) {
+						ballX--;
+						ball.setLocation(ballX, ballY);
+					} else if(ballX == TBarXPosition + 5) {
+						ballX++;
+						ball.setLocation(ballX, ballY);
+					}
+				}
+			}*/
+			if(((previousCurrentIndex == 0 && currentIndex == blocks.length-1) || previousCurrentIndex > currentIndex) && didScore == false) {
+				score++;
+				didScore = true;
+				scoreLabel.setText("Score: " + score);
+			}
+		} else if(isBallJumping == false) {
+			isBallFalling = true;
+			currentIndex = -1;
+			if(ballFallingSpeed < 15) {
+				ballFallingSpeed++;
+			}
+		}
 		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] >= 100 * blocks.length) {
@@ -341,7 +314,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 			
 			blocksYPositions[i] += blockFallingSpeed;
-			
 		}
 		
 		if(isBallJumping == true) {
@@ -359,9 +331,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		if(isBallJumping == false && isBallFalling == false) {
-			if(modes[1].isSelected() && isHorizontalKeysDown == false) {
+			if(modes[1].isSelected() && isLeftKeyDown == false && isRightKeyDown == false) {
 				stopBallSlowly = true;
-			} else if(isHorizontalKeysDown == false) {
+			} else if(isLeftKeyDown == false && isRightKeyDown == false) {
 				ballHorizontalDirection = 0;
 			}
 		}
@@ -388,30 +360,56 @@ public class GamePanel extends JPanel implements ActionListener {
 			ballHealthLosingSpeed += 5;
 		}
 		
-		if(currentIndex > -1 || previousCurrentIndex > -1) {
-			int index = -1;
-			if(currentIndex > -1) {
-				index = currentIndex;
-			} else {
-				index = previousCurrentIndex;
-			}
-			if(blocks[index] instanceof UpsideDownTBlock) {
-				int num = blocks[index].TBarXPosition();
-				if(ballHorizontalDirection < 0) {
-					if(ballX >= num + 5 && ballY + ball.getHeight() > blocksYPositions[index] - blocks[index].TBarHeight()) {
-						if(ballX + ballHorizontalDirection <= num + 5) {
-							ballHorizontalDirection = 0;
+		/*if(isBallJumping == false && isBallFalling == false) {
+			if(currentIndex > -1 || previousCurrentIndex > -1) {
+				int index = -1;
+				if(currentIndex > -1) {
+					index = currentIndex;
+				} else {
+					index = previousCurrentIndex;
+				}
+				if(blocks[index] instanceof WiperBlock) {
+					int TBarXPosition = blocks[index].TBarXPosition();
+					if(ballX >= TBarXPosition + 5 && ballY + ball.getHeight() > blocksYPositions[index] - blocks[index].TBarHeight()) {
+						if(ballX + ballHorizontalDirection <= TBarXPosition + 5) {
+							if(blocks[index].isTBarRight() == false) {
+								if(isLeftKeyDown) {
+									ballHorizontalDirection = -1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							} else {
+								if(isLeftKeyDown) {
+									ballHorizontalDirection = 1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							}
+							
+							ballX = TBarXPosition + 5;
 						}
-					}
-				} else if(ballHorizontalDirection > 0) {
-					if(ballX + ball.getWidth() <= num && ballY + ball.getHeight() > blocksYPositions[index] - blocks[index].TBarHeight()) {
-						if(ballX + ball.getWidth() + ballHorizontalDirection >= num) {
-							ballHorizontalDirection = 0;
+					} else if(ballX + ball.getWidth() <= TBarXPosition && ballY + ball.getHeight() > blocksYPositions[index] - blocks[index].TBarHeight()) {
+						if(ballX + ball.getWidth() + ballHorizontalDirection >= TBarXPosition) {
+							if(blocks[index].isTBarRight()) {
+								if(isRightKeyDown) {
+									ballHorizontalDirection = 1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							} else {
+								if(isRightKeyDown) {
+									ballHorizontalDirection = -1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							}
+							
+							ballX = TBarXPosition - (int) ball.getWidth();
 						}
 					}
 				}
 			}
-		}
+		}*/
 		
 		ballX += ballHorizontalDirection;
 		ballY += ballFallingSpeed;
@@ -493,34 +491,70 @@ public class GamePanel extends JPanel implements ActionListener {
 						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
 						return true;
 					}
-				} else if(blocks[i] instanceof UpsideDownTBlock) {
+				} else if(blocks[i] instanceof WiperBlock) {
 					int TBarXPosition = blocks[i].TBarXPosition();
 					
-					if(isBallJumping || isBallFalling) {
-						if(ballX + ball.getWidth() <= TBarXPosition && ballX + ball.getWidth() + ballHorizontalDirection >= TBarXPosition && ballY + ball.getHeight() + ballFallingSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() + ballFallingSpeed <= blocksYPositions[i]) {
+					/*if(isBallJumping || isBallFalling) {
+						if(ballX + ball.getWidth() <= TBarXPosition && ballX + ball.getWidth() + ballHorizontalDirection > TBarXPosition && ballY + ball.getHeight() + ballFallingSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
 							if(ballHorizontalDirection > 0) {
 								ballHorizontalDirection = -1;
 							} else if(ballHorizontalDirection < 0) {
 								ballHorizontalDirection = 1;
 							}
+							
+							if(blocks[i].isTBarRight()) {
+								if(isRightKeyDown) {
+									ballHorizontalDirection = 1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							} else {
+								ballHorizontalDirection = -1;
+							}
 							ballX = TBarXPosition - (int) ball.getWidth();
-						} else if(ballX >= TBarXPosition + 5 && ballX + ballHorizontalDirection <= TBarXPosition + 5 && ballY + ball.getHeight() + ballFallingSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() + ballFallingSpeed <= blocksYPositions[i]) {
+						} else if(ballX >= TBarXPosition + 5 && ballX + ballHorizontalDirection < TBarXPosition + 5 && ballY + ball.getHeight() + ballFallingSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
 							if(ballHorizontalDirection > 0) {
 								ballHorizontalDirection = -1;
 							} else if(ballHorizontalDirection < 0) {
+								ballHorizontalDirection = 1;
+							}
+							if(blocks[i].isTBarRight() == false) {
+								if(isLeftKeyDown) {
+									ballHorizontalDirection = -1;
+								} else {
+									ballHorizontalDirection = 0;
+								}
+							} else {
 								ballHorizontalDirection = 1;
 							}
 							ballX = TBarXPosition + 5;
 						}
+					}*/
+					if(ballX >= TBarXPosition + 5 && ballY + ball.getHeight() + ballFallingSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
+						if(ballX + ballHorizontalDirection <= TBarXPosition + 5) {
+							ballHorizontalDirection = 0;
+							ballX = TBarXPosition + 5 + 1;
+							ball.setLocation(ballX, ballY);
+						}
+					} else if(ballX + ball.getWidth() <= TBarXPosition && ballY + ball.getHeight() + ballFallingSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
+						if(ballX + ball.getWidth() + ballHorizontalDirection >= TBarXPosition) {
+							ballHorizontalDirection = 0;
+							ballX = TBarXPosition - (int) ball.getWidth() - 1;
+							ball.setLocation(ballX, ballY);
+						}
 					}
 					
-					if(ballX + ball.getWidth() + ballHorizontalDirection > TBarXPosition && ballX + ballHorizontalDirection < TBarXPosition + 5 && ballY + ball.getHeight() + ballFallingSpeed >= (int)(blocksYPositions[i] - blocks[i].TBarHeight()) && ballY + ball.getHeight() <= (int)(blocksYPositions[i] - blocks[i].TBarHeight())) {
+					if((ballX + ball.getWidth() <= blocksXPositions[i] && ballX + ball.getWidth() + ballHorizontalDirection >= blocksXPositions[i]) || (ballX >= blocksXPositions[i] + blocksWidth[i] && ballX + ballHorizontalDirection <= blocksXPositions[i] + blocksWidth[i])) {
+						
+					}
+					
+					if(ballX + ball.getWidth() + ballHorizontalDirection > TBarXPosition && ballX + ballHorizontalDirection < TBarXPosition + 5 && ballY + ball.getHeight() + ballFallingSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i] - blocks[i].TBarHeight()) {
 						changeBlockColorTransparency(i);
 						isBallFalling = false;
 						currentIndex = i;
 						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - blocks[i].TBarHeight());
 						return true;
-					} else if((ballX + ball.getWidth() + ballHorizontalDirection > blocksXPositions[i] && ballX + ballHorizontalDirection < blocksXPositions[i] + blocksWidth[i]) && (ballY + ball.getHeight() + ballFallingSpeed > (int) blocksYPositions[i] && ballY + ball.getHeight() <= (int) blocksYPositions[i])) {
+					} else if((ballX + ball.getWidth() + ballHorizontalDirection > blocksXPositions[i] && ballX + ballHorizontalDirection < blocksXPositions[i] + blocksWidth[i]) && (ballY + ball.getHeight() + ballFallingSpeed > (int) blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i])) {
 						changeBlockColorTransparency(i);
 						isBallFalling = false;
 						currentIndex = i;
@@ -576,7 +610,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			currentIndex = -1;
 		}
 	}
-
+	
 	public boolean isBallJumping() {
 		return isBallJumping;
 	}
@@ -595,7 +629,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
 				break;
 			case 2:
-				blocks[index] = new UpsideDownTBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
+				blocks[index] = new WiperBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], 5);
 				break;	
 		}
 	}
@@ -643,7 +677,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		return ballHorizontalDirection;
 	}
 
-	public void horizontalKeysAction(boolean x) {
-		isHorizontalKeysDown = x;
+	public void rightKeyDown(boolean x) {
+		isRightKeyDown = x;
+	}
+
+	public void leftKeyDown(boolean x) {
+		isLeftKeyDown = x;
 	}
 }

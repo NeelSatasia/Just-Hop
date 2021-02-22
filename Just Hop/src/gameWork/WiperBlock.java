@@ -3,7 +3,7 @@ package gameWork;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class UpsideDownTBlock extends Blocks {
+public class WiperBlock extends Blocks {
 	
 	Color blockColor;
 	
@@ -11,9 +11,9 @@ public class UpsideDownTBlock extends Blocks {
 	
 	boolean isTBarRight = true;
 	
-	int TBarHeight = 25;
+	int TBarHeight = 50;
 	
-	public UpsideDownTBlock(int x, int y, int w, int h) {
+	public WiperBlock(int x, int y, int w, int h) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
@@ -45,9 +45,9 @@ public class UpsideDownTBlock extends Blocks {
 		}
 		
 		if(isTBarRight == true) {
-			TBarXPosition += 0.5;
+			TBarXPosition += 1;
 		} else {
-			TBarXPosition -= 0.5;
+			TBarXPosition -= 1;
 		}
 	}
 	

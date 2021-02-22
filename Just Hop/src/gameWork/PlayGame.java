@@ -28,10 +28,10 @@ public class PlayGame {
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
 					gamePanel.changeBallHorizontalDirection("right");
-					gamePanel.horizontalKeysAction(true);
+					gamePanel.rightKeyDown(true);
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
 					gamePanel.changeBallHorizontalDirection("left");
-					gamePanel.horizontalKeysAction(true);
+					gamePanel.leftKeyDown(true);
 				}
 				if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
 					gamePanel.makeBallJump();
@@ -41,9 +41,9 @@ public class PlayGame {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-					gamePanel.horizontalKeysAction(false);
+					gamePanel.rightKeyDown(false);
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-					gamePanel.horizontalKeysAction(false);
+					gamePanel.leftKeyDown(false);
 				}
 			}
 
