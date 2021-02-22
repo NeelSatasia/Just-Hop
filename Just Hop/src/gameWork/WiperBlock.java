@@ -45,9 +45,9 @@ public class WiperBlock extends Blocks {
 		}
 		
 		if(isTBarRight == true) {
-			TBarXPosition += 1;
+			TBarXPosition++;
 		} else {
-			TBarXPosition -= 1;
+			TBarXPosition--;
 		}
 	}
 	
