@@ -11,7 +11,7 @@ public class WiperBlock extends Blocks {
 	
 	boolean isTBarRight = true;
 	
-	int TBarHeight = 50;
+	int TBarHeight = (int)(Math.random() * 21) + 25;
 	
 	public WiperBlock(int x, int y, int w, int h) {
 		this.x = x;
@@ -38,16 +38,16 @@ public class WiperBlock extends Blocks {
 	
 	@Override
 	public void changeTBarXPosition() {
-		if(TBarXPosition == this.x) {
-			isTBarRight = true;
-		} else if(TBarXPosition == this.x + this.width - 5) {
-			isTBarRight = false;
-		}
-		
 		if(isTBarRight == true) {
 			TBarXPosition++;
 		} else {
 			TBarXPosition--;
+		}
+		
+		if(TBarXPosition == this.x) {
+			isTBarRight = true;
+		} else if(TBarXPosition == this.x + this.width - 5) {
+			isTBarRight = false;
 		}
 	}
 	

@@ -353,6 +353,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(ballY > 600) {
 			ballHealth = 0;
+			ballHealthLabel.setText("Health: " + ballHealth);
 		}
 		
 		repaint();
@@ -406,6 +407,13 @@ public class GamePanel extends JPanel implements ActionListener {
 				if((ballX + ball.getWidth() <= blocksXPositions[i] && ballX + ball.getWidth() + ballHorizontalDirection >= blocksXPositions[i]) || (ballX >= blocksXPositions[i] + blocksWidth[i] && ballX + ballHorizontalDirection <= blocksXPositions[i] + blocksWidth[i])) {
 					if((ballY + ballFallingSpeed >= blocksYPositions[i] && ballY + ballFallingSpeed <= blocksYPositions[i] + 5) || (ballY + ball.getHeight() + ballFallingSpeed >= blocksYPositions[i] && ballY + ball.getHeight() + ballFallingSpeed <= blocksYPositions[i] + 5) || (ballY + ballFallingSpeed <= blocksYPositions[i] && ballY + ball.getHeight() + ballFallingSpeed >= blocksYPositions[i] + 5)) {
 						ballHorizontalDirection = 0;
+					}
+				}
+				if(isBallJumping) {
+					if(ballX + ball.getWidth() + ballHorizontalDirection > blocksXPositions[i] && ballX + ballHorizontalDirection < blocksXPositions[i] + blocksWidth[i]) {
+						if(blocksYPositions[i] + 5 + blockFallingSpeed == ballY) {
+							isBallJumping = false;
+						}
 					}
 				}
 				if(blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) {
