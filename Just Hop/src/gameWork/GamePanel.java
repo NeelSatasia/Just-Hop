@@ -3,6 +3,7 @@ package gameWork;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JPanel;
@@ -22,6 +23,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int[] blocksYPositions = new int[blocks.length];
 	int[] blocksWidth = new int[blocks.length];
 	int[] blocksColorTransparency = new int[blocks.length];
+	
+	HealthBooster[] healthBooster = new HealthBooster[blocks.length];
 	
 	int blockYPositioner = -25;
 	
@@ -66,10 +69,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		setLayout(null);
 		setBackground(Color.WHITE);
 		
-		changeBrickXPositions();
+		changeBlocksXPositions();
 		
 		ballX = (int) (blocksXPositions[3]);
-		ballY = (int) (blocksYPositions[3] - ball.getHeight());
 		
 		ball.setLocation(ballX, ballY);
 		
@@ -171,7 +173,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					isBallFalling = false;
 					stopBallSlowly = false;
 					
-					changeBrickXPositions();
+					changeBlocksXPositions();
 					
 					blockYPositioner = -25;
 					
@@ -203,16 +205,31 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			});
 		} else {
-			ball.setBounds(ballX, ballY, (int) ball.getWidth(), (int) ball.getHeight());
+			ball.setLocation(ballX, ballY);
+			ball.draw(g);
 			
 			for(int i = 0; i < blocks.length; i++) {
 				if(blocks[i].getY() >= 100 * blocks.length) {
 					generateRandomBlock(i);
-					
+					if(ballHealth < 100) {
+						int healthBoosterChance = (int)(Math.random() * 11);
+						if(healthBoosterChance <= 10) {
+							int healthBoosterXPosition = (int)(Math.random() * (blocksWidth[i] - ball.getWidth())) + blocksXPositions[i];
+							healthBooster[i] = new HealthBooster(healthBoosterXPosition, blocksYPositions[i]);
+						}
+					}
 				} else {
 					blocks[i].setBounds(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5);
 					
 					blocks[i].changeColorTransparency(new Color(0, 0, 0, blocksColorTransparency[i]), new Color(255, 0, 0, blocksColorTransparency[i]));
+					
+					if(healthBooster[i] != null) {
+						if(ballHealth < 100) {
+							healthBooster[i].setLocation((int) healthBooster[i].getX(), blocksYPositions[i]);
+						} else {
+							healthBooster[i] = null;
+						}
+					}
 					
 					if(blocks[i] instanceof WiperBlock) {
 						blocks[i].changeTBarXPosition();
@@ -220,9 +237,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 				
 				blocks[i].draw(g);
+				
+				if(healthBooster[i] != null) {
+					healthBooster[i].draw(g);
+				}
 			}
-			
-			ball.draw(g);
 		}
 	}
 	
@@ -351,6 +370,23 @@ public class GamePanel extends JPanel implements ActionListener {
 		ballX += ballHorizontalDirection;
 		ballY += ballFallingSpeed;
 		
+		for(int i = 0; i < healthBooster.length; i++) {
+			if(healthBooster[i] != null) {
+				if(ballY + ball.getHeight() >= healthBooster[i].getY() && ballY <= healthBooster[i].getY() + healthBooster[i].getHeight()) {
+					if(ballX + ball.getWidth() >= healthBooster[i].getX() && ballX <= healthBooster[i].getX() + healthBooster[i].getWidth()) {
+						healthBooster[i] = null;
+						if(ballHealth + 5 > 100) {
+							ballHealth = 100;
+						} else {
+							ballHealth += 5;
+						}
+						ballHealthLabel.setText("Health: " + ballHealth);
+						break;
+					}
+				}
+			}
+		}
+		
 		if(ballY > 600) {
 			ballHealth = 0;
 			ballHealthLabel.setText("Health: " + ballHealth);
@@ -359,7 +395,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		repaint();
 	}
 	
-	public void changeBrickXPositions() {
+	public void changeBlocksXPositions() {
 		for(int i = 0; i < blocksXPositions.length; i++) {
 			int brickXPosition = (int)(Math.random() * 3);
 			switch(brickXPosition) {
