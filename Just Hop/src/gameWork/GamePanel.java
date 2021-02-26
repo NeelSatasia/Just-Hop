@@ -464,7 +464,6 @@ public class GamePanel extends JPanel implements ActionListener {
 							} else if(blocks[i].isRedOnRightSide() == false && ballX > blocksXPositions[i] + blocksWidth[i]/2) {
 								ballLoseHealth(false);
 							}
-							
 						} else {
 							ballLoseHealth(false);
 						}
@@ -525,15 +524,17 @@ public class GamePanel extends JPanel implements ActionListener {
 					int secondBlockXPosition = blocks[i].secondBlockXPosition();
 					
 					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-							if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + (secondBlockXPosition - (ball.getWidth() + 1))) {
-								currentIndex = i;
-								ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
-								return true;
-							} else if(ballX + ball.getWidth() + ballHorizontalSpeed > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-								currentIndex = i;
-								ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
-								return true;
+						if(ballX + ball.getWidth() > blocksXPositions[i] && ballX < secondBlockXPosition - (ball.getWidth() + 5)) {
+							currentIndex = i;
+							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+							return true;
+						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX < blocksXPositions[i] + blocksWidth[i]) {
+							currentIndex = i;
+							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+							return true;
+						} else if(ballX > secondBlockXPosition - (ball.getWidth() + 5) && ballX + ball.getWidth() < secondBlockXPosition) {
+							if((ballY + ballVerticalSpeed >= blocksYPositions[i] && ballY + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ballVerticalSpeed <= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] + 5)) {
+								ballHorizontalSpeed = 0;
 							}
 						}
 					}
