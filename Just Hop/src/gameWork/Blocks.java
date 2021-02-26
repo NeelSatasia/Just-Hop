@@ -32,4 +32,8 @@ public class Blocks extends Rectangle{
 	public int TBarHeight() {
 		return 0;
 	}
+	
+	public int secondBlockXPosition() {
+		return 0;
+	}
 }
