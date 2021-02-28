@@ -309,6 +309,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			changeBlockColorTransparency(currentIndex);
 			isBallFalling = false;
 			ballVerticalSpeed = blockVerticalSpeed;
+			//ballVerticalSpeed = 0;
 			
 			if(((previousIndex == 0 && currentIndex == blocks.length-1) || previousIndex > currentIndex) && didScore == false) {
 				score++;
@@ -439,7 +440,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksColorTransparency[i] > 0) {
 				if((ballX + ball.getWidth() <= blocksXPositions[i] && ballX + ball.getWidth() + ballHorizontalSpeed >= blocksXPositions[i]) || (ballX >= blocksXPositions[i] + blocksWidth[i] && ballX + ballHorizontalSpeed <= blocksXPositions[i] + blocksWidth[i])) {
-					if((ballY + ballVerticalSpeed >= blocksYPositions[i] && ballY + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ballVerticalSpeed <= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] + 5)) {
+					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY <= blocksYPositions[i] + 5) {
 						ballHorizontalSpeed = 0;
 					}
 				}
@@ -469,7 +470,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						}
 						
 						currentIndex = i;
-						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 						return true;
 					}
 				} else if(blocks[i] instanceof WiperBlock) {
@@ -513,35 +514,36 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					if(ballX + ball.getWidth() + ballHorizontalSpeed > TBarXPosition && ballX + ballHorizontalSpeed < TBarXPosition + 5 && ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i] - blocks[i].TBarHeight()) {
 						currentIndex = i;
-						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - blocks[i].TBarHeight());
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - blocks[i].TBarHeight() - 1);
 						return true;
 					} else if((ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) && (ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i])) {
 						currentIndex = i;
-						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 						return true;
 					}
 				} else if(blocks[i] instanceof SplitBlock) {
 					int secondBlockXPosition = blocks[i].secondBlockXPosition();
 					
 					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						if(ballX + ball.getWidth() > blocksXPositions[i] && ballX < secondBlockXPosition - (ball.getWidth() + 5)) {
+						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth()) {
 							currentIndex = i;
-							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
-						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX < blocksXPositions[i] + blocksWidth[i]) {
+						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
 							currentIndex = i;
-							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight());
+							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
-						} else if(ballX > secondBlockXPosition - (ball.getWidth() + 5) && ballX + ball.getWidth() < secondBlockXPosition) {
-							if((ballY + ballVerticalSpeed >= blocksYPositions[i] && ballY + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed <= blocksYPositions[i] + 5) || (ballY + ballVerticalSpeed <= blocksYPositions[i] && ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] + 5)) {
+						} else if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
+							if(ballX + ballHorizontalSpeed >= secondBlockXPosition - ball.getWidth()) {
+								ballX = secondBlockXPosition - ((int) ball.getWidth());
 								ballHorizontalSpeed = 0;
+								return false;
 							}
 						}
 					}
 				}
 			}
 		}
-		
 		if(currentIndex > -1) {
 			previousIndex = currentIndex;
 		}

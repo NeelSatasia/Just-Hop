@@ -21,7 +21,7 @@ public class SplitBlock extends Blocks {
 		if(whichBlockSmaller == 1) {
 			secondBlockXPosition = this.x + (this.width/2);
 		} else {
-			secondBlockXPosition = this.x + ((this.width/2) + ballWidth + 5);
+			secondBlockXPosition = this.x + ((this.width/2) + ballWidth);
 		}
 		
 		blockColor = Color.BLACK;
@@ -31,11 +31,11 @@ public class SplitBlock extends Blocks {
 	public void draw(Graphics g) {
 		g.setColor(blockColor);
 		if(whichBlockSmaller == 1) {
-			g.fillRect(this.x, this.y, (this.width/2) - (ballWidth + 5), this.height);
+			g.fillRect(this.x, this.y, (this.width/2) - (ballWidth), this.height);
 			g.fillRect(secondBlockXPosition, this.y, this.width/2, this.height);
 		} else {
 			g.fillRect(this.x, this.y, this.width/2, this.height);
-			g.fillRect(secondBlockXPosition, this.y, (this.width/2) - (ballWidth + 5), this.height);
+			g.fillRect(secondBlockXPosition, this.y, (this.width/2) - (ballWidth), this.height);
 		}
 	}
 	
