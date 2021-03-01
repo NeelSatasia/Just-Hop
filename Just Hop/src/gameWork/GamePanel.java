@@ -525,25 +525,38 @@ public class GamePanel extends JPanel implements ActionListener {
 					int secondBlockXPosition = blocks[i].secondBlockXPosition();
 					
 					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth()) {
+						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth() && ballX < secondBlockXPosition - ball.getWidth()) {
 							currentIndex = i;
 							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
-						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
+						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX + ball.getWidth() + ballHorizontalSpeed > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
 							currentIndex = i;
 							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
 						} else if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-							if(ballX + ballHorizontalSpeed >= secondBlockXPosition - ball.getWidth()) {
+							if(ballX >= secondBlockXPosition - ball.getWidth()) {
+								if(ballY + ballVerticalSpeed < blocksYPositions[i] + 5) {
+									ballX = secondBlockXPosition - ((int) ball.getWidth());
+									ballHorizontalSpeed = 0;
+									return false;
+								} else {
+									if(isRightKeyDown) {
+										ballHorizontalSpeed = 4;
+									} else if(isLeftKeyDown) {
+										ballHorizontalSpeed = -4;
+									}
+								}
+							} /*else if(ballX + ball.getWidth() + ballHorizontalSpeed <= secondBlockXPosition) {
 								ballX = secondBlockXPosition - ((int) ball.getWidth());
 								ballHorizontalSpeed = 0;
 								return false;
-							}
+							}*/
 						}
 					}
 				}
 			}
 		}
+		
 		if(currentIndex > -1) {
 			previousIndex = currentIndex;
 		}
