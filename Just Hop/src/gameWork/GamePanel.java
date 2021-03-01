@@ -460,14 +460,10 @@ public class GamePanel extends JPanel implements ActionListener {
 								ballLoseHealth(true);
 							} else if(blocks[i].isRedOnRightSide() == false && ballX < blocksXPositions[i] + blocksWidth[i]/2) {
 								ballLoseHealth(true);
-							} else if(blocks[i].isRedOnRightSide() && ballX + ball.getWidth() < blocksXPositions[i] + blocksWidth[i]/2) {
-								ballLoseHealth(false);
-							} else if(blocks[i].isRedOnRightSide() == false && ballX > blocksXPositions[i] + blocksWidth[i]/2) {
+							} else {
 								ballLoseHealth(false);
 							}
-						} else {
-							ballLoseHealth(false);
-						}
+						} 
 						
 						currentIndex = i;
 						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
@@ -481,7 +477,9 @@ public class GamePanel extends JPanel implements ActionListener {
 							ballHorizontalSpeed = 0;
 							if(blocks[i].isTBarRight() == false && TBarXPosition > blocksXPositions[i]) {
 								if(isLeftKeyDown) {
-									ballX = TBarXPosition + 5 - 1;
+									if(TBarXPosition + 5 - 1 < blocksXPositions[i] + blocksWidth[i] - 1) {
+										ballX = TBarXPosition + 5 - 1;
+									}
 								}
 							} else {
 								ballX = TBarXPosition + 5 + 1;
@@ -493,7 +491,9 @@ public class GamePanel extends JPanel implements ActionListener {
 							ballHorizontalSpeed = 0;
 							if(blocks[i].isTBarRight() && TBarXPosition + 5 < blocksXPositions[i] + blocksWidth[i]) {
 								if(isRightKeyDown) {
-									ballX = TBarXPosition - (int) ball.getWidth() + 1;
+									if(TBarXPosition - (int) ball.getWidth() + 1 > blocksXPositions[i]) {
+										ballX = TBarXPosition - (int) ball.getWidth() + 1;
+									}
 								}
 							} else {
 								ballX = TBarXPosition - (int) ball.getWidth() - 1;
@@ -525,7 +525,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					int secondBlockXPosition = blocks[i].secondBlockXPosition();
 					
 					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth() && ballX < secondBlockXPosition - ball.getWidth()) {
+						if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX < secondBlockXPosition - ball.getWidth() && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth()) {
 							currentIndex = i;
 							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
@@ -534,23 +534,20 @@ public class GamePanel extends JPanel implements ActionListener {
 							ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 							return true;
 						} else if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-							if(ballX >= secondBlockXPosition - ball.getWidth()) {
+							if((ballX + ballHorizontalSpeed >= secondBlockXPosition - ball.getWidth()) || (ballX + ball.getWidth() + ballHorizontalSpeed <= secondBlockXPosition)) {
 								if(ballY + ballVerticalSpeed < blocksYPositions[i] + 5) {
-									ballX = secondBlockXPosition - ((int) ball.getWidth());
+									ballX = secondBlockXPosition - (int) ball.getWidth();
 									ballHorizontalSpeed = 0;
-									return false;
 								} else {
-									if(isRightKeyDown) {
-										ballHorizontalSpeed = 4;
-									} else if(isLeftKeyDown) {
-										ballHorizontalSpeed = -4;
+									if(ballY + ballVerticalSpeed > blocksYPositions[i] + 5) {
+										if(isRightKeyDown) {
+											ballHorizontalSpeed = 4;
+										} else if(isLeftKeyDown) {
+											ballHorizontalSpeed = -4;
+										}
 									}
 								}
-							} /*else if(ballX + ball.getWidth() + ballHorizontalSpeed <= secondBlockXPosition) {
-								ballX = secondBlockXPosition - ((int) ball.getWidth());
-								ballHorizontalSpeed = 0;
-								return false;
-							}*/
+							}
 						}
 					}
 				}
