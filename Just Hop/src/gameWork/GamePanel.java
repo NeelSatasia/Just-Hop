@@ -318,7 +318,10 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		} else if(isBallJumping == false) {
 			isBallFalling = true;
-			currentIndex = -1;
+			if(currentIndex > -1) {
+				previousIndex = currentIndex;
+				currentIndex = -1;
+			}
 			if(ballVerticalSpeed < 15) {
 				ballVerticalSpeed++;
 			}
@@ -445,8 +448,12 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				}
 				if(isBallJumping) {
-					if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-						if(blocksYPositions[i] + 5 == ballY + ballVerticalSpeed) {
+					int num = previousIndex - 1;
+					if(num < 0) {
+						num = blocks.length - 1;
+					}
+					if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[num] && ballX + ballHorizontalSpeed < blocksXPositions[num] + blocksWidth[num]) {
+						if(blocksYPositions[num] + 5 <= ballY + ballVerticalSpeed) {
 							isBallJumping = false;
 							ballVerticalSpeed = 4;
 							return false;
@@ -538,24 +545,22 @@ public class GamePanel extends JPanel implements ActionListener {
 								if(ballY + ballVerticalSpeed < blocksYPositions[i] + 5) {
 									ballX = secondBlockXPosition - (int) ball.getWidth();
 									ballHorizontalSpeed = 0;
-								} else {
-									if(ballY + ballVerticalSpeed > blocksYPositions[i] + 5) {
-										if(isRightKeyDown) {
-											ballHorizontalSpeed = 4;
-										} else if(isLeftKeyDown) {
-											ballHorizontalSpeed = -4;
-										}
-									}
 								}
+							}
+						}
+					} else if(blocks[previousIndex] instanceof SplitBlock && ballY > blocksYPositions[previousIndex] + 5) {
+						if(ballX == secondBlockXPosition - (int) ball.getWidth()) {
+							if(isRightKeyDown) {
+								ballHorizontalSpeed = 4;
+							} else if(isLeftKeyDown) {
+								ballHorizontalSpeed = -4;
+							} else {
+								ballHorizontalSpeed = 0;
 							}
 						}
 					}
 				}
 			}
-		}
-		
-		if(currentIndex > -1) {
-			previousIndex = currentIndex;
 		}
 		
 		if(isBallLosingHealth == true) {
