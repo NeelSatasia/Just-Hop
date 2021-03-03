@@ -26,11 +26,15 @@ public class PlayGame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-					gamePanel.changeBallHorizontalDirection("right");
+				if((e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D)) {
+					if(gamePanel.isBallJumping() == false && gamePanel.isBallFalling() == false) {
+						gamePanel.changeBallHorizontalSpeed(4);
+					}
 					gamePanel.rightKeyDown(true);
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-					gamePanel.changeBallHorizontalDirection("left");
+					if(gamePanel.isBallJumping() == false && gamePanel.isBallFalling() == false) {
+						gamePanel.changeBallHorizontalSpeed(-4);
+					}
 					gamePanel.leftKeyDown(true);
 				}
 				if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
