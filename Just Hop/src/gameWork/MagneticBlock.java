@@ -6,9 +6,9 @@ import java.awt.Graphics;
 public class MagneticBlock extends Blocks {
 	
 	Color blockColor = Color.BLACK;
-	Color magnetbarColor = new Color(104, 104, 104);
+	Color magnetbarColor = new Color(0, 179, 89);
 	
-	int TBarXPosition = (int)(Math.random() * 1);
+	int TBarXPosition;
 	int TBarHeight = (int)(Math.random() * 6) + 30;
 	
 	public MagneticBlock(int x, int y, int w) {
@@ -17,11 +17,7 @@ public class MagneticBlock extends Blocks {
 		this.width = w;
 		this.height = 5;
 		
-		if(TBarXPosition() == 0) {
-			TBarXPosition = x;
-		} else {
-			TBarXPosition = x + w - 5;
-		}
+		TBarXPosition = (int)(Math.random() * (this.width - 5)) + this.x;
 	}
 	
 	@Override
@@ -37,7 +33,7 @@ public class MagneticBlock extends Blocks {
 	@Override
 	public void changeColorTransparency(int colorTransparency) {
 		blockColor = new Color(0, 0, 0, colorTransparency);
-		magnetbarColor = new Color(104, 104, 104, colorTransparency);
+		magnetbarColor = new Color(0, 179, 89, colorTransparency);
 	}
 	
 	@Override

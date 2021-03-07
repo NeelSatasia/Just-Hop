@@ -62,6 +62,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isRightKeyDown = false;
 	boolean isLeftKeyDown = false;
 	
+	boolean changedDirectionInAir = false;
+	
 	JCheckBox[] modes = new JCheckBox[3];
 	
 	public GamePanel() {
@@ -174,6 +176,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					isBallFalling = false;
 					stopBallSlowly = false;
 					didScore = false;
+					changedDirectionInAir = false;
 					
 					isRightKeyDown = false;
 					isLeftKeyDown = false;
@@ -347,18 +350,13 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		if(isBallJumping == false && isBallFalling == false) {
+			if(changedDirectionInAir) {
+				changedDirectionInAir = false;
+			}
 			if(modes[1].isSelected() && isLeftKeyDown == false && isRightKeyDown == false) {
 				stopBallSlowly = true;
 			} else if(isLeftKeyDown == false && isRightKeyDown == false && blocks[currentIndex] instanceof MagneticBlock == false) {
 				ballHorizontalSpeed = 0;
-			}
-		} else if(isBallJumping || isBallFalling) {
-			if(ballHorizontalSpeed > 0 && isLeftKeyDown) {
-				ballHorizontalSpeed--;
-				ballHorizontalSpeed *= -1;
-			} else if(ballHorizontalSpeed < 0 && isRightKeyDown) {
-				ballHorizontalSpeed++;
-				ballHorizontalSpeed *= -1;
 			}
 		}
 		
@@ -476,7 +474,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				}
 				if(blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) {
-					if(isOnHorizontalBlock(i)) {
+					if(collisionCheck(i)) {
 						if((blocks[i] instanceof HalfRedBlock)) {
 							if(blocks[i].isRedOnRightSide() && ballX + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2) {
 								ballLoseHealth(true);
@@ -517,19 +515,9 @@ public class GamePanel extends JPanel implements ActionListener {
 							}
 						}
 						ball.setLocation(ballX, ballY);
-					} /*else {
-						if(isBallJumping) {
-							if((ballX + ball.getWidth() > blocksXPositions[previousIndex] && ballX < blocksXPositions[previousIndex] + blocksWidth[previousIndex]) && (ballY + ball.getHeight() < blocksYPositions[previousIndex] - blocks[previousIndex].TBarHeight())) {
-								if(isRightKeyDown) {
-									ballHorizontalSpeed = 4;
-								} else if(isLeftKeyDown) {
-									ballHorizontalSpeed = -4;
-								}
-							}
-						}
-					}*/
+					}
 					
-					if(isOnHorizontalBlock(i)) {
+					if(collisionCheck(i)) {
 						return true;
 					}
 				} else if(blocks[i] instanceof SplitBlock) {
@@ -552,13 +540,9 @@ public class GamePanel extends JPanel implements ActionListener {
 								}
 							}
 						}
-					} else if(blocks[previousIndex] instanceof SplitBlock && ballY > blocksYPositions[previousIndex] + 5) {
+					} else if(blocks[previousIndex] instanceof SplitBlock && ballY > blocksYPositions[previousIndex] + 5 && ballY + ball.getHeight() < blocksYPositions[previousIndex] + 5 + (ball.getHeight() * 2)) {
 						if(ballX == secondBlockXPosition - (int) ball.getWidth()) {
-							if(isRightKeyDown) {
-								ballHorizontalSpeed = 4;
-							} else if(isLeftKeyDown) {
-								ballHorizontalSpeed = -4;
-							}
+							changeBallHorizontalSpeed();
 						}
 					}
 				} else if(blocks[i] instanceof MagneticBlock) {
@@ -586,7 +570,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						ball.setLocation(ballX, ballY);
 					}
 					
-					if(isOnHorizontalBlock(i)) {
+					if(collisionCheck(i)) {
 						return true;
 					}
 				}
@@ -600,7 +584,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		return false;
 	}
 	
-	public boolean isOnHorizontalBlock(int i) {
+	public boolean collisionCheck(int i) {
 		if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
 			if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
 				currentIndex = i;
@@ -608,6 +592,12 @@ public class GamePanel extends JPanel implements ActionListener {
 				return true;
 			} else if(blocks[i] instanceof WiperBlock || blocks[i] instanceof MagneticBlock) {
 				int TBarXPosition = blocks[i].TBarXPosition();
+				
+				if(isBallJumping) {
+					if((ballX + ball.getWidth() > blocksXPositions[previousIndex] && ballX < blocksXPositions[previousIndex] + blocksWidth[previousIndex]) && (ballY + ball.getHeight() < blocksYPositions[previousIndex] - blocks[previousIndex].TBarHeight())) {
+						changeBallHorizontalSpeed();
+					}
+				}
 				
 				if(ballX + ball.getWidth() + ballHorizontalSpeed > TBarXPosition && ballX + ballHorizontalSpeed < TBarXPosition + 5) {
 					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i] - blocks[i].TBarHeight()) {
@@ -623,7 +613,38 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void changeBallHorizontalSpeed(int speed) {
-		ballHorizontalSpeed = speed;
+		if(isBallJumping || isBallFalling) {
+			if(ballHorizontalSpeed > 0 && speed < 0) {
+				changedDirectionInAir = true;
+				ballHorizontalSpeed--;
+				ballHorizontalSpeed *= -1;
+			} else if(ballHorizontalSpeed < 0 && speed > 0) {
+				changedDirectionInAir = true;
+				ballHorizontalSpeed++;
+				ballHorizontalSpeed *= -1;
+			} else if(ballHorizontalSpeed == 0 && changedDirectionInAir == false) {
+				ballHorizontalSpeed = speed;
+			}
+		} else if(blocks[currentIndex] instanceof  MagneticBlock) {
+			if(isLeftKeyDown) {
+				ballHorizontalSpeed -= 2;
+			} else if(isRightKeyDown) {
+				ballHorizontalSpeed += 2;
+			}
+		}
+		else {
+			ballHorizontalSpeed = speed;
+		}
+	}
+	
+	public void changeBallHorizontalSpeed() {
+		if(ballHorizontalSpeed == 0 && changedDirectionInAir == false) {
+			if(isRightKeyDown) {
+				ballHorizontalSpeed = 4;
+			} else if(isLeftKeyDown) {
+				ballHorizontalSpeed = -4;
+			}
+		}
 	}
 	
 	public void makeBallJump() {
@@ -712,5 +733,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void leftKeyDown(boolean x) {
 		isLeftKeyDown = x;
+	}
+
+	public boolean isChangedDirectionInAir() {
+		return changedDirectionInAir;
 	}
 }
