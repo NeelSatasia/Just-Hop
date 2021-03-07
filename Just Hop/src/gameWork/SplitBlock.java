@@ -11,11 +11,11 @@ public class SplitBlock extends Blocks {
 	
 	Color blockColor;
 	
-	public SplitBlock(int x, int y, int w, int h, int ballW) {
+	public SplitBlock(int x, int y, int w, int ballW) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
-		this.height = h;
+		this.height = 5;
 		ballWidth = ballW;
 		
 		if(whichBlockSmaller == 1) {
@@ -45,7 +45,7 @@ public class SplitBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeColorTransparency(Color color, Color color2) {
-		blockColor = color;
+	public void changeColorTransparency(int colorTransparency) {
+		blockColor = new Color(0, 0, 0, colorTransparency);
 	}
 }

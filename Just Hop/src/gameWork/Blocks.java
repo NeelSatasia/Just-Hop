@@ -11,7 +11,7 @@ public class Blocks extends Rectangle{
 	public void draw(Graphics g) {
 	}
 	
-	public void changeColorTransparency(Color color, Color color2) {
+	public void changeColorTransparency(int colorTransparency) {
 	}
 	
 	public boolean isRedOnRightSide() {
@@ -20,7 +20,7 @@ public class Blocks extends Rectangle{
 	
 	public void changeTBarXPosition() {
 	}
-
+	
 	public int TBarXPosition() {
 		return 0;
 	}

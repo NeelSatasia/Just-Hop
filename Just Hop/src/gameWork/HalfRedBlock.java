@@ -11,11 +11,11 @@ public class HalfRedBlock extends Blocks {
 	int randNum;
 	boolean isRedPartOnRightSide = false;
 	
-	public HalfRedBlock(int x, int y, int w, int h) {
+	public HalfRedBlock(int x, int y, int w) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
-		this.height = h;
+		this.height = 5;
 		this.blackColor = Color.BLACK;
 		this.redColor = Color.RED;
 		
@@ -47,9 +47,9 @@ public class HalfRedBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeColorTransparency(Color halfBlack, Color halfRed) {
-		blackColor = halfBlack;
-		redColor = halfRed;
+	public void changeColorTransparency(int colorTransparency) {
+		blackColor = new Color(0, 0, 0, colorTransparency);
+		redColor = new Color(255, 0, 0, colorTransparency);
 	}
 	
 	@Override

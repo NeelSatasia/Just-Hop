@@ -13,11 +13,11 @@ public class WiperBlock extends Blocks {
 	
 	int TBarHeight = (int)(Math.random() * 21) + 25;
 	
-	public WiperBlock(int x, int y, int w, int h) {
+	public WiperBlock(int x, int y, int w) {
 		this.x = x;
 		this.y = y;
 		this.width = w;
-		this.height = h;
+		this.height = 5;
 		this.blockColor = Color.BLACK;
 		
 		TBarXPosition = this.x + (this.width/2) - (5/2);
@@ -32,8 +32,8 @@ public class WiperBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeColorTransparency(Color color, Color color2) {
-		blockColor = color;
+	public void changeColorTransparency(int colorTransparency) {
+		blockColor = new Color(0, 0, 0, colorTransparency);
 	}
 	
 	@Override
