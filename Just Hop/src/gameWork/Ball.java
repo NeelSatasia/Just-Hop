@@ -24,4 +24,8 @@ public class Ball extends Rectangle {
 	public void changeColor(Color color) {
 		ballColor = color;
 	}
+	
+	public Color getBallColor() {
+		return ballColor;
+	}
 }

@@ -248,6 +248,18 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				blocks[i].draw(g);
 				
+				if(blocks[i] instanceof ShooterBlock) {
+					if(blocks[i].didBallLoseHealthFromBullet()) {
+						if(ballHealth - 10 >= 0) {
+							ballHealth -= 10;
+						} else {
+							ballHealth = 0;
+						}
+						
+						ballHealthLabel.setText("Health: " + ballHealth);
+					}
+				}
+				
 				if(healthBooster[i] != null) {
 					healthBooster[i].draw(g);
 				}
@@ -355,7 +367,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 			if(modes[1].isSelected() && isLeftKeyDown == false && isRightKeyDown == false) {
 				stopBallSlowly = true;
-			} else if(isLeftKeyDown == false && isRightKeyDown == false && blocks[currentIndex] instanceof MagneticBlock == false) {
+			} else if(isLeftKeyDown == false && isRightKeyDown == false) {
 				ballHorizontalSpeed = 0;
 			}
 		}
@@ -545,31 +557,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							changeBallHorizontalSpeed();
 						}
 					}
-				} else if(blocks[i] instanceof MagneticBlock) {
-					int TBarXPosition = blocks[i].TBarXPosition();
-					
-					if(ballY + ball.getHeight() + ballVerticalSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
-						if(ballX >= TBarXPosition + 5) {
-							if(ballX - (TBarXPosition + 5) <= 50) {
-								ballHorizontalSpeed--;
-							}
-							if(ballX + ballHorizontalSpeed <= TBarXPosition + 5) {
-								ballHorizontalSpeed = 0;
-								ballX = TBarXPosition + 5;
-							}
-							
-						} else if(ballX + ball.getWidth() <= TBarXPosition) {
-							if(TBarXPosition - (ballX + ball.getWidth()) <= 50) {
-								ballHorizontalSpeed++;	
-							}
-							if(ballX + ball.getWidth() + ballHorizontalSpeed >= TBarXPosition) {
-								ballHorizontalSpeed = 0;
-								ballX = TBarXPosition - (int) ball.getWidth();
-							}
-						}
-						ball.setLocation(ballX, ballY);
-					}
-					
+				} else if(blocks[i] instanceof ShooterBlock) {
 					if(collisionCheck(i)) {
 						return true;
 					}
@@ -590,7 +578,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				currentIndex = i;
 				ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
 				return true;
-			} else if(blocks[i] instanceof WiperBlock || blocks[i] instanceof MagneticBlock) {
+			} else if(blocks[i] instanceof WiperBlock) {
 				int TBarXPosition = blocks[i].TBarXPosition();
 				
 				if(isBallJumping) {
@@ -624,12 +612,6 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHorizontalSpeed *= -1;
 			} else if(ballHorizontalSpeed == 0 && changedDirectionInAir == false) {
 				ballHorizontalSpeed = speed;
-			}
-		} else if(blocks[currentIndex] instanceof  MagneticBlock) {
-			if(isLeftKeyDown) {
-				ballHorizontalSpeed -= 2;
-			} else if(isRightKeyDown) {
-				ballHorizontalSpeed += 2;
 			}
 		}
 		else {
@@ -691,7 +673,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				blocks[index] = new SplitBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], (int) ball.getWidth());
 				break;
 			case 4:
-				blocks[index] = new MagneticBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+				blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], blocks, ball);
 				break;
 		}
 	}

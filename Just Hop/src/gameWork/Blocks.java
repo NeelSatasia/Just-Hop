@@ -36,4 +36,8 @@ public class Blocks extends Rectangle{
 	public int secondBlockXPosition() {
 		return 0;
 	}
+	
+	public boolean didBallLoseHealthFromBullet() {
+		return false;
+	}
 }

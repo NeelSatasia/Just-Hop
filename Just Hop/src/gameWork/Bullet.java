@@ -10,30 +10,46 @@ import javax.swing.Timer;
 
 public class Bullet extends Rectangle {
 	
-	private int bulletX = 0;
-	private int bulletY = 0;
+	int bulletX = 0;
+	int bulletY = 0;
 	
-	private int bulletInitialY = 0;
+	int bulletInitialYPosition;
 	
-	private int yDistance = 0;
+	boolean didHitBall = false;
 	
 	public Bullet(int x, int y) {
 		bulletX = x;
 		bulletY = y;
-		
-		bulletInitialY = y;
+		bulletInitialYPosition = bulletY;
 	}
-	
-	public void draw(Graphics g, int currentBlockYLocation) {
+
+	public void draw(Graphics g, Ball ball) {
 		g.setColor(Color.BLUE);
-		g.fillArc(bulletX, bulletY + 5, 10, 10, 0, 360);
-		bulletY += 3;
-		yDistance += 3;
+		g.fillRect(bulletX, bulletY += 5, 10, 10);
+		didHitBall = false;
 		
-		if(yDistance >= 265) {
-			bulletInitialY = currentBlockYLocation;
-			bulletY = bulletInitialY;
-			yDistance = 0;
+		if(bulletY > 600) {
+			bulletY = bulletInitialYPosition;
+		} else if((bulletX + this.width > ball.getX() && bulletX < ball.getX() + ball.getWidth() && bulletY + this.height > ball.getY() && bulletY + this.height <= ball.getY() + ball.getHeight())) {
+			didHitBall = true;
+			bulletY = bulletInitialYPosition;
 		}
 	}
+
+	public void changeBulletX(int x) {
+		bulletX = x;
+	}
+
+	public void changeBulletY(int y) {
+		bulletY = y;
+	}
+	
+	public void bulletInitialYPosition(int blockYPosition) {
+		bulletInitialYPosition = blockYPosition;
+	}
+	
+	public boolean didHitBall() {
+		return didHitBall;
+	}
+	
 }
