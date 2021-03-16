@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-public class Blocks extends Rectangle{
+public class Blocks extends Rectangle {
 	
 	//different blocks' different features
 	
@@ -39,5 +39,16 @@ public class Blocks extends Rectangle{
 	
 	public boolean didBallLoseHealthFromBullet() {
 		return false;
+	}
+	
+	public void setBulletYPosition() {
+	}
+
+	public int getBulletXPosition() {
+		return 0;
+	}
+
+	public int getBulletYPosition() {
+		return 0;
 	}
 }
