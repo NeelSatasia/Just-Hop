@@ -3,6 +3,7 @@ package gameWork;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 public class Blocks extends Rectangle {
 	
@@ -37,18 +38,10 @@ public class Blocks extends Rectangle {
 		return 0;
 	}
 	
-	public boolean didBallLoseHealthFromBullet() {
-		return false;
+	public ArrayList<Bullet> getBulletsList() {
+		return null;
 	}
 	
-	public void setBulletYPosition() {
-	}
-
-	public int getBulletXPosition() {
-		return 0;
-	}
-
-	public int getBulletYPosition() {
-		return 0;
+	public void removeBullet(int index) {
 	}
 }

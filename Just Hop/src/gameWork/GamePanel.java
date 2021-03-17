@@ -16,7 +16,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballX = 300;
 	int ballY = 200;
 	
-	Ball ball = new Ball(ballX, ballY, 15, 15, new Color(0, 179, 89));
+	Ball ball = new Ball(ballX, ballY, 15, 15, new Color(31, 122, 31));
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -69,7 +69,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public GamePanel() {
 		
 		setLayout(null);
-		setBackground(Color.WHITE);
+		setBackground(new Color(255, 255, 102));
 		
 		changeBlocksXPositions();
 		
@@ -209,7 +209,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					ball.setLocation(ballX, ballY);
 					
-					ball.changeColor(new Color(0, 179, 89));
+					ball.changeColor(new Color(31, 122, 31));
 					
 					currentIndex = 3;
 					previousIndex = 3;
@@ -404,22 +404,25 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 			
 			if(blocks[i] instanceof ShooterBlock) {
-				if(blocks[i].getBulletXPosition() + 10 >= ballX && blocks[i].getBulletXPosition() <= ballX + ball.getWidth()) {
-					if(blocks[i].getBulletYPosition() + 10 >= ballY && blocks[i].getBulletYPosition() <= ballY + ball.getHeight()) {
-						if(ballHealth - 10 >= 0) {
-							ballHealth -= 10;
-						} else {
-							ballHealth = 0;
+				for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
+					if(blocks[i].getBulletsList().get(j).getBulletXPosition() + blocks[i].getBulletsList().get(j).getWidth() >= ballX && blocks[i].getBulletsList().get(j).getBulletXPosition() <= ballX + ball.getWidth()) {
+						if(blocks[i].getBulletsList().get(j).getBulletYPosition() + blocks[i].getBulletsList().get(j).getHeight() >= ballY && blocks[i].getBulletsList().get(j).getBulletYPosition() <= ballY + ball.getHeight()) {
+							if(ballHealth - 10 >= 0) {
+								ballHealth -= 10;
+							} else {
+								ballHealth = 0;
+							}
+							
+							ballHealthLabel.setText("Health: " + ballHealth);
+							
+							blocks[i].removeBullet(j);
+							break;
 						}
-						
-						ballHealthLabel.setText("Health: " + ballHealth);
-						
-						blocks[i].setBulletYPosition();
 					}
-				}
-				
-				if(blocks[i].getBulletYPosition() >= 600) {
-					blocks[i].setBulletYPosition();
+					if(blocks[i].getBulletsList().get(j).getY() >= 600) {
+						blocks[i].removeBullet(j);
+						break;
+					}
 				}
 			}
 		}
@@ -713,7 +716,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHealthLosingSpeed = 0;
 			}
 		} else {
-			ball.changeColor(new Color(0, 179, 89));
+			ball.changeColor(new Color(31, 122, 31));
 			isBallLosingHealth = false;
 			ballHealthLosingSpeed = 0;
 		}
