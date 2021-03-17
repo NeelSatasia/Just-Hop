@@ -26,64 +26,55 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	HealthBooster[] healthBooster = new HealthBooster[blocks.length];
 	
-	int blockYPositioner = -25;
+	int blockYPositioner;
 	
-	int blockVerticalSpeed = 1;
-	int ballVerticalSpeed = blockVerticalSpeed;
+	int blockVerticalSpeed;
+	int ballVerticalSpeed;
 	
-	int ballHorizontalSpeed = 0;
+	int ballHorizontalSpeed;
 	
-	boolean isBallJumping = false;
-	boolean isBallFalling = false;
+	boolean isBallJumping;
+	boolean isBallFalling;
 	
-	int currentBallJumpYDistance = 0;
-	double ballJumpSpeed = 0.0;
+	int currentBallJumpYDistance;
+	double ballJumpSpeed;
 	
-	int changeBlocksSpeedTimer = 0;
+	int changeBlocksSpeedTimer;
 	
-	int currentIndex = 3;
-	private int previousIndex = 3;
+	int currentIndex;
+	private int previousIndex;
 	
-	boolean didScore = false;
-	int score = 0;
+	boolean didScore;
+	int score;
 	JLabel scoreLabel = new JLabel("Score: " + score);
 	
-	int ballHealth = 100;
+	int ballHealth;
 	JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
 	
 	int differentTypesOfBlocks = 5;
 	
-	int ballHealthLosingSpeed = 0;
-	boolean isBallLosingHealth = false;
+	int ballHealthLosingSpeed;
+	boolean isBallLosingHealth;
 	
-	boolean stopBallSlowly = false;
-	double slowingDownSpeed = 0.0;
+	boolean stopBallSlowly;
+	double slowingDownSpeed;
 	
-	boolean isRightKeyDown = false;
-	boolean isLeftKeyDown = false;
+	boolean isRightKeyDown;
+	boolean isLeftKeyDown;
 	
-	boolean changedDirectionInAir = false;
+	boolean changedDirectionInAir;
 	
 	JCheckBox[] modes = new JCheckBox[3];
+	
+	JButton startgame = new JButton("Start Game");
+	JButton customize = new JButton("Customize");
+	JButton store = new JButton("Store");
+	JButton music = new JButton("Music");
 	
 	public GamePanel() {
 		
 		setLayout(null);
 		setBackground(new Color(255, 255, 102));
-		
-		changeBlocksXPositions();
-		
-		ballX = blocksXPositions[3];
-		
-		ball.setLocation(ballX, ballY);
-		
-		add(scoreLabel);
-		scoreLabel.setBounds(10, 10, 150, 30);
-		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
-		
-		add(ballHealthLabel);
-		ballHealthLabel.setBounds(10, 40, 150, 30);
-		ballHealthLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
 		
 		modes[0] = new JCheckBox("Blocks With Random Sizes");
 		modes[1] = new JCheckBox("Slippery Blocks");
@@ -107,30 +98,46 @@ public class GamePanel extends JPanel implements ActionListener {
 			});
 		}
 		
-		for(int i = 0; i < blocks.length; i++) {
-			healthBooster[i] = null;
-			//bullets[i] = null;
-			blocksYPositions[i] += blockYPositioner;
-			blockYPositioner = blocksYPositions[i] + 100;
-			
-			if(modes[0].isSelected()) {
-				blocksWidth[i] = (int)(Math.random() * 31) + 30;
-			} else {
-				blocksWidth[i] = 60;
-			}
-			
-			blocksColorTransparency[i] = 255;
-			
-			generateRandomBlock(i);
-		}
+		add(startgame);
+		startgame.setBounds(365, 185, 70, 30);
+		enableButton(startgame);
 		
-		timer.start();
+		startgame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuButtons(false);
+				
+				startGame();
+				timer.start();
+			}
+		});
+		
+		add(customize);
+		customize.setBounds(365, 225, 70, 30);
+		enableButton(customize);
+		
+		customize.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				menuButtons(false);
+			}
+		});
+		
+		add(store);
+		store.setBounds(365, 265, 70, 30);
+		enableButton(store);
+		
+		store.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				menuButtons(false);
+			}
+		});
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if(ballHealth == 0) {
+		if(ballHealth == 0 && timer.isRunning()) {
 			timer.stop();
 			
 			JButton gameOverButton = new JButton("Try Again");
@@ -159,65 +166,10 @@ public class GamePanel extends JPanel implements ActionListener {
 						remove(modes[i]);
 					}
 					
-					score = 0;
-					scoreLabel.setText("Score: " + score);
-					
-					ballHealth = 100;
-					ballHealthLabel.setText("Health: " + ballHealth);
-					
-					ballHorizontalSpeed = 0;
-					ballVerticalSpeed = blockVerticalSpeed;
-					slowingDownSpeed = 0.0;
-					currentBallJumpYDistance = 0;
-					ballJumpSpeed = 0;
-					ballHealthLosingSpeed = 0;
-					
-					isBallLosingHealth = false;
-					isBallJumping = false;
-					isBallFalling = false;
-					stopBallSlowly = false;
-					didScore = false;
-					changedDirectionInAir = false;
-					
-					isRightKeyDown = false;
-					isLeftKeyDown = false;
-					
-					changeBlocksXPositions();
-					
-					blockYPositioner = -25;
-					
-					for(int i = 0; i < blocks.length; i++) {
-						healthBooster[i] = null;
-						blocksYPositions[i] = 0;
-						blocksYPositions[i] += blockYPositioner;
-						blockYPositioner = blocksYPositions[i] + 100;
-						
-						if(modes[0].isSelected()) {
-							blocksWidth[i] = (int)(Math.random() * 16) + 45;
-						} else {
-							blocksWidth[i] = 60;
-						}
-						
-						blocksColorTransparency[i] = 255;
-						
-						generateRandomBlock(i);
-						blocks[i].draw(g);
-					}
-					
-					ballX = blocksXPositions[3];
-					ballY = 200;
-					
-					ball.setLocation(ballX, ballY);
-					
-					ball.changeColor(new Color(31, 122, 31));
-					
-					currentIndex = 3;
-					previousIndex = 3;
-					
-					timer.restart();
+					startGame();
 				}
 			});
-		} else {
+		} else if(timer.isRunning()) {
 			ball.setLocation(ballX, ballY);
 			ball.draw(g);
 			
@@ -321,7 +273,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			changeBlockColorTransparency(currentIndex);
 			isBallFalling = false;
 			ballVerticalSpeed = blockVerticalSpeed;
-			//ballVerticalSpeed = 0;
 			
 			if(((previousIndex == 0 && currentIndex == blocks.length-1) || previousIndex > currentIndex) && didScore == false) {
 				score++;
@@ -419,7 +370,11 @@ public class GamePanel extends JPanel implements ActionListener {
 							break;
 						}
 					}
-					if(blocks[i].getBulletsList().get(j).getY() >= 600) {
+					if(blocks[i].getBulletsList().get(j).getBulletYPosition() >= 600) {
+						blocks[i].removeBullet(j);
+						break;
+					}
+					if(ballY + ball.getHeight() <= blocksYPositions[i] && blocks[i].getBulletsList().get(j).getBulletYPosition() <= blocksYPositions[i] + blocks[i].getHeight() + 15) {
 						blocks[i].removeBullet(j);
 						break;
 					}
@@ -433,6 +388,73 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		repaint();
+	}
+	
+	public void startGame() {
+		score = 0;
+		scoreLabel.setText("Score: " + score);
+		
+		ballHealth = 100;
+		ballHealthLabel.setText("Health: " + ballHealth);
+		
+		add(scoreLabel);
+		scoreLabel.setBounds(10, 10, 150, 30);
+		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		
+		add(ballHealthLabel);
+		ballHealthLabel.setBounds(10, 40, 150, 30);
+		ballHealthLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		
+		ballHorizontalSpeed = 0;
+		blockVerticalSpeed = 1;
+		ballVerticalSpeed = blockVerticalSpeed;
+		slowingDownSpeed = 0.0;
+		currentBallJumpYDistance = 0;
+		ballJumpSpeed = 0;
+		ballHealthLosingSpeed = 0;
+		
+		isBallLosingHealth = false;
+		isBallJumping = false;
+		isBallFalling = false;
+		stopBallSlowly = false;
+		didScore = false;
+		changedDirectionInAir = false;
+		
+		isRightKeyDown = false;
+		isLeftKeyDown = false;
+		
+		changeBlocksXPositions();
+		
+		blockYPositioner = -25;
+		
+		for(int i = 0; i < blocks.length; i++) {
+			healthBooster[i] = null;
+			blocksYPositions[i] = 0;
+			blocksYPositions[i] += blockYPositioner;
+			blockYPositioner = blocksYPositions[i] + 100;
+			
+			if(modes[0].isSelected()) {
+				blocksWidth[i] = (int)(Math.random() * 16) + 45;
+			} else {
+				blocksWidth[i] = 60;
+			}
+			
+			blocksColorTransparency[i] = 255;
+			
+			generateRandomBlock(i);
+		}
+		
+		ballX = blocksXPositions[3];
+		ballY = 200;
+		
+		ball.setLocation(ballX, ballY);
+		
+		ball.changeColor(new Color(31, 122, 31));
+		
+		currentIndex = 3;
+		previousIndex = 3;
+		
+		timer.restart();
 	}
 	
 	public void changeBlocksXPositions() {
@@ -475,7 +497,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			blocksXPositions[i] = blockXPosition;
 		}
 	}
-	
 	
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
@@ -729,8 +750,38 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void leftKeyDown(boolean x) {
 		isLeftKeyDown = x;
 	}
-
-	public boolean isChangedDirectionInAir() {
-		return changedDirectionInAir;
+	
+	public void enableButton(JButton button) {
+		button.setEnabled(true);
+		button.setBackground(Color.DARK_GRAY);
+		button.setBorder(null);
+		button.setForeground(Color.WHITE);
+		button.setFocusable(false);
+	}
+	
+	public void disableButton(JButton button) {
+		button.setEnabled(false);
+		button.setBackground(new Color(217, 217, 217));
+		button.setBorder(null);
+		button.setForeground(new Color(26, 26, 26));
+		button.setFocusable(false);
+	}
+	
+	public void menuButtons(boolean show) {
+		if(show == false) {
+			startgame.hide();
+			customize.hide();
+			store.hide();
+			remove(startgame);
+			remove(customize);
+			remove(store);
+		} else {
+			add(startgame);
+			add(customize);
+			add(store);
+			startgame.show();
+			customize.show();
+			store.show();
+		}
 	}
 }
