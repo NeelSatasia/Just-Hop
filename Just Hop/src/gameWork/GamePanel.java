@@ -64,12 +64,18 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean changedDirectionInAir;
 	
+	boolean isPlayingGame = false;
+	boolean pause;
+	
+	JCheckBox[] differentBlocks = new JCheckBox[differentTypesOfBlocks];
 	JCheckBox[] modes = new JCheckBox[3];
 	
 	JButton startgame = new JButton("Start Game");
 	JButton customize = new JButton("Customize");
 	JButton store = new JButton("Store");
 	JButton music = new JButton("Music");
+	
+	JButton exit = new JButton("Exit");
 	
 	public GamePanel() {
 		
@@ -79,6 +85,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		modes[0] = new JCheckBox("Blocks With Random Sizes");
 		modes[1] = new JCheckBox("Slippery Blocks");
 		modes[2] = new JCheckBox("Transparent Blocks");
+		
+		differentBlocks[0] = new JCheckBox("Regular Blocks");
+		differentBlocks[1] = new JCheckBox("HalfRed Blocks");
+		differentBlocks[2] = new JCheckBox("Wiper Blocks");
+		differentBlocks[3] = new JCheckBox("Split Blocks");
+		differentBlocks[4] = new JCheckBox("Shooter Blocks");
 		
 		for(int i = 0; i < modes.length; i++) {
 			modes[i].setFocusable(false);
@@ -117,8 +129,39 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		customize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
 				menuButtons(false);
+				add(exit);
+				
+				JLabel blocksLabel = new JLabel("Blocks");
+				add(blocksLabel);
+				blocksLabel.setBounds(200, 200, 100, 40);
+				blocksLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+				
+				JLabel modesLabel = new JLabel("Modes");
+				add(modesLabel);
+				modesLabel.setBounds(450, 200, 100, 40);
+				modesLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+				
+				int y = 250;
+				
+				for(int i = 0; i < differentBlocks.length; i++) {
+					add(differentBlocks[i]);
+					differentBlocks[i].setBounds(170, y, 120, 20);
+					y += 25;
+				}
+				
+				exit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						remove(exit);
+						remove(blocksLabel);
+						remove(modesLabel);
+						menuButtons(true);
+						
+						repaint();
+					}
+				});
+				
+				repaint();
 			}
 		});
 		
@@ -128,16 +171,32 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		store.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
 				menuButtons(false);
+				add(exit);
+				
+				exit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						remove(exit);
+						
+						menuButtons(true);
+						
+						repaint();
+					}
+				});
+				
+				repaint();
 			}
 		});
+		
+		exit.setBounds(15, 15, 60, 30);
+		enableButton(exit);
+		exit.setBackground(new Color(204, 0, 0));
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		if(ballHealth == 0 && timer.isRunning()) {
+		if(ballHealth == 0 && timer.isRunning() && pause == false) {
 			timer.stop();
 			
 			JButton gameOverButton = new JButton("Try Again");
@@ -157,6 +216,8 @@ public class GamePanel extends JPanel implements ActionListener {
 				modesListY += 25;
 			}
 			
+			isPlayingGame = false;
+			
 			gameOverButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					gameOverButton.hide();
@@ -169,7 +230,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					startGame();
 				}
 			});
-		} else if(timer.isRunning()) {
+		} else if(timer.isRunning() && pause == false) {
 			ball.setLocation(ballX, ballY);
 			ball.draw(g);
 			
@@ -206,6 +267,13 @@ public class GamePanel extends JPanel implements ActionListener {
 					healthBooster[i].draw(g);
 				}
 			}
+		} else if(pause) {
+			timer.stop();
+			
+			g.setFont(new Font("Times New Roman", Font.PLAIN, 50));
+			g.drawString("Paused", 340, 260);
+			g.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+			g.drawString("(Press Spacebar To Unpause)", 305, 285);
 		}
 	}
 	
@@ -422,6 +490,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		isRightKeyDown = false;
 		isLeftKeyDown = false;
+		
+		isPlayingGame = true;
+		pause = false;
 		
 		changeBlocksXPositions();
 		
@@ -654,7 +725,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void changeBallHorizontalSpeed() {
-		if(ballHorizontalSpeed == 0 && changedDirectionInAir == false) {
+		if(ballHorizontalSpeed == 0 && changedDirectionInAir == false && pause == false) {
 			if(isRightKeyDown) {
 				ballHorizontalSpeed = 4;
 			} else if(isLeftKeyDown) {
@@ -664,7 +735,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void makeBallJump() {
-		if(isBallJumping == false && isBallFalling == false) {
+		if(isBallJumping == false && isBallFalling == false && pause == false) {
 			isBallJumping = true;
 			
 			switch(blockVerticalSpeed) {
@@ -769,9 +840,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public void menuButtons(boolean show) {
 		if(show == false) {
-			startgame.hide();
-			customize.hide();
-			store.hide();
 			remove(startgame);
 			remove(customize);
 			remove(store);
@@ -779,9 +847,19 @@ public class GamePanel extends JPanel implements ActionListener {
 			add(startgame);
 			add(customize);
 			add(store);
-			startgame.show();
-			customize.show();
-			store.show();
 		}
+	}
+	
+	public void pauseTheGame(boolean pauseit) {
+		if(isPlayingGame) {
+			pause = pauseit;
+			if(pause == false) {
+				timer.start();
+			}
+		}
+	}
+	
+	public boolean isGamePaused() {
+		return pause;
 	}
 }

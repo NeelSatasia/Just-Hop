@@ -45,6 +45,14 @@ public class PlayGame {
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
 					gamePanel.leftKeyDown(false);
 				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+					if(gamePanel.isGamePaused() == false) {
+						gamePanel.pauseTheGame(true);
+					} else if(gamePanel.isGamePaused()) {
+						gamePanel.pauseTheGame(false);
+					}
+				}
 			}
 
 			@Override
