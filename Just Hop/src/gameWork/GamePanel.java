@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.JPanel;
 import javax.swing.*;
 
@@ -52,6 +54,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
 	
 	int differentTypesOfBlocks = 5;
+	ArrayList<String> differentBlocksInGame = new ArrayList<String>();
 	
 	int ballHealthLosingSpeed;
 	boolean isBallLosingHealth;
@@ -87,6 +90,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		modes[2] = new JCheckBox("Transparent Blocks");
 		
 		differentBlocks[0] = new JCheckBox("Regular Blocks");
+		differentBlocks[0].setSelected(true);
+		differentBlocksInGame.add(differentBlocks[0].getText());
+		
 		differentBlocks[1] = new JCheckBox("HalfRed Blocks");
 		differentBlocks[2] = new JCheckBox("Wiper Blocks");
 		differentBlocks[3] = new JCheckBox("Split Blocks");
@@ -104,6 +110,30 @@ public class GamePanel extends JPanel implements ActionListener {
 							modes[j].setSelected(true);
 						} else {
 							modes[j].setSelected(false);
+						}
+					}
+				}
+			});
+		}
+		
+		for(int i = 0; i < differentBlocks.length; i++) {
+			differentBlocks[i].setFocusable(false);
+			differentBlocks[i].setFont(new Font("Consolas", Font.PLAIN, 10));
+			
+			int j = i;
+			differentBlocks[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(e.getSource() == differentBlocks[j]) {
+						if(differentBlocks[j].isSelected()) {
+							differentBlocks[j].setSelected(true);
+							differentBlocksInGame.add(differentBlocks[j].getText());
+						} else {
+							if(differentBlocksInGame.size() - 1 > 0) {
+								differentBlocks[j].setSelected(false);
+								differentBlocksInGame.remove(differentBlocks[j].getText());
+							} else {
+								differentBlocks[j].setSelected(true);
+							}
 						}
 					}
 				}
@@ -147,6 +177,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				for(int i = 0; i < differentBlocks.length; i++) {
 					add(differentBlocks[i]);
 					differentBlocks[i].setBounds(170, y, 120, 20);
+					
+					if(i < modes.length) {
+						add(modes[i]);
+						modes[i].setBounds(410, y, 180, 20);
+					}
 					y += 25;
 				}
 				
@@ -155,6 +190,13 @@ public class GamePanel extends JPanel implements ActionListener {
 						remove(exit);
 						remove(blocksLabel);
 						remove(modesLabel);
+						for(int i = 0; i < differentBlocks.length; i++) {
+							remove(differentBlocks[i]);
+							if(i < modes.length) {
+								remove(modes[i]);
+							}
+						}
+						
 						menuButtons(true);
 						
 						repaint();
@@ -198,38 +240,43 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(ballHealth == 0 && timer.isRunning() && pause == false) {
 			timer.stop();
+			isPlayingGame = false;
 			
 			JButton gameOverButton = new JButton("Try Again");
 			add(gameOverButton);
 			gameOverButton.setBounds(370, 285, 60, 30);
-			gameOverButton.setEnabled(true);
-			gameOverButton.setBorder(null);
-			gameOverButton.setBackground(Color.BLACK);
-			gameOverButton.setForeground(Color.WHITE);
-			gameOverButton.setFocusable(false);
+			enableButton(gameOverButton);
 			
-			int modesListY = 320;
-			
-			for(int i = 0; i < modes.length; i++) {
-				add(modes[i]);
-				modes[i].setBounds(310, modesListY, 190, 20);
-				modesListY += 25;
-			}
-			
-			isPlayingGame = false;
+			JButton exit = new JButton("Exit");
+			add(exit);
+			exit.setBounds(370, 325, 60, 30);
+			enableButton(exit);
+			exit.setBackground(new Color(204, 0, 0));
 			
 			gameOverButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					gameOverButton.hide();
 					remove(gameOverButton);
+					remove(exit);
 					
-					for(int i = 0; i < modes.length; i++) {
-						remove(modes[i]);
-					}
+					repaint();
 					
 					startGame();
 				}
 			});
+			
+			exit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					remove(ballHealthLabel);
+					remove(scoreLabel);
+					remove(gameOverButton);
+					remove(exit);
+					
+					menuButtons(true);
+					
+					repaint();
+				}
+			});
+			
 		} else if(timer.isRunning() && pause == false) {
 			ball.setLocation(ballX, ballY);
 			ball.draw(g);
@@ -754,32 +801,31 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 	
-	public boolean isBallJumping() {
-		return isBallJumping;
-	}
-
-	public boolean isBallFalling() {
-		return isBallFalling;
-	}
-	
 	public void generateRandomBlock(int index) {
-		int randBlock = (int)(Math.random() * differentTypesOfBlocks);
-		switch(randBlock) {
-			case 0:
-				blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+		int randBlock = (int)(Math.random() * differentBlocksInGame.size());
+		
+		for(int i = 0; i < differentBlocksInGame.size(); i++) {
+			if(i == randBlock) {
+				switch(differentBlocksInGame.get(i)) {
+					case "Regular Blocks":
+						blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+						break;
+					case "HalfRed Blocks":
+						blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+						break;
+					case "Wiper Blocks":
+						blocks[index] = new WiperBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+						break;
+					case "Split Blocks":
+						blocks[index] = new SplitBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], (int) ball.getWidth());
+						break;
+					case "Shooter Blocks":
+						blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
+						break;
+				}
+				
 				break;
-			case 1:
-				blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
-				break;
-			case 2:
-				blocks[index] = new WiperBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
-				break;
-			case 3:
-				blocks[index] = new SplitBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], (int) ball.getWidth());
-				break;
-			case 4:
-				blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
-				break;
+			}
 		}
 	}
 
