@@ -5,28 +5,23 @@ import java.awt.Rectangle;
 
 public class BlockBullet extends Rectangle {
 	
-	int bulletXPosition;
-	int bulletYPosition;
-	
 	public BlockBullet(int x, int y) {
 		this.x = x;
 		this.y = y;
-		bulletXPosition = x;
-		bulletYPosition = y;
 		this.width = 10;
 		this.height = 10;
 	}
 	
 	public void draw(Graphics g) {
-		g.fillPolygon(new int[] {this.x, this.x + 10, this.x + 5}, new int[] {bulletYPosition, bulletYPosition, bulletYPosition + 10}, 3); //bullet
-		bulletYPosition += 5;
+		g.fillPolygon(new int[] {this.x, this.x + 10, this.x + 5}, new int[] {this.y, this.y, this.y + 10}, 3); //bullet
+		this.y += 5;
 	}
 	
 	public int getBulletXPosition() {
-		return bulletXPosition;
+		return this.x;
 	}
 
 	public int getBulletYPosition() {
-		return bulletYPosition;
+		return this.y;
 	}
 }

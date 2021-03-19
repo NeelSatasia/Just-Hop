@@ -25,8 +25,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	int[] blocksWidth = new int[blocks.length];
 	int[] blocksColorTransparency = new int[blocks.length];
 	
-	HealthBooster[] healthBooster = new HealthBooster[blocks.length];
-	
 	int blockYPositioner;
 	
 	int blockVerticalSpeed;
@@ -49,6 +47,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int score;
 	JLabel scoreLabel = new JLabel("Score: " + score);
 	
+	int coins;
+	
 	int ballHealth;
 	JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
 	
@@ -65,6 +65,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isLeftKeyDown;
 	
 	boolean changedDirectionInAir;
+	
+	boolean ballBulletCollision = false;
 	
 	boolean isPlayingGame = false;
 	boolean pause;
@@ -280,14 +282,14 @@ public class GamePanel extends JPanel implements ActionListener {
 			ball.draw(g);
 			
 			for(int i = 0; i < blocks.length; i++) {
-				if(blocks[i].getY() >= 100 * blocks.length) {
+				if(blocks[i].y >= 100 * blocks.length) {
 					generateRandomBlock(i);
 					
 					if(ballHealth < 50) {
 						int healthBoosterChance = (int)(Math.random() * 21);
 						if(healthBoosterChance <= 10) {
 							int healthBoosterXPosition = (int)(Math.random() * (blocksWidth[i] - ball.getWidth())) + blocksXPositions[i];
-							healthBooster[i] = new HealthBooster(healthBoosterXPosition, blocksYPositions[i]);
+							blocks[i].addHealthBooster(true);
 						}
 					}
 				} else {
@@ -295,22 +297,10 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					blocks[i].changeColorTransparency(blocksColorTransparency[i]);
 					
-					if(healthBooster[i] != null) {
-						if(ballHealth < 100) {
-							healthBooster[i].setLocation((int) healthBooster[i].getX(), blocksYPositions[i]);
-						} else {
-							healthBooster[i] = null;
-						}
-					}
-					
 					blocks[i].changeTBarXPosition();
 				}
 				
 				blocks[i].draw(g);
-				
-				if(healthBooster[i] != null) {
-					healthBooster[i].draw(g);
-				}
 			}
 		} else if(pause) {
 			timer.stop();
@@ -453,36 +443,23 @@ public class GamePanel extends JPanel implements ActionListener {
 		ballY += ballVerticalSpeed;
 		
 		for(int i = 0; i < blocks.length; i++) {
-			if(healthBooster[i] != null) {
-				if(ballY + ball.getHeight() >= healthBooster[i].getY() && ballY <= healthBooster[i].getY() + healthBooster[i].getHeight()) {
-					if(ballX + ball.getWidth() >= healthBooster[i].getX() && ballX <= healthBooster[i].getX() + healthBooster[i].getWidth()) {
-						healthBooster[i] = null;
-						if(ballHealth + 5 > 100) {
-							ballHealth = 100;
-						} else {
-							ballHealth += 5;
-						}
-						ballHealthLabel.setText("Health: " + ballHealth);
-						break;
-					}
-				}
+			if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
+				blocks[i].addHealthBooster(false);
 			}
 			
 			if(blocks[i] instanceof ShooterBlock) {
 				for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
-					if(blocks[i].getBulletsList().get(j).getBulletXPosition() + blocks[i].getBulletsList().get(j).getWidth() >= ballX && blocks[i].getBulletsList().get(j).getBulletXPosition() <= ballX + ball.getWidth()) {
-						if(blocks[i].getBulletsList().get(j).getBulletYPosition() + blocks[i].getBulletsList().get(j).getHeight() >= ballY && blocks[i].getBulletsList().get(j).getBulletYPosition() <= ballY + ball.getHeight()) {
-							if(ballHealth - 10 >= 0) {
-								ballHealth -= 10;
-							} else {
-								ballHealth = 0;
-							}
-							
-							ballHealthLabel.setText("Health: " + ballHealth);
-							
-							blocks[i].removeBullet(j);
-							break;
+					if(blocks[i].getBulletsList().get(j).intersects(ball)) {		
+						if(ballHealth - 10 >= 0) {
+							ballHealth -= 10;
+						} else {
+							ballHealth = 0;
 						}
+						
+						ballHealthLabel.setText("Health: " + ballHealth);
+						
+						blocks[i].removeBullet(j);
+						break;
 					}
 					if(blocks[i].getBulletsList().get(j).getBulletYPosition() >= 600) {
 						blocks[i].removeBullet(j);
@@ -492,6 +469,12 @@ public class GamePanel extends JPanel implements ActionListener {
 						blocks[i].removeBullet(j);
 						break;
 					}
+				}
+			}
+			
+			for(int j = 0; j < ball.bullets.size(); j++) {
+				if(ball.bullets.get(j) != null && blocks[i].intersects(ball.bullets.get(j))) {
+					ball.bullets.set(j, null);
 				}
 			}
 		}
@@ -510,6 +493,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		ballHealth = 100;
 		ballHealthLabel.setText("Health: " + ballHealth);
+		
+		coins = 0;
 		
 		add(scoreLabel);
 		scoreLabel.setBounds(10, 10, 150, 30);
@@ -537,6 +522,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		isRightKeyDown = false;
 		isLeftKeyDown = false;
 		
+		ball.shootBullets = false;
+		
 		isPlayingGame = true;
 		pause = false;
 		
@@ -545,7 +532,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		blockYPositioner = -25;
 		
 		for(int i = 0; i < blocks.length; i++) {
-			healthBooster[i] = null;
 			blocksYPositions[i] = 0;
 			blocksYPositions[i] += blockYPositioner;
 			blockYPositioner = blocksYPositions[i] + 100;
@@ -906,5 +892,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public boolean isGamePaused() {
 		return pause;
+	}
+
+	public void ballShootBullets(boolean b) {
+		if(isPlayingGame && pause == false) {
+			ball.shootBullets = b;
+		}
 	}
 }

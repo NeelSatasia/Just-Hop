@@ -10,13 +10,13 @@ public class ShooterBlock extends Blocks {
 	
 	int gunXPosition;
 	
-	int counter = 0;
+	int gunReloadCounter = 0;
 	
 	ArrayList<BlockBullet> bullets = new ArrayList<BlockBullet>();
 	
 	int randX;
 	int coinChance = (int)(Math.random() * 10);
-	Coin coin;
+	Coin coin = null;
 	
 	int blockColorTransparency = 255;
 
@@ -31,13 +31,25 @@ public class ShooterBlock extends Blocks {
 		bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
 		
 		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 5)) + this.x;
-			coin = new Coin(randX, this.y + 4);
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
 		}
 	}
 	
 	@Override
 	public void draw(Graphics g) {
+		
+		gunReloadCounter++;
+		
+		if(gunReloadCounter == 50 && blockColorTransparency == 255) {
+			bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
+			gunReloadCounter = 0;
+		}
+		
+		for(BlockBullet bullet: bullets) {
+			g.setColor(blockColor);
+			bullet.draw(g);
+		}
 		
 		g.setColor(blockColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
@@ -46,21 +58,9 @@ public class ShooterBlock extends Blocks {
 		g.fillRect(this.x + ((this.width/2) - 10), this.y + this.height, 20, 15);
 		g.fillRect(gunXPosition, this.y + this.height + 15, 10, 5);
 		
-		if(coinChance > 5) {
-			coin.changeYPosition(this.y + 4);
+		if(coin != null) {
+			coin.changeYPosition(this.y);
 			coin.draw(g);
-		}
-		
-		counter++;
-		
-		if(counter == 50 && blockColorTransparency == 255) {
-			bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
-			counter = 0;
-		}
-		
-		for(BlockBullet bullet: bullets) {
-			g.setColor(blockColor);
-			bullet.draw(g);
 		}
 	}
 	

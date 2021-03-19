@@ -36,6 +36,10 @@ public class PlayGame {
 				if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
 					gamePanel.makeBallJump();
 				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_B) {
+					gamePanel.ballShootBullets(true);
+				}
 			}
 
 			@Override
@@ -52,6 +56,10 @@ public class PlayGame {
 					} else if(gamePanel.isGamePaused()) {
 						gamePanel.pauseTheGame(false);
 					}
+				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_B) {
+					gamePanel.ballShootBullets(false);
 				}
 			}
 

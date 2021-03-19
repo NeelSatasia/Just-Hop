@@ -44,4 +44,11 @@ public class Blocks extends Rectangle {
 	
 	public void removeBullet(int index) {
 	}
+
+	public HealthBooster getHealthBooster() {
+		return null;
+	}
+
+	public void addHealthBooster(boolean b) {
+	}
 }
