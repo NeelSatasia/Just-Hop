@@ -11,6 +11,10 @@ public class HalfRedBlock extends Blocks {
 	int randNum;
 	boolean isRedPartOnRightSide = false;
 	
+	int randX;
+	int coinChance = (int)(Math.random() * 10);
+	Coin coin;
+	
 	public HalfRedBlock(int x, int y, int w) {
 		this.x = x;
 		this.y = y;
@@ -23,6 +27,11 @@ public class HalfRedBlock extends Blocks {
 		
 		if(randNum < 3) {
 			isRedPartOnRightSide = true;
+		}
+		
+		if(coinChance > 5) {
+			randX = (int) (Math.random() * (this.width - 5)) + this.x;
+			coin = new Coin(randX, this.y + 4);
 		}
 	}	
 	
@@ -43,7 +52,13 @@ public class HalfRedBlock extends Blocks {
 		} else {
 			g.setColor(this.blackColor);
 		}
+		
 		g.fillRect(this.x+rect2X, this.y, rect2X, this.height);
+		
+		if(coinChance > 5) {
+			coin.changeYPosition(this.y + 4);
+			coin.draw(g);
+		}
 	}
 	
 	@Override

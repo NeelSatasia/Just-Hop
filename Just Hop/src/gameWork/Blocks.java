@@ -38,7 +38,7 @@ public class Blocks extends Rectangle {
 		return 0;
 	}
 	
-	public ArrayList<Bullet> getBulletsList() {
+	public ArrayList<BlockBullet> getBulletsList() {
 		return null;
 	}
 	

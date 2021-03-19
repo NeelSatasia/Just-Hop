@@ -11,6 +11,10 @@ public class SplitBlock extends Blocks {
 	
 	Color blockColor;
 	
+	int randX;
+	int coinChance = (int)(Math.random() * 10);
+	Coin coin;
+	
 	public SplitBlock(int x, int y, int w, int ballW) {
 		this.x = x;
 		this.y = y;
@@ -25,6 +29,11 @@ public class SplitBlock extends Blocks {
 		}
 		
 		blockColor = Color.BLACK;
+		
+		if(coinChance > 5) {
+			randX = (int) (Math.random() * (this.width - 5)) + this.x;
+			coin = new Coin(randX, this.y + 4);
+		}
 	}
 	
 	@Override
@@ -36,6 +45,11 @@ public class SplitBlock extends Blocks {
 		} else {
 			g.fillRect(this.x, this.y, this.width/2, this.height);
 			g.fillRect(secondBlockXPosition, this.y, (this.width/2) - (ballWidth), this.height);
+		}
+		
+		if(coinChance > 5) {
+			coin.changeYPosition(this.y + 4);
+			coin.draw(g);
 		}
 	}
 	

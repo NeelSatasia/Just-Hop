@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -77,22 +76,18 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton customize = new JButton("Customize");
 	JButton store = new JButton("Store");
 	JButton music = new JButton("Music");
-	
 	JButton exit = new JButton("Exit");
 	
 	public GamePanel() {
 		
 		setLayout(null);
-		setBackground(new Color(255, 255, 102));
+		setBackground(Color.WHITE);
 		
 		modes[0] = new JCheckBox("Blocks With Random Sizes");
 		modes[1] = new JCheckBox("Slippery Blocks");
 		modes[2] = new JCheckBox("Transparent Blocks");
 		
 		differentBlocks[0] = new JCheckBox("Regular Blocks");
-		differentBlocks[0].setSelected(true);
-		differentBlocksInGame.add(differentBlocks[0].getText());
-		
 		differentBlocks[1] = new JCheckBox("HalfRed Blocks");
 		differentBlocks[2] = new JCheckBox("Wiper Blocks");
 		differentBlocks[3] = new JCheckBox("Split Blocks");
@@ -119,6 +114,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < differentBlocks.length; i++) {
 			differentBlocks[i].setFocusable(false);
 			differentBlocks[i].setFont(new Font("Consolas", Font.PLAIN, 10));
+			
+			differentBlocks[i].setSelected(true);
+			differentBlocksInGame.add(differentBlocks[i].getText());
 			
 			int j = i;
 			differentBlocks[i].addActionListener(new ActionListener() {
@@ -164,15 +162,15 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				JLabel blocksLabel = new JLabel("Blocks");
 				add(blocksLabel);
-				blocksLabel.setBounds(200, 200, 100, 40);
+				blocksLabel.setBounds(200, 100, 100, 40);
 				blocksLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
 				
 				JLabel modesLabel = new JLabel("Modes");
 				add(modesLabel);
-				modesLabel.setBounds(450, 200, 100, 40);
+				modesLabel.setBounds(450, 100, 100, 40);
 				modesLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
 				
-				int y = 250;
+				int y = 150;
 				
 				for(int i = 0; i < differentBlocks.length; i++) {
 					add(differentBlocks[i]);
@@ -326,6 +324,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] >= 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;

@@ -7,11 +7,15 @@ public class WiperBlock extends Blocks {
 	
 	Color blockColor;
 	
-	double TBarXPosition = 0;
+	int TBarXPosition = 0;
 	
 	boolean isTBarRight = true;
 	
 	int TBarHeight = (int)(Math.random() * 21) + 25;
+	
+	int randX;
+	int coinChance = (int)(Math.random() * 10);
+	Coin coin;
 	
 	public WiperBlock(int x, int y, int w) {
 		this.x = x;
@@ -21,6 +25,11 @@ public class WiperBlock extends Blocks {
 		this.blockColor = Color.BLACK;
 		
 		TBarXPosition = this.x + (this.width/2) - (5/2);
+		
+		if(coinChance > 5) {
+			randX = (int) (Math.random() * (this.width - 7)) + this.x;
+			coin = new Coin(randX, this.y + 4);
+		}
 	}	
 	
 	@Override
@@ -28,7 +37,12 @@ public class WiperBlock extends Blocks {
 		g.setColor(this.blockColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
 		
-		g.fillRect((int) TBarXPosition, this.y - TBarHeight, 5, TBarHeight);
+		g.fillRect(TBarXPosition, this.y - TBarHeight, 5, TBarHeight); //Wiper
+		
+		if(coinChance > 5) {
+			coin.changeYPosition(this.y + 4);
+			coin.draw(g);
+		}
 	}
 	
 	@Override
