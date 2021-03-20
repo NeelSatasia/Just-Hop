@@ -51,4 +51,11 @@ public class Blocks extends Rectangle {
 
 	public void addHealthBooster(boolean b) {
 	}
+	
+	public Coin getCoin() {
+		return null;
+	}
+
+	public void addCoin(boolean b) {
+	}
 }

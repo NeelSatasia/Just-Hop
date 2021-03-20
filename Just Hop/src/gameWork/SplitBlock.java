@@ -12,8 +12,9 @@ public class SplitBlock extends Blocks {
 	Color blockColor;
 	
 	int randX;
-	int coinChance = (int)(Math.random() * 10);
 	Coin coin = null;
+	
+	HealthBooster healthBooster = null;
 	
 	public SplitBlock(int x, int y, int w, int ballW) {
 		this.x = x;
@@ -29,11 +30,6 @@ public class SplitBlock extends Blocks {
 		}
 		
 		blockColor = Color.BLACK;
-		
-		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 12)) + this.x;
-			coin = new Coin(randX, this.y);
-		}
 	}
 	
 	@Override
@@ -51,6 +47,11 @@ public class SplitBlock extends Blocks {
 			coin.changeYPosition(this.y);
 			coin.draw(g);
 		}
+		
+		if(healthBooster != null) {
+			healthBooster.changeYPosition(this.y);
+			healthBooster.draw(g);
+		}
 	}
 	
 	@Override
@@ -61,5 +62,34 @@ public class SplitBlock extends Blocks {
 	@Override
 	public void changeColorTransparency(int colorTransparency) {
 		blockColor = new Color(0, 0, 0, colorTransparency);
+	}
+	
+	@Override
+	public HealthBooster getHealthBooster() {
+		return healthBooster;
+	}
+	
+	@Override
+	public void addHealthBooster(boolean b) {
+		if(b) {
+			healthBooster = new HealthBooster((int)(Math.random() * (this.width - 16)) + this.x, this.y);
+		} else {
+			healthBooster = null;
+		}
+	}
+	
+	@Override
+	public Coin getCoin() {
+		return coin;
+	}
+	
+	@Override
+	public void addCoin(boolean b) {
+		if(b) {
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
+		} else {
+			coin = null;
+		}
 	}
 }

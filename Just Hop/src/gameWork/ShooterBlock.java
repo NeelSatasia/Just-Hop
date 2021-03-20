@@ -15,8 +15,9 @@ public class ShooterBlock extends Blocks {
 	ArrayList<BlockBullet> bullets = new ArrayList<BlockBullet>();
 	
 	int randX;
-	int coinChance = (int)(Math.random() * 10);
 	Coin coin = null;
+	
+	HealthBooster healthBooster = null;
 	
 	int blockColorTransparency = 255;
 
@@ -29,11 +30,6 @@ public class ShooterBlock extends Blocks {
 		gunXPosition = this.x + ((this.width/2) - 10) + 5;
 		
 		bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
-		
-		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 12)) + this.x;
-			coin = new Coin(randX, this.y);
-		}
 	}
 	
 	@Override
@@ -62,6 +58,11 @@ public class ShooterBlock extends Blocks {
 			coin.changeYPosition(this.y);
 			coin.draw(g);
 		}
+		
+		if(healthBooster != null) {
+			healthBooster.changeYPosition(this.y);
+			healthBooster.draw(g);
+		}
 	}
 	
 	@Override
@@ -78,5 +79,34 @@ public class ShooterBlock extends Blocks {
 	@Override
 	public void removeBullet(int index) {
 		bullets.remove(index);
+	}
+	
+	@Override
+	public HealthBooster getHealthBooster() {
+		return healthBooster;
+	}
+	
+	@Override
+	public void addHealthBooster(boolean b) {
+		if(b) {
+			healthBooster = new HealthBooster((int)(Math.random() * (this.width - 16)) + this.x, this.y);
+		} else {
+			healthBooster = null;
+		}
+	}
+	
+	@Override
+	public Coin getCoin() {
+		return coin;
+	}
+	
+	@Override
+	public void addCoin(boolean b) {
+		if(b) {
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
+		} else {
+			coin = null;
+		}
 	}
 }

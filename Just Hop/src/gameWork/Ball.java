@@ -26,13 +26,11 @@ public class Ball extends Rectangle {
 	public void draw(Graphics g) {
 		g.setColor(this.ballColor);
 		g.fillRect(this.x, this.y, this.width, this.height);
-		//g.setColor(Color.BLUE);
-		//g.drawRect(this.x-1, this.y-1, this.width+1, this.height+1);
 		
 		if(shootBullets) {
 			loadBulletCounter++;
 			if(loadBulletCounter == 50) {
-				bullets.add(new BallBullet(this.x, this.y));
+				bullets.add(new BallBullet(this.x + (this.width/2) - 5, this.y));
 				loadBulletCounter = 0;
 			}
 		} else if(loadBulletCounter > 0) {
@@ -42,7 +40,7 @@ public class Ball extends Rectangle {
 		
 		int i = 0;
 		while(i < bullets.size()) {
-			if(bullets.get(i) != null && bullets.get(i).y > 0) {
+			if(bullets.get(i).y > 0) {
 				bullets.get(i).draw(g);
 				i++;
 			} else {

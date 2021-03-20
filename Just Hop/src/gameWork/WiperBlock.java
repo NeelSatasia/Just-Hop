@@ -14,8 +14,9 @@ public class WiperBlock extends Blocks {
 	int TBarHeight = (int)(Math.random() * 21) + 25;
 	
 	int randX;
-	int coinChance = (int)(Math.random() * 10);
 	Coin coin = null;
+	
+	HealthBooster healthBooster = null;
 	
 	public WiperBlock(int x, int y, int w) {
 		this.x = x;
@@ -25,11 +26,6 @@ public class WiperBlock extends Blocks {
 		this.blockColor = Color.BLACK;
 		
 		TBarXPosition = this.x + (this.width/2) - (5/2);
-		
-		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 12)) + this.x;
-			coin = new Coin(randX, this.y);
-		}
 	}	
 	
 	@Override
@@ -42,6 +38,11 @@ public class WiperBlock extends Blocks {
 		if(coin != null) {
 			coin.changeYPosition(this.y);
 			coin.draw(g);
+		}
+		
+		if(healthBooster != null) {
+			healthBooster.changeYPosition(this.y);
+			healthBooster.draw(g);
 		}
 	}
 	
@@ -78,6 +79,35 @@ public class WiperBlock extends Blocks {
 	@Override
 	public int TBarHeight() {
 		return TBarHeight;
+	}
+	
+	@Override
+	public HealthBooster getHealthBooster() {
+		return healthBooster;
+	}
+	
+	@Override
+	public void addHealthBooster(boolean b) {
+		if(b) {
+			healthBooster = new HealthBooster((int)(Math.random() * (this.width - 16)) + this.x, this.y);
+		} else {
+			healthBooster = null;
+		}
+	}
+	
+	@Override
+	public Coin getCoin() {
+		return coin;
+	}
+	
+	@Override
+	public void addCoin(boolean b) {
+		if(b) {
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
+		} else {
+			coin = null;
+		}
 	}
 }
 

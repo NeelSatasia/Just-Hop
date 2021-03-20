@@ -8,7 +8,6 @@ public class RegularBlock extends Blocks {
 	Color blockColor;
 	
 	int randX;
-	int coinChance = (int)(Math.random() * 10);
 	Coin coin = null;
 	
 	HealthBooster healthBooster = null;
@@ -19,11 +18,6 @@ public class RegularBlock extends Blocks {
 		this.width = w;
 		this.height = 5;
 		this.blockColor = Color.BLACK;
-		
-		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 12)) + this.x;
-			coin = new Coin(randX, this.y);
-		}
 	}
 	
 	@Override
@@ -58,6 +52,21 @@ public class RegularBlock extends Blocks {
 			healthBooster = new HealthBooster((int)(Math.random() * (this.width - 16)) + this.x, this.y);
 		} else {
 			healthBooster = null;
+		}
+	}
+	
+	@Override
+	public Coin getCoin() {
+		return coin;
+	}
+	
+	@Override
+	public void addCoin(boolean b) {
+		if(b) {
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
+		} else {
+			coin = null;
 		}
 	}
 }

@@ -12,8 +12,9 @@ public class HalfRedBlock extends Blocks {
 	boolean isRedPartOnRightSide = false;
 	
 	int randX;
-	int coinChance = (int)(Math.random() * 10);
 	Coin coin = null;
+	
+	HealthBooster healthBooster = null;
 	
 	public HalfRedBlock(int x, int y, int w) {
 		this.x = x;
@@ -27,11 +28,6 @@ public class HalfRedBlock extends Blocks {
 		
 		if(randNum < 3) {
 			isRedPartOnRightSide = true;
-		}
-		
-		if(coinChance > 5) {
-			randX = (int) (Math.random() * (this.width - 12)) + this.x;
-			coin = new Coin(randX, this.y);
 		}
 	}	
 	
@@ -59,6 +55,11 @@ public class HalfRedBlock extends Blocks {
 			coin.changeYPosition(this.y);
 			coin.draw(g);
 		}
+		
+		if(healthBooster != null) {
+			healthBooster.changeYPosition(this.y);
+			healthBooster.draw(g);
+		}
 	}
 	
 	@Override
@@ -70,5 +71,34 @@ public class HalfRedBlock extends Blocks {
 	@Override
 	public boolean isRedOnRightSide() {
 		return isRedPartOnRightSide;
+	}
+	
+	@Override
+	public HealthBooster getHealthBooster() {
+		return healthBooster;
+	}
+	
+	@Override
+	public void addHealthBooster(boolean b) {
+		if(b) {
+			healthBooster = new HealthBooster((int)(Math.random() * (this.width - 16)) + this.x, this.y);
+		} else {
+			healthBooster = null;
+		}
+	}
+	
+	@Override
+	public Coin getCoin() {
+		return coin;
+	}
+	
+	@Override
+	public void addCoin(boolean b) {
+		if(b) {
+			randX = (int) (Math.random() * (this.width - 12)) + this.x;
+			coin = new Coin(randX, this.y);
+		} else {
+			coin = null;
+		}
 	}
 }

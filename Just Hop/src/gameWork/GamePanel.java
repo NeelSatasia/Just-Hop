@@ -17,7 +17,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballX = 300;
 	int ballY = 200;
 	
-	Ball ball = new Ball(ballX, ballY, 15, 15, new Color(31, 122, 31));
+	Ball ball = new Ball(ballX, ballY, 16, 16, new Color(31, 122, 31));
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -43,11 +43,17 @@ public class GamePanel extends JPanel implements ActionListener {
 	int currentIndex;
 	private int previousIndex;
 	
+	int highScore = 0;
 	boolean didScore;
 	int score;
 	JLabel scoreLabel = new JLabel("Score: " + score);
+	JLabel highScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
 	
+	int totalCoins;
 	int coins;
+	int coinWorth = 0;
+	JLabel coinsLabel = new JLabel("Current Coins: " + coins);
+	JLabel totalCoinsLabel = new JLabel("Total Coins: " + totalCoins, SwingConstants.CENTER);
 	
 	int ballHealth;
 	JLabel ballHealthLabel = new JLabel("Health: " + ballHealth);
@@ -70,6 +76,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean isPlayingGame = false;
 	boolean pause;
+	
+	JLabel gameNameLabel = new JLabel(" \"Just Hop\" ", SwingConstants.CENTER);
 	
 	JCheckBox[] differentBlocks = new JCheckBox[differentTypesOfBlocks];
 	JCheckBox[] modes = new JCheckBox[3];
@@ -120,6 +128,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			differentBlocks[i].setSelected(true);
 			differentBlocksInGame.add(differentBlocks[i].getText());
 			
+			coinWorth++;
+			
 			int j = i;
 			differentBlocks[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -127,10 +137,12 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(differentBlocks[j].isSelected()) {
 							differentBlocks[j].setSelected(true);
 							differentBlocksInGame.add(differentBlocks[j].getText());
+							coinWorth++;
 						} else {
 							if(differentBlocksInGame.size() - 1 > 0) {
 								differentBlocks[j].setSelected(false);
 								differentBlocksInGame.remove(differentBlocks[j].getText());
+								coinWorth--;
 							} else {
 								differentBlocks[j].setSelected(true);
 							}
@@ -140,13 +152,23 @@ public class GamePanel extends JPanel implements ActionListener {
 			});
 		}
 		
+		add(gameNameLabel);
+		gameNameLabel.setBounds(200, 85, 400, 100);
+		gameNameLabel.setFont(new Font("Times New Roman", Font.PLAIN, 80));
+		gameNameLabel.setBackground(new Color(255, 153, 0));
+		gameNameLabel.setOpaque(true);
+		
+		add(highScoreLabel);
+		highScoreLabel.setBounds(200, 200, 400, 50);
+		highScoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 40));
+		
 		add(startgame);
-		startgame.setBounds(365, 185, 70, 30);
+		startgame.setBounds(365, 280, 70, 30);
 		enableButton(startgame);
 		
 		startgame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				menuButtons(false);
+				menuPage(false);
 				
 				startGame();
 				timer.start();
@@ -154,12 +176,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		});
 		
 		add(customize);
-		customize.setBounds(365, 225, 70, 30);
+		customize.setBounds(365, 320, 70, 30);
 		enableButton(customize);
 		
 		customize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				menuButtons(false);
+				menuPage(false);
 				add(exit);
 				
 				JLabel blocksLabel = new JLabel("Blocks");
@@ -197,8 +219,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							}
 						}
 						
-						menuButtons(true);
-						
+						menuPage(true);
 						repaint();
 					}
 				});
@@ -208,19 +229,19 @@ public class GamePanel extends JPanel implements ActionListener {
 		});
 		
 		add(store);
-		store.setBounds(365, 265, 70, 30);
+		store.setBounds(365, 360, 70, 30);
 		enableButton(store);
 		
 		store.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				menuButtons(false);
+				menuPage(false);
 				add(exit);
 				
 				exit.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						remove(exit);
 						
-						menuButtons(true);
+						menuPage(true);
 						
 						repaint();
 					}
@@ -242,20 +263,38 @@ public class GamePanel extends JPanel implements ActionListener {
 			timer.stop();
 			isPlayingGame = false;
 			
-			JButton gameOverButton = new JButton("Try Again");
-			add(gameOverButton);
-			gameOverButton.setBounds(370, 285, 60, 30);
-			enableButton(gameOverButton);
+			totalCoins += coins;
+			
+			if(score > highScore) {
+				highScore = score;
+				highScoreLabel.setText("High Score: " + highScore);
+			}
+			
+			JLabel newHighScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
+			add(newHighScoreLabel);
+			newHighScoreLabel.setBounds(250, 150, 300, 40);
+			newHighScoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 40));
+			
+			add(totalCoinsLabel);
+			totalCoinsLabel.setBounds(225, 200, 350, 30);
+			totalCoinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+			
+			JButton tryAgainButton = new JButton("Try Again");
+			add(tryAgainButton);
+			tryAgainButton.setBounds(370, 250, 60, 30);
+			enableButton(tryAgainButton);
 			
 			JButton exit = new JButton("Exit");
 			add(exit);
-			exit.setBounds(370, 325, 60, 30);
+			exit.setBounds(370, 290, 60, 30);
 			enableButton(exit);
 			exit.setBackground(new Color(204, 0, 0));
 			
-			gameOverButton.addActionListener(new ActionListener() {
+			tryAgainButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					remove(gameOverButton);
+					remove(newHighScoreLabel);
+					remove(totalCoinsLabel);
+					remove(tryAgainButton);
 					remove(exit);
 					
 					repaint();
@@ -268,11 +307,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				public void actionPerformed(ActionEvent e) {
 					remove(ballHealthLabel);
 					remove(scoreLabel);
-					remove(gameOverButton);
+					remove(coinsLabel);
+					remove(tryAgainButton);
 					remove(exit);
 					
-					menuButtons(true);
-					
+					menuPage(true);
 					repaint();
 				}
 			});
@@ -291,6 +330,11 @@ public class GamePanel extends JPanel implements ActionListener {
 							int healthBoosterXPosition = (int)(Math.random() * (blocksWidth[i] - ball.getWidth())) + blocksXPositions[i];
 							blocks[i].addHealthBooster(true);
 						}
+					}
+					
+					int coinChance = (int)(Math.random() * 21);
+					if(coinChance > 10) {
+						blocks[i].addCoin(true);
 					}
 				} else {
 					blocks[i].setBounds(blocksXPositions[i], blocksYPositions[i], blocksWidth[i], 5);
@@ -472,9 +516,17 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 			
-			for(int j = 0; j < ball.bullets.size(); j++) {
-				if(ball.bullets.get(j) != null && blocks[i].intersects(ball.bullets.get(j))) {
-					ball.bullets.set(j, null);
+			int j = 0;
+			while(j < ball.bullets.size()) {
+				if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball.bullets.get(j))) {
+					ball.bullets.remove(j);
+					blocks[i].addCoin(false);
+					coins += coinWorth;
+					coinsLabel.setText("Coins: " + coins);
+				} else if(blocks[i].intersects(ball.bullets.get(j))) {
+					ball.bullets.remove(j);
+				} else {
+					j++;
 				}
 			}
 		}
@@ -489,20 +541,24 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public void startGame() {
 		score = 0;
-		scoreLabel.setText("Score: " + score);
-		
 		ballHealth = 100;
-		ballHealthLabel.setText("Health: " + ballHealth);
 		
 		coins = 0;
 		
 		add(scoreLabel);
 		scoreLabel.setBounds(10, 10, 150, 30);
 		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		scoreLabel.setText("Score: " + score);
 		
 		add(ballHealthLabel);
 		ballHealthLabel.setBounds(10, 40, 150, 30);
 		ballHealthLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		ballHealthLabel.setText("Health: " + ballHealth);
+		
+		add(coinsLabel);
+		coinsLabel.setBounds(10, 70, 150, 30);
+		coinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
+		coinsLabel.setText("Coins: " + coins);
 		
 		ballHorizontalSpeed = 0;
 		blockVerticalSpeed = 1;
@@ -869,12 +925,16 @@ public class GamePanel extends JPanel implements ActionListener {
 		button.setFocusable(false);
 	}
 	
-	public void menuButtons(boolean show) {
+	public void menuPage(boolean show) {
 		if(show == false) {
+			remove(gameNameLabel);
+			remove(highScoreLabel);
 			remove(startgame);
 			remove(customize);
 			remove(store);
 		} else {
+			add(gameNameLabel);
+			add(highScoreLabel);
 			add(startgame);
 			add(customize);
 			add(store);
