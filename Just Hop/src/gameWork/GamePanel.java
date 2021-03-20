@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -72,7 +74,15 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean changedDirectionInAir;
 	
-	boolean ballBulletCollision = false;
+	boolean ballFlyingAbility = false;
+	boolean ballHasShield = false;
+	boolean ballShootsTwoBullets = false;
+	
+	int shieldPower = 0;
+	int shieldActivationAmount = 0;
+	int flyPower = 0;
+	int flyActivationAmount = 0;
+	int bulletReloadSpeed = 50;
 	
 	boolean isPlayingGame = false;
 	boolean pause;
@@ -85,6 +95,9 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton startgame = new JButton("Start Game");
 	JButton customize = new JButton("Customize");
 	JButton store = new JButton("Store");
+	JButton abilities = new JButton("Abilities");
+	JButton upgrades = new JButton("Upgrades");
+	JButton balls = new JButton("Balls");
 	JButton music = new JButton("Music");
 	JButton exit = new JButton("Exit");
 	
@@ -153,17 +166,21 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		add(gameNameLabel);
-		gameNameLabel.setBounds(200, 85, 400, 100);
+		gameNameLabel.setBounds(0, 0, 800, 100);
 		gameNameLabel.setFont(new Font("Times New Roman", Font.PLAIN, 80));
-		gameNameLabel.setBackground(new Color(255, 153, 0));
+		gameNameLabel.setBackground(new Color(230, 92, 0));
 		gameNameLabel.setOpaque(true);
 		
 		add(highScoreLabel);
-		highScoreLabel.setBounds(200, 200, 400, 50);
+		highScoreLabel.setBounds(200, 185, 400, 50);
 		highScoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 40));
 		
+		add(totalCoinsLabel);
+		totalCoinsLabel.setBounds(200, 235, 400, 40);
+		totalCoinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		
 		add(startgame);
-		startgame.setBounds(365, 280, 70, 30);
+		startgame.setBounds(365, 290, 70, 30);
 		enableButton(startgame);
 		
 		startgame.addActionListener(new ActionListener() {
@@ -176,7 +193,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		});
 		
 		add(customize);
-		customize.setBounds(365, 320, 70, 30);
+		customize.setBounds(365, 330, 70, 30);
 		enableButton(customize);
 		
 		customize.addActionListener(new ActionListener() {
@@ -229,7 +246,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		});
 		
 		add(store);
-		store.setBounds(365, 360, 70, 30);
+		store.setBounds(365, 370, 70, 30);
 		enableButton(store);
 		
 		store.addActionListener(new ActionListener() {
@@ -237,8 +254,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				menuPage(false);
 				add(exit);
 				
+				storePage(true);
+				
 				exit.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						storePage(false);
 						remove(exit);
 						
 						menuPage(true);
@@ -248,6 +268,192 @@ public class GamePanel extends JPanel implements ActionListener {
 				});
 				
 				repaint();
+			}
+		});
+		
+		abilities.setBounds(365, 175, 70, 30);
+		enableButton(abilities);
+		
+		abilities.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				storePage(false);
+				remove(exit);
+				
+				JLabel buyLabel = new JLabel("Buy Abilities", SwingConstants.CENTER);
+				add(buyLabel);
+				buyLabel.setBounds(300, 170, 200, 50);
+				buyLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+				
+				JButton flyingButton = new JButton("Fly Power");
+				add(flyingButton);
+				flyingButton.setBounds(365, 230, 70, 30);
+				if(totalCoins >= 500 && highScore >= 200 && ballFlyingAbility == false) {
+					enableButton(flyingButton);
+				} else {
+					disableButton(flyingButton);
+				}
+				
+				flyingButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						disableButton(flyingButton);
+						ballFlyingAbility = true;
+						totalCoins -= 500;
+						flyPower = -1;
+						flyActivationAmount = 5000;
+					}
+				});
+				
+				flyingButton.addMouseListener(new MouseAdapter() {
+					JLabel abilityInfoLabel1 = new JLabel("500 coins or more");
+					JLabel abilityInfoLabel2 = new JLabel("High score of 200 or more");
+					
+				    public void mouseEntered(MouseEvent e) {
+				    	add(abilityInfoLabel1);
+				    	abilityInfoLabel1.setBounds(flyingButton.getX() + flyingButton.getWidth() + 5, flyingButton.getY(), 200, 17);
+				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	
+				    	add(abilityInfoLabel2);
+				    	abilityInfoLabel2.setBounds(flyingButton.getX() + flyingButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 3, 200, 17);
+				    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	repaint();
+				    }
+
+				    public void mouseExited(MouseEvent e) {
+				        remove(abilityInfoLabel1);
+				        remove(abilityInfoLabel2);
+				        repaint();
+				    }
+				});
+				
+				JButton shieldButton = new JButton("Shield");
+				add(shieldButton);
+				shieldButton.setBounds(365, 270, 70, 30);
+				if(totalCoins > 800 && highScore >= 300 && ballHasShield == false) {
+					enableButton(shieldButton);
+				} else {
+					disableButton(shieldButton);
+				}
+				
+				shieldButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						disableButton(shieldButton);
+						ballHasShield = true;
+						totalCoins -= 800;
+						shieldPower = 2;
+						shieldActivationAmount = 5000;
+					}
+				});
+				
+				shieldButton.addMouseListener(new MouseAdapter() {
+					JLabel abilityInfoLabel1 = new JLabel("800 coins or more");
+					JLabel abilityInfoLabel2 = new JLabel("High score of 300 or more");
+					
+				    public void mouseEntered(MouseEvent e) {
+				    	add(abilityInfoLabel1);
+				    	abilityInfoLabel1.setBounds(shieldButton.getX() + shieldButton.getWidth() + 5, shieldButton.getY(), 200, 17);
+				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	
+				    	add(abilityInfoLabel2);
+				    	abilityInfoLabel2.setBounds(shieldButton.getX() + shieldButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 3, 200, 17);
+				    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	repaint();
+				    }
+
+				    public void mouseExited(MouseEvent e) {
+				        remove(abilityInfoLabel1);
+				        remove(abilityInfoLabel2);
+				        repaint();
+				    }
+				});
+				
+				JButton twoBulletsButton = new JButton("Two Bullets");
+				add(twoBulletsButton);
+				twoBulletsButton.setBounds(365, 310, 70, 30);
+				if(totalCoins > 1000 && highScore >= 350 && ballShootsTwoBullets == false) {
+					enableButton(twoBulletsButton);
+				} else {
+					disableButton(twoBulletsButton);
+				}
+				
+				twoBulletsButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						disableButton(twoBulletsButton);
+						ballShootsTwoBullets = true;
+						totalCoins -= 1000;
+					}
+				});
+				
+				twoBulletsButton.addMouseListener(new MouseAdapter() {
+					JLabel abilityInfoLabel1 = new JLabel("1000 coins or more");
+					JLabel abilityInfoLabel2 = new JLabel("High score of 350 or more");
+					
+				    public void mouseEntered(MouseEvent e) {
+				    	add(abilityInfoLabel1);
+				    	abilityInfoLabel1.setBounds(twoBulletsButton.getX() + twoBulletsButton.getWidth() + 5, twoBulletsButton.getY(), 200, 17);
+				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	
+				    	add(abilityInfoLabel2);
+				    	abilityInfoLabel2.setBounds(twoBulletsButton.getX() + twoBulletsButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 3, 200, 17);
+				    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	repaint();
+				    }
+
+				    public void mouseExited(MouseEvent e) {
+				        remove(abilityInfoLabel1);
+				        remove(abilityInfoLabel2);
+				        repaint();
+				    }
+				});
+				
+				JButton exitAbilitiesPage = new JButton("Exit");
+				add(exitAbilitiesPage);
+				exitAbilitiesPage.setBounds(15, 15, 60, 30);
+				enableButton(exitAbilitiesPage);
+				exitAbilitiesPage.setBackground(new Color(204, 0, 0));
+				
+				exitAbilitiesPage.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						remove(buyLabel);
+						remove(flyingButton);
+						remove(shieldButton);
+						remove(twoBulletsButton);
+						remove(exitAbilitiesPage);
+						storePage(true);
+						add(exit);
+						
+						repaint();
+					}
+				});
+				
+				repaint();
+			}
+		});
+		
+		upgrades.setBounds(365, 215, 70, 30);
+		enableButton(upgrades);
+		
+		upgrades.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				exit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						storePage(true);
+					}
+				});
+			}
+		});
+		
+		balls.setBounds(370, 255, 60, 30);
+		enableButton(balls);
+		
+		balls.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				exit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						storePage(true);
+					}
+				});
 			}
 		});
 		
@@ -272,33 +478,33 @@ public class GamePanel extends JPanel implements ActionListener {
 			
 			JLabel newHighScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
 			add(newHighScoreLabel);
-			newHighScoreLabel.setBounds(250, 150, 300, 40);
+			newHighScoreLabel.setBounds(250, 150, 300, 50);
 			newHighScoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 40));
 			
-			add(totalCoinsLabel);
-			totalCoinsLabel.setBounds(225, 200, 350, 30);
-			totalCoinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+			JLabel newTotalCoinsLabel = new JLabel("Total Coins: " + totalCoins, SwingConstants.CENTER);
+			add(newTotalCoinsLabel);
+			newTotalCoinsLabel.setBounds(225, 210, 350, 30);
+			newTotalCoinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 			
 			JButton tryAgainButton = new JButton("Try Again");
 			add(tryAgainButton);
-			tryAgainButton.setBounds(370, 250, 60, 30);
+			tryAgainButton.setBounds(370, 260, 60, 30);
 			enableButton(tryAgainButton);
 			
 			JButton exit = new JButton("Exit");
 			add(exit);
-			exit.setBounds(370, 290, 60, 30);
+			exit.setBounds(370, 300, 60, 30);
 			enableButton(exit);
 			exit.setBackground(new Color(204, 0, 0));
 			
 			tryAgainButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					remove(newHighScoreLabel);
-					remove(totalCoinsLabel);
+					remove(newTotalCoinsLabel);
 					remove(tryAgainButton);
 					remove(exit);
 					
 					repaint();
-					
 					startGame();
 				}
 			});
@@ -308,6 +514,8 @@ public class GamePanel extends JPanel implements ActionListener {
 					remove(ballHealthLabel);
 					remove(scoreLabel);
 					remove(coinsLabel);
+					remove(newHighScoreLabel);
+					remove(newTotalCoinsLabel);
 					remove(tryAgainButton);
 					remove(exit);
 					
@@ -327,7 +535,6 @@ public class GamePanel extends JPanel implements ActionListener {
 					if(ballHealth < 50) {
 						int healthBoosterChance = (int)(Math.random() * 21);
 						if(healthBoosterChance <= 10) {
-							int healthBoosterXPosition = (int)(Math.random() * (blocksWidth[i] - ball.getWidth())) + blocksXPositions[i];
 							blocks[i].addHealthBooster(true);
 						}
 					}
@@ -929,15 +1136,29 @@ public class GamePanel extends JPanel implements ActionListener {
 		if(show == false) {
 			remove(gameNameLabel);
 			remove(highScoreLabel);
+			remove(totalCoinsLabel);
 			remove(startgame);
 			remove(customize);
 			remove(store);
 		} else {
 			add(gameNameLabel);
 			add(highScoreLabel);
+			add(totalCoinsLabel);
 			add(startgame);
 			add(customize);
 			add(store);
+		}
+	}
+	
+	public void storePage(boolean show) {
+		if(show) {
+			add(abilities);
+			add(upgrades);
+			add(balls);
+		} else {
+			remove(abilities);
+			remove(upgrades);
+			remove(balls);
 		}
 	}
 	

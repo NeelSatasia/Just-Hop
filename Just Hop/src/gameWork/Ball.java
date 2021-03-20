@@ -13,7 +13,7 @@ public class Ball extends Rectangle {
 	
 	boolean shootBullets = false;
 	
-	int loadBulletCounter = 0;
+	int bulletReloadSpeed = 0;
 	
 	public Ball(int x, int y, int w, int h, Color color) {
 		this.x = x;
@@ -28,13 +28,13 @@ public class Ball extends Rectangle {
 		g.fillRect(this.x, this.y, this.width, this.height);
 		
 		if(shootBullets) {
-			loadBulletCounter++;
-			if(loadBulletCounter == 50) {
+			bulletReloadSpeed++;
+			if(bulletReloadSpeed == 50) {
 				bullets.add(new BallBullet(this.x + (this.width/2) - 5, this.y));
-				loadBulletCounter = 0;
+				bulletReloadSpeed = 0;
 			}
-		} else if(loadBulletCounter > 0) {
-			loadBulletCounter = 0;
+		} else if(bulletReloadSpeed > 0) {
+			bulletReloadSpeed = 0;
 		}
 		
 		
