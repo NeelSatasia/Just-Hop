@@ -3,7 +3,6 @@ package gameWork;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -19,7 +18,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballX = 300;
 	int ballY = 200;
 	
-	Ball ball = new Ball(ballX, ballY, 16, 16, new Color(31, 122, 31));
+	Ball ball = new Ball(1, ballX, ballY);
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -93,7 +92,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int flyPowerUpgradePrice = 0;
 	int flyActivationAmountUpgradePrice = 0;
 	
-	int bulletReloadSpeed = 50;
+	int bulletReloadSpeedLevel = 0;
+	int bulletReloadSpeedUpgradePrice = 60;
 	
 	int freezeActivationAmount = 0;
 	int freezeActivationAmountLevel = 0;
@@ -633,8 +633,8 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				JButton freezeActivationAmountButton = new JButton("Freeze Time");
 				add(freezeActivationAmountButton);
-				freezeActivationAmountButton.setBounds(355, 310, 90, 30);
-				if(ballHasShield && shieldActivationAmountLevel < 5 && totalCoins >= shieldActivationAmountUpgradePrice) {
+				freezeActivationAmountButton.setBounds(355, 350, 90, 30);
+				if(freezePower && freezeActivationAmountLevel < 5 && totalCoins >= freezeActivationAmountUpgradePrice) {
 					enableButton(freezeActivationAmountButton);
 				} else {
 					disableButton(freezeActivationAmountButton);
@@ -655,6 +655,69 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				upgradeButtonHover(freezeActivationAmountButton, freezePower, freezeActivationAmountLevel, 5, freezeActivationAmountUpgradePrice);
 				
+				JButton bulletReloadSpeedButton = new JButton("Reload Speed");
+				add(bulletReloadSpeedButton);
+				bulletReloadSpeedButton.setBounds(355, 390, 90, 30);
+				if(bulletReloadSpeedLevel < 3 && totalCoins >= bulletReloadSpeedUpgradePrice) {
+					enableButton(bulletReloadSpeedButton);
+				} else {
+					disableButton(bulletReloadSpeedButton);
+				}
+				
+				bulletReloadSpeedButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						ball.bulletReloadSpeed -= 10;
+						totalCoins -= bulletReloadSpeedUpgradePrice;
+						bulletReloadSpeedLevel++;
+						bulletReloadSpeedUpgradePrice += 30;
+						
+						if(bulletReloadSpeedLevel == 3 || totalCoins < bulletReloadSpeedUpgradePrice) {
+							disableButton(bulletReloadSpeedButton);
+						}
+					}
+				});
+				
+				bulletReloadSpeedButton.addMouseListener(new MouseAdapter() {
+					JLabel abilityInfoLabel1 = new JLabel();
+					JLabel abilityInfoLabel2 = new JLabel();
+					
+				    public void mouseEntered(MouseEvent e) {
+				    	if(bulletReloadSpeedLevel < 3) {
+							abilityInfoLabel1.setText("Upgrade To Level: " + (bulletReloadSpeedLevel + 1));
+						} else if(bulletReloadSpeedLevel == 3) {
+							abilityInfoLabel1.setText("Reached Maximum Level: " + bulletReloadSpeedLevel);
+						}
+				    	
+				    	add(abilityInfoLabel1);
+				    	abilityInfoLabel1.setBounds(bulletReloadSpeedButton.getX() + bulletReloadSpeedButton.getWidth() + 5, bulletReloadSpeedButton.getY(), 200, 17);
+				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				    	
+				    	add(abilityInfoLabel2);
+				    	if(bulletReloadSpeedLevel < 3) {
+					    	abilityInfoLabel2.setBounds(bulletReloadSpeedButton.getX() + bulletReloadSpeedButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 1, 200, 17);
+					    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+					    	abilityInfoLabel2.setText(bulletReloadSpeedUpgradePrice + " Coins");
+				    	}
+				    	
+				    	if(bulletReloadSpeedLevel < 3 && totalCoins >= bulletReloadSpeedUpgradePrice) {
+				    		abilityInfoLabel1.setForeground(new Color(41, 163, 41));
+				    		abilityInfoLabel2.setForeground(new Color(41, 163, 41));
+				    	} else {
+				    		abilityInfoLabel1.setForeground(new Color(204, 0, 82));
+				    		abilityInfoLabel2.setForeground(new Color(204, 0, 82));
+				    	}
+				    	
+				    	repaint();
+				    }
+
+				    public void mouseExited(MouseEvent e) {
+				        remove(abilityInfoLabel1);
+				        remove(abilityInfoLabel2);
+				        repaint();
+				    }
+				});
+				
+				
 				JButton exitUpgradesPage = new JButton("Exit");
 				add(exitUpgradesPage);
 				exitUpgradesPage.setBounds(15, 15, 60, 30);
@@ -669,6 +732,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						remove(shieldPowerButton);
 						remove(shieldActivationAmountButton);
 						remove(freezeActivationAmountButton);
+						remove(bulletReloadSpeedButton);
 						remove(exitUpgradesPage);
 						
 						storePage(true);
@@ -690,6 +754,13 @@ public class GamePanel extends JPanel implements ActionListener {
 				storePage(false);
 				remove(exit);
 				
+				JLabel ballsLabel = new JLabel("Balls", SwingConstants.CENTER);
+				add(ballsLabel);
+				ballsLabel.setBounds(300, 130, 200, 50);
+				ballsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+				
+				
+				
 				JButton exitUpgradesPage = new JButton("Exit");
 				add(exitUpgradesPage);
 				exitUpgradesPage.setBounds(15, 15, 60, 30);
@@ -698,6 +769,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				exitUpgradesPage.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						remove(ballsLabel);
 						remove(exitUpgradesPage);
 						
 						storePage(true);
@@ -819,7 +891,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] >= 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;
@@ -1227,24 +1298,24 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public boolean collisionCheck(int i) {
-		if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
-			if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.getHeight() <= blocksYPositions[i]) {
+		if(ballX + ball.width + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
+			if(ballY + ball.height + ballVerticalSpeed >= blocksYPositions[i] && ballY + ball.height <= blocksYPositions[i]) {
 				currentIndex = i;
-				ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - 1);
+				ballY = (int)(blocksYPositions[currentIndex] - ball.height - 1);
 				return true;
 			} else if(blocks[i] instanceof WiperBlock) {
 				int TBarXPosition = blocks[i].TBarXPosition();
 				
 				if(isBallJumping) {
-					if((ballX + ball.getWidth() > blocksXPositions[previousIndex] && ballX < blocksXPositions[previousIndex] + blocksWidth[previousIndex]) && (ballY + ball.getHeight() < blocksYPositions[previousIndex] - blocks[previousIndex].TBarHeight())) {
+					if((ballX + ball.width > blocksXPositions[previousIndex] && ballX < blocksXPositions[previousIndex] + blocksWidth[previousIndex]) && (ballY + ball.height < blocksYPositions[previousIndex] - blocks[previousIndex].TBarHeight())) {
 						changeBallHorizontalSpeed();
 					}
 				}
 				
-				if(ballX + ball.getWidth() + ballHorizontalSpeed > TBarXPosition && ballX + ballHorizontalSpeed < TBarXPosition + 5) {
-					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i] - blocks[i].TBarHeight()) {
+				if(ballX + ball.width + ballHorizontalSpeed > TBarXPosition && ballX + ballHorizontalSpeed < TBarXPosition + 5) {
+					if(ballY + ball.height + ballVerticalSpeed >= blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.height <= blocksYPositions[i] - blocks[i].TBarHeight()) {
 						currentIndex = i;
-						ballY = (int)(blocksYPositions[currentIndex] - ball.getHeight() - blocks[i].TBarHeight() - 1);
+						ballY = (int)(blocksYPositions[currentIndex] - ball.height - blocks[i].TBarHeight() - 1);
 						return true;
 					}
 				}
@@ -1442,7 +1513,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			
 		    public void mouseEntered(MouseEvent e) {
 		    	if(ability && abilityLevel < maxLevel) {
-					abilityInfoLabel1.setText("Upgrade To Level: " + abilityLevel + 1);
+					abilityInfoLabel1.setText("Upgrade To Level: " + (abilityLevel + 1));
 				} else if(ability && abilityLevel == maxLevel) {
 					abilityInfoLabel1.setText("Reached Maximum Level: " + abilityLevel);
 				} else {
