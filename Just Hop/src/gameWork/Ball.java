@@ -92,6 +92,10 @@ public class Ball extends Rectangle {
 		}
 	}
 	
+	public void draw(Graphics g, int ball) {
+		
+	}
+	
 	public void changeColor(Color color) {
 		ballColor = color;
 	}

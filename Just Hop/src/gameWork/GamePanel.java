@@ -1,6 +1,7 @@
 package gameWork;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -18,7 +19,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	int ballX = 300;
 	int ballY = 200;
 	
-	Ball ball = new Ball(1, ballX, ballY);
+	int[] totalBalls = new int[4];
+	int[] ballsPrice = new int[totalBalls.length];
+	
+	int ballNum = 1;
+	Ball ball = new Ball(ballNum, ballX, ballY);
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -99,6 +104,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	int freezeActivationAmountLevel = 0;
 	int freezeActivationAmountUpgradePrice = 0;
 	
+	boolean showBalls = false;
+	
 	boolean isPlayingGame = false;
 	boolean pause;
 	
@@ -120,6 +127,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		setLayout(null);
 		setBackground(Color.WHITE);
+		
+		int ballPrice = 40;
+		for(int i = 0; i < totalBalls.length; i++) {
+			totalBalls[i] = 0;
+			ballsPrice[i] = ballPrice;
+			ballPrice += 10;
+		}
+		
+		totalBalls[0] = 1;
 		
 		modes[0] = new JCheckBox("Blocks With Random Sizes");
 		modes[1] = new JCheckBox("Slippery Blocks");
@@ -759,7 +775,85 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballsLabel.setBounds(300, 130, 200, 50);
 				ballsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
 				
+				showBalls = true;
 				
+				int buttonY = 190;
+				
+				JButton[] buyBallsArr = new JButton[totalBalls.length];
+				JButton[] equipBallsArr = new JButton[totalBalls.length];
+				
+				for(int i = 0; i < totalBalls.length; i++) {
+					buyBallsArr[i] = new JButton("Buy");
+					equipBallsArr[i] = new JButton("Equip");
+					add(buyBallsArr[i]);
+					add(equipBallsArr[i]);
+					buyBallsArr[i].setBounds(410, buttonY, 50, 16);
+					equipBallsArr[i].setBounds(buyBallsArr[i].getX() + buyBallsArr[i].getWidth() + 5, buttonY, 60, 16);
+					buttonY += 28;
+					if(totalCoins >= ballsPrice[i] && totalBalls[i] == 0) {
+						enableButton(buyBallsArr[i]);
+					} else {
+						disableButton(buyBallsArr[i]);
+					}
+					
+					if(totalBalls[i] != 0 && ballNum != totalBalls[i]) {
+						enableButton(equipBallsArr[i]);
+					} else {
+						disableButton(equipBallsArr[i]);
+					}
+					
+					int j = i;
+					
+					buyBallsArr[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							disableButton(buyBallsArr[j]);
+							totalCoins -= ballsPrice[j];
+							totalBalls[j] = j + 1;
+							enableButton(equipBallsArr[j]);
+						}
+					});
+					
+					buyBallsArr[i].addMouseListener(new MouseAdapter() {
+						JLabel abilityInfoLabel1 = new JLabel(ballsPrice[j] + " Coins");
+						
+					    public void mouseEntered(MouseEvent e) {
+					    	add(abilityInfoLabel1);
+					    	abilityInfoLabel1.setBounds(equipBallsArr[j].getX() + equipBallsArr[j].getWidth() + 5, equipBallsArr[j].getY(), 200, 17);
+					    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+					    	
+					    	if(totalBalls[j] != 0) {
+					    		abilityInfoLabel1.setText("Bought");
+					    	}
+					    	
+					    	if(totalCoins >= ballsPrice[j] || totalBalls[j] != 0) {
+					    		abilityInfoLabel1.setForeground(new Color(41, 163, 41));
+					    	} else {
+					    		abilityInfoLabel1.setForeground(new Color(204, 0, 82));
+					    	}
+					    	
+					    	repaint();
+					    }
+
+					    public void mouseExited(MouseEvent e) {
+					        remove(abilityInfoLabel1);
+					        repaint();
+					    }
+					});
+					
+					equipBallsArr[i].addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							disableButton(equipBallsArr[j]);
+							ballNum = totalBalls[j];
+							ball = new Ball(ballNum, ballX, ballY);
+							
+							for(int i = 0; i < equipBallsArr.length; i++) {
+								if(totalBalls[i] != 0 && totalBalls[i] != ballNum) {
+									enableButton(equipBallsArr[i]);
+								}
+							}
+						}
+					});
+				}
 				
 				JButton exitUpgradesPage = new JButton("Exit");
 				add(exitUpgradesPage);
@@ -769,7 +863,12 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				exitUpgradesPage.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						showBalls = false;
 						remove(ballsLabel);
+						for(int i = 0; i < totalBalls.length; i++) {
+							remove(buyBallsArr[i]);
+							remove(equipBallsArr[i]);
+						}
 						remove(exitUpgradesPage);
 						
 						storePage(true);
@@ -790,6 +889,55 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
+		if(showBalls) {
+			int ballsX = 390;
+			g.setColor(new Color(0, 153, 0));
+			g.fillRect(ballsX, 190, ball.width, ball.height);
+			
+			int ball2Y = 216;
+			g.setColor(new Color(102, 255, 102));
+			g.fillRect(ballsX, ball2Y, 4, 4);
+			g.fillRect(ballsX + 6, ball2Y, 4, 4);
+			g.fillRect(ballsX + (ball.width - 4), ball2Y, 4, 4);
+			
+			g.setColor(new Color(0, 204, 0));
+			g.fillRect(ballsX, ball2Y + 6, 4, 4);
+			g.fillRect(ballsX + 6, ball2Y + 6, 4, 4);
+			g.fillRect(ballsX + (ball.width - 4), ball2Y + 6, 4, 4);
+			
+			g.setColor(new Color(0, 102, 0));
+			g.fillRect(ballsX, ball2Y + (ball.height - 4), 4, 4);
+			g.fillRect(ballsX + 6, ball2Y + (ball.height - 4), 4, 4);
+			g.fillRect(ballsX + (ball.width - 4), ball2Y + (ball.height - 4), 4, 4);
+			
+			int ball3Y = 252;
+			g.setColor(new Color(230, 0, 0));
+			g.fillPolygon(new int[] {ballsX, ballsX + (ball.width/2/2), ballsX + (ball.width/2)}, new int[] {ball3Y, ball3Y - 10, ball3Y}, 3);
+			g.fillPolygon(new int[] {ballsX + (ball.width/2), ballsX + (ball.width - (ball.width/4)), ballsX + ball.width}, new int[] {ball3Y, ball3Y - 10, ball3Y}, 3);
+			
+			g.setColor(Color.BLACK);
+			g.fillRect(ballsX, ball3Y, ball.width, ball.height);
+			
+			g.setColor(new Color(77, 195, 255));
+			g.fillRect(ballsX + 2, ball3Y + 4, 3, 3);
+			g.fillRect(ballsX + (ball.width - 5), ball3Y + 4, 3, 3);
+			g.setColor(Color.RED);
+			g.fillRect(ballsX + 4, ball3Y + (ball.height - 4), 8, 2);
+			g.fillRect(ballsX + 2, ball3Y + (ball.height - 5), 2, 2);
+			g.fillRect(ballsX + (ball.width - 4), ball3Y + (ball.height - 5), 2, 2);
+			
+			int ball4Y = 278;
+			g.setColor(new Color(0, 153, 0));
+			g.fillPolygon(new int[] {ballsX, ballsX, ballsX + 6}, new int[] {ball4Y + 2, ball4Y + (ball.height - 2), ball4Y + 8}, 3);
+			g.setColor(new Color(255, 102, 0));
+			g.fillPolygon(new int[] {ballsX + 2, ballsX + (ball.width - 2), ballsX + 8}, new int[] {ball4Y, ball4Y, ball4Y + 6}, 3);
+			g.setColor(new Color(0, 51, 204));
+			g.fillPolygon(new int[] {ballsX + ball.width, ballsX + ball.width, ballsX + (ball.width - 6)}, new int[] {ball4Y + 2, ball4Y + (ball.height - 2), ball4Y + 8}, 3);
+			g.setColor(new Color(230, 0, 115));
+			g.fillPolygon(new int[] {ballsX + 2, ballsX + (ball.width - 2), ballsX + 8}, new int[] {ball4Y + ball.height, ball4Y + ball.height, ball4Y + (ball.height - 6)}, 3);
+			
+		}
 		
 		if(ballHealth == 0 && timer.isRunning() && pause == false) {
 			timer.stop();
@@ -1416,7 +1564,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public void ballLoseHealth(boolean shouldLose) {
 		if(shouldLose == true) {
-			ball.changeColor(Color.RED);
+			ballHealthLabel.setForeground(Color.RED);
 			if(isBallLosingHealth == false) {
 				ballHealth -= 5;
 				ballHealthLabel.setText("Health: " + ballHealth);
@@ -1427,7 +1575,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				ballHealthLosingSpeed = 0;
 			}
 		} else {
-			ball.changeColor(new Color(31, 122, 31));
+			ballHealthLabel.setForeground(Color.BLACK);
 			isBallLosingHealth = false;
 			ballHealthLosingSpeed = 0;
 		}
