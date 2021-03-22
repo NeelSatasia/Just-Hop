@@ -28,10 +28,10 @@ public class PlayGame {
 			public void keyPressed(KeyEvent e) {
 				if((e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D)) {
 					gamePanel.changeBallHorizontalSpeed(4);
-					gamePanel.rightKeyDown(true);
+					gamePanel.isRightKeyDown = true;
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
 					gamePanel.changeBallHorizontalSpeed(-4);
-					gamePanel.leftKeyDown(true);
+					gamePanel.isLeftKeyDown = true;
 				}
 				if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
 					gamePanel.makeBallJump();
@@ -45,21 +45,25 @@ public class PlayGame {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-					gamePanel.rightKeyDown(false);
+					gamePanel.isRightKeyDown = false;
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-					gamePanel.leftKeyDown(false);
+					gamePanel.isLeftKeyDown = false;
 				}
 				
 				if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-					if(gamePanel.isGamePaused() == false) {
+					if(gamePanel.pause == false) {
 						gamePanel.pauseTheGame(true);
-					} else if(gamePanel.isGamePaused()) {
+					} else if(gamePanel.pause) {
 						gamePanel.pauseTheGame(false);
 					}
 				}
 				
 				if(e.getKeyCode() == KeyEvent.VK_B) {
 					gamePanel.ballShootBullets(false);
+				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_F) {
+					gamePanel.freezeTime(true);
 				}
 			}
 
