@@ -77,7 +77,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean changedDirectionInAir;
 	
-	String currentAbility = "Freeze";
+	String currentAbility = "Freeze Time";
 	
 	boolean ballFlyAbility = false;
 	boolean ballShieldAbility = false;
@@ -104,11 +104,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	int freezeActivationAmount = 1500;
 	int freezeActivationAmountLevel = 1;
 	int freezeActivationAmountUpgradePrice = 60;
-	boolean isFreezePowerOn = false;
 	
-	int abilityUseCounter = 0;
+	boolean usingAbility = false;
+	int abilityUseCounter = freezeActivationAmount;
 	int abilityReloadCounter = 10000;
 	boolean isAbilityReloading = false;
+	
+	JLabel currentAbilityLabel = new JLabel("Ability: " + currentAbility);
+	JProgressBar abilityProgressBar = new JProgressBar();
 	
 	boolean showBalls = false;
 	
@@ -569,7 +572,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							abilityInfoLabel1.setText("Equip");
 							abilityInfoLabel1.setForeground(new Color(41, 163, 41));
 						} else {
-							currentAbility = "Freeze";
+							currentAbility = "Freeze Time";
 							disableButton(freezeAbilityButton);
 							abilityInfoLabel1.setText("Equipped");
 							
@@ -590,7 +593,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 				    	
 				    	if(ballFreezeAbility) {
-				    		if(currentAbility.equals("Freeze")) {
+				    		if(currentAbility.equals("Freeze Time")) {
 				    			abilityInfoLabel1.setText("Equipped");
 				    		} else {
 				    			abilityInfoLabel1.setText("Equip");
@@ -1084,6 +1087,10 @@ public class GamePanel extends JPanel implements ActionListener {
 					remove(ballHealthLabel);
 					remove(scoreLabel);
 					remove(coinsLabel);
+					if(currentAbility.equals("") == false) {
+						remove(currentAbilityLabel);
+						remove(abilityProgressBar);
+					}
 					remove(newHighScoreLabel);
 					remove(newTotalCoinsLabel);
 					remove(tryAgainButton);
@@ -1118,9 +1125,11 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					blocks[i].changeColorTransparency(blocksColorTransparency[i]);
 					
-					if(isFreezePowerOn) {
-						blocks[i].changeTBarXPosition(false);
-						blocks[i].freezeBullets(true);
+					if(usingAbility) {
+						if(currentAbility.equals("Freeze Time")) {
+							blocks[i].changeTBarXPosition(false);
+							blocks[i].freezeBullets(true);
+						}
 					} else {
 						blocks[i].changeTBarXPosition(true);
 						blocks[i].freezeBullets(false);
@@ -1196,22 +1205,26 @@ public class GamePanel extends JPanel implements ActionListener {
 				blocksXPositions[i] = blockXPosition;
 			}
 			if(pause == false && isPlayingGame) {
-				if(currentAbility.equals("Freeze")) {
-					if(isFreezePowerOn && isAbilityReloading == false) {
+				if(currentAbility.equals("Freeze Time")) {
+					if(usingAbility && isAbilityReloading == false) {
 						blockVerticalSpeed = 0;
-						abilityUseCounter++;
-						if(abilityUseCounter == freezeActivationAmount) {
-							isFreezePowerOn = false;
+						abilityUseCounter--;
+						abilityProgressBar.setValue(abilityUseCounter);
+						if(abilityUseCounter == 0) {
+							usingAbility = false;
 							isAbilityReloading = true;
-							abilityUseCounter = 0;
+							abilityProgressBar.setMaximum(10000);
+							abilityUseCounter = freezeActivationAmount;
 							blockVerticalSpeed = 1;
 						}
 					}
 					if(isAbilityReloading) {
-						abilityReloadCounter--;
-						if(abilityReloadCounter == 0) {
+						abilityReloadCounter++;
+						abilityProgressBar.setValue(abilityReloadCounter);
+						if(abilityReloadCounter == 10000) {
 							isAbilityReloading = false;
-							abilityReloadCounter = 10000;
+							abilityReloadCounter = 0;
+							abilityProgressBar.setMaximum(freezeActivationAmount);
 						}
 					}
 				}
@@ -1371,6 +1384,41 @@ public class GamePanel extends JPanel implements ActionListener {
 		coinsLabel.setFont(new Font("Times New Roman", Font.PLAIN, 24));
 		coinsLabel.setText("Coins: " + coins);
 		
+		if(currentAbility.equals("") == false) {
+			add(currentAbilityLabel);
+			currentAbilityLabel.setBounds(10, 110, 130, 30);
+			currentAbilityLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+			
+			add(abilityProgressBar);
+			abilityProgressBar.setBounds(15, 150, 100, 20);
+			abilityProgressBar.setForeground(new Color(0, 0, 204));
+			abilityProgressBar.setBorder(null);
+			abilityProgressBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			abilityProgressBar.setMinimum(0);
+		}
+		
+		switch(currentAbility) {
+			case "Freeze Time":
+				abilityUseCounter = freezeActivationAmount;
+				abilityProgressBar.setMaximum(freezeActivationAmount);
+				abilityProgressBar.setValue(freezeActivationAmount);
+				break;
+			case "Fly":
+				abilityUseCounter = flyActivationAmount;
+				abilityProgressBar.setMaximum(flyActivationAmount);
+				abilityProgressBar.setValue(flyActivationAmount);
+				break;
+			case "Shield":
+				abilityUseCounter = shieldActivationAmount;
+				abilityProgressBar.setMaximum(shieldActivationAmount);
+				abilityProgressBar.setValue(shieldActivationAmount);
+				break;
+		}
+		
+		usingAbility = false;
+		abilityReloadCounter = 0;
+		isAbilityReloading = false;
+		
 		ballHorizontalSpeed = 0;
 		blockVerticalSpeed = 1;
 		ballVerticalSpeed = blockVerticalSpeed;
@@ -1390,10 +1438,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		isLeftKeyDown = false;
 		
 		ball.shootBullets = false;
-		
-		abilityUseCounter = 0;
-		abilityReloadCounter = 10000;
-		isAbilityReloading = false;
 		
 		isPlayingGame = true;
 		pause = false;
@@ -1513,7 +1557,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					if(ballY + ball.height + ballVerticalSpeed > blocks[i].y - blocks[i].TBarHeight() && ballY + ball.height <= blocks[i].y) {
 						if(ballX >= TBarXPosition + 5 && ballX + ballHorizontalSpeed <= TBarXPosition + 5) {
 							ballHorizontalSpeed = 0;
-							if(isFreezePowerOn) {
+							if(usingAbility) {
 								ballX = TBarXPosition + 5;
 							}
 							else {
@@ -1529,7 +1573,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							}
 						} else if(ballX + ball.width <= TBarXPosition && ballX + ball.width + ballHorizontalSpeed >= TBarXPosition) {
 							ballHorizontalSpeed = 0;
-							if(isFreezePowerOn) {
+							if(usingAbility) {
 								ballX = TBarXPosition - ball.width;
 							} else {
 								if(blocks[i].isTBarRight() && TBarXPosition + 5 < blocksXPositions[i] + blocksWidth[i]) {
@@ -1836,8 +1880,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void freezeTime(boolean b) {
-		if(isPlayingGame && pause == false && ballFreezeAbility && currentAbility.equals("Freeze") && isAbilityReloading == false) {
-			isFreezePowerOn = true;
+		if(isPlayingGame && pause == false && ballFreezeAbility && currentAbility.equals("Freeze Time") && isAbilityReloading == false) {
+			usingAbility = true;
 		}
 	}
 }
