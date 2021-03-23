@@ -52,23 +52,25 @@ public class WiperBlock extends Blocks {
 	}
 	
 	@Override
-	public void changeTBarXPosition() {
-		if(isTBarRight == true) {
-			TBarXPosition++;
-		} else {
-			TBarXPosition--;
-		}
-		
-		if(TBarXPosition == this.x) {
-			isTBarRight = true;
-		} else if(TBarXPosition == this.x + this.width - 5) {
-			isTBarRight = false;
+	public void changeTBarXPosition(boolean b) {
+		if(b) {
+			if(isTBarRight == true) {
+				TBarXPosition++;
+			} else {
+				TBarXPosition--;
+			}
+			
+			if(TBarXPosition == this.x) {
+				isTBarRight = true;
+			} else if(TBarXPosition == this.x + this.width - 5) {
+				isTBarRight = false;
+			}
 		}
 	}
 	
 	@Override
 	public int TBarXPosition() {
-		return (int) TBarXPosition;
+		return TBarXPosition;
 	}
 	
 	@Override

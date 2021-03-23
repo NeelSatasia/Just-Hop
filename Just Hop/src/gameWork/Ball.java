@@ -56,6 +56,7 @@ public class Ball extends Rectangle {
 			g.setColor(new Color(77, 195, 255));
 			g.fillRect(this.x + 2, this.y + 4, 3, 3);
 			g.fillRect(this.x + (this.width - 5), this.y + 4, 3, 3);
+			g.setColor(Color.RED);
 			g.fillRect(this.x + 4, this.y + (this.height - 4), 8, 2);
 			g.fillRect(this.x + 2, this.y + (this.height - 5), 2, 2);
 			g.fillRect(this.x + (this.width - 4), this.y + (this.height - 5), 2, 2);

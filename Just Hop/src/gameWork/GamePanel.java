@@ -101,10 +101,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	int bulletReloadSpeedLevel = 0;
 	int bulletReloadSpeedUpgradePrice = 60;
 	
-	int freezeActivationAmount = 5000;
+	int freezeActivationAmount = 1500;
 	int freezeActivationAmountLevel = 1;
 	int freezeActivationAmountUpgradePrice = 60;
 	boolean isFreezePowerOn = false;
+	
+	int abilityUseCounter = 0;
+	int abilityReloadCounter = 10000;
+	boolean isAbilityReloading = false;
 	
 	boolean showBalls = false;
 	
@@ -1114,7 +1118,13 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					blocks[i].changeColorTransparency(blocksColorTransparency[i]);
 					
-					blocks[i].changeTBarXPosition();
+					if(isFreezePowerOn) {
+						blocks[i].changeTBarXPosition(false);
+						blocks[i].freezeBullets(true);
+					} else {
+						blocks[i].changeTBarXPosition(true);
+						blocks[i].freezeBullets(false);
+					}
 				}
 				
 				blocks[i].draw(g);
@@ -1185,10 +1195,28 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				blocksXPositions[i] = blockXPosition;
 			}
-			
-			if(isFreezePowerOn) {
-				blockVerticalSpeed = 0;
+			if(pause == false && isPlayingGame) {
+				if(currentAbility.equals("Freeze")) {
+					if(isFreezePowerOn && isAbilityReloading == false) {
+						blockVerticalSpeed = 0;
+						abilityUseCounter++;
+						if(abilityUseCounter == freezeActivationAmount) {
+							isFreezePowerOn = false;
+							isAbilityReloading = true;
+							abilityUseCounter = 0;
+							blockVerticalSpeed = 1;
+						}
+					}
+					if(isAbilityReloading) {
+						abilityReloadCounter--;
+						if(abilityReloadCounter == 0) {
+							isAbilityReloading = false;
+							abilityReloadCounter = 10000;
+						}
+					}
+				}
 			}
+			
 			blocksYPositions[i] += blockVerticalSpeed;
 		}
 		
@@ -1264,6 +1292,14 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
 				blocks[i].addHealthBooster(false);
+				
+				if(ballHealth + 5 > 100) {
+					ballHealth = 100;
+				} else {
+					ballHealth += 5;
+				}
+				
+				ballHealthLabel.setText("Health: " + ballHealth);
 			}
 			
 			if(blocks[i] instanceof ShooterBlock) {
@@ -1355,6 +1391,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		ball.shootBullets = false;
 		
+		abilityUseCounter = 0;
+		abilityReloadCounter = 10000;
+		isAbilityReloading = false;
+		
 		isPlayingGame = true;
 		pause = false;
 		
@@ -1435,8 +1475,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	public boolean collisionCheck() {
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksColorTransparency[i] > 0) {
-				if((ballX + ball.getWidth() <= blocksXPositions[i] && ballX + ball.getWidth() + ballHorizontalSpeed >= blocksXPositions[i]) || (ballX >= blocksXPositions[i] + blocksWidth[i] && ballX + ballHorizontalSpeed <= blocksXPositions[i] + blocksWidth[i])) {
-					if(ballY + ball.getHeight() + ballVerticalSpeed >= blocksYPositions[i] && ballY <= blocksYPositions[i] + 5) {
+				if((ballX + ball.width <= blocksXPositions[i] && ballX + ball.width + ballHorizontalSpeed >= blocksXPositions[i]) || (ballX >= blocksXPositions[i] + blocksWidth[i] && ballX + ballHorizontalSpeed <= blocksXPositions[i] + blocksWidth[i])) {
+					if(ballY + ball.height + ballVerticalSpeed >= blocksYPositions[i] && ballY <= blocksYPositions[i] + 5) {
 						ballHorizontalSpeed = 0;
 					}
 				}
@@ -1456,7 +1496,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				if(blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) {
 					if(collisionCheck(i)) {
 						if((blocks[i] instanceof HalfRedBlock)) {
-							if(blocks[i].isRedOnRightSide() && ballX + ball.getWidth() > blocksXPositions[i] + blocksWidth[i]/2) {
+							if(blocks[i].isRedOnRightSide() && ballX + ball.width > blocksXPositions[i] + blocksWidth[i]/2) {
 								ballLoseHealth(true);
 							} else if(blocks[i].isRedOnRightSide() == false && ballX < blocksXPositions[i] + blocksWidth[i]/2) {
 								ballLoseHealth(true);
@@ -1470,28 +1510,37 @@ public class GamePanel extends JPanel implements ActionListener {
 				} else if(blocks[i] instanceof WiperBlock) {
 					int TBarXPosition = blocks[i].TBarXPosition();
 					
-					if(ballY + ball.getHeight() + ballVerticalSpeed > blocksYPositions[i] - blocks[i].TBarHeight() && ballY + ball.getHeight() <= blocksYPositions[i]) {
+					if(ballY + ball.height + ballVerticalSpeed > blocks[i].y - blocks[i].TBarHeight() && ballY + ball.height <= blocks[i].y) {
 						if(ballX >= TBarXPosition + 5 && ballX + ballHorizontalSpeed <= TBarXPosition + 5) {
 							ballHorizontalSpeed = 0;
-							if(blocks[i].isTBarRight() == false && TBarXPosition > blocksXPositions[i]) {
-								if(isLeftKeyDown) {
-									if(TBarXPosition + 5 - 1 < blocksXPositions[i] + blocksWidth[i] - 1) {
-										ballX = TBarXPosition + 5 - 1;
-									}
-								}
-							} else {
-								ballX = TBarXPosition + 5 + 1;
+							if(isFreezePowerOn) {
+								ballX = TBarXPosition + 5;
 							}
-						} else if(ballX + ball.getWidth() <= TBarXPosition && ballX + ball.getWidth() + ballHorizontalSpeed >= TBarXPosition) {
-							ballHorizontalSpeed = 0;
-							if(blocks[i].isTBarRight() && TBarXPosition + 5 < blocksXPositions[i] + blocksWidth[i]) {
-								if(isRightKeyDown) {
-									if(TBarXPosition - (int) ball.getWidth() + 1 > blocksXPositions[i]) {
-										ballX = TBarXPosition - (int) ball.getWidth() + 1;
+							else {
+								if(blocks[i].isTBarRight() == false && TBarXPosition > blocksXPositions[i]) {
+									if(isLeftKeyDown) {
+										if(TBarXPosition + 5 - 1 < blocksXPositions[i] + blocksWidth[i] - 1) {
+											ballX = TBarXPosition + 5 - 1;
+										}
 									}
+								} else {
+									ballX = TBarXPosition + 5 + 1;
 								}
+							}
+						} else if(ballX + ball.width <= TBarXPosition && ballX + ball.width + ballHorizontalSpeed >= TBarXPosition) {
+							ballHorizontalSpeed = 0;
+							if(isFreezePowerOn) {
+								ballX = TBarXPosition - ball.width;
 							} else {
-								ballX = TBarXPosition - (int) ball.getWidth() - 1;
+								if(blocks[i].isTBarRight() && TBarXPosition + 5 < blocksXPositions[i] + blocksWidth[i]) {
+									if(isRightKeyDown) {
+										if(TBarXPosition - ball.width + 1 > blocksXPositions[i]) {
+											ballX = TBarXPosition - ball.width + 1;
+										}
+									}
+								} else {
+									ballX = TBarXPosition - ball.width - 1;
+								}
 							}
 						}
 						ball.setLocation(ballX, ballY);
@@ -1503,16 +1552,16 @@ public class GamePanel extends JPanel implements ActionListener {
 				} else if(blocks[i] instanceof SplitBlock) {
 					int secondBlockXPosition = blocks[i].secondBlockXPosition();
 					
-					if(ballY + ball.height + ballVerticalSpeed >= blocks[i].getY() && ballY + ball.height <= blocks[i].getY() + blocks[i].height) {
+					if(ballY + ball.height + ballVerticalSpeed >= blocks[i].y && ballY + ball.height <= blocks[i].y + blocks[i].height) {
 						if(ballX + ball.width + ballHorizontalSpeed > blocksXPositions[i] && ballX < secondBlockXPosition - ball.width && ballX + ballHorizontalSpeed < secondBlockXPosition - ball.getWidth()) {
 							currentIndex = i;
 							ballY = blocks[currentIndex].y - ball.height;
 							return true;
-						} else if(ballX + ball.getWidth() > secondBlockXPosition && ballX + ball.width + ballHorizontalSpeed > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
+						} else if(ballX + ball.width > secondBlockXPosition && ballX + ball.width + ballHorizontalSpeed > secondBlockXPosition && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
 							currentIndex = i;
 							ballY = blocks[currentIndex].y - ball.height;
 							return true;
-						} else if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
+						} else if(ballX + ball.width + ballHorizontalSpeed > blocksXPositions[i] && ballX + ballHorizontalSpeed < blocksXPositions[i] + blocksWidth[i]) {
 							if((ballX + ballHorizontalSpeed >= secondBlockXPosition - ball.width) || (ballX + ball.width + ballHorizontalSpeed <= secondBlockXPosition)) {
 								if(ballY + ballVerticalSpeed < blocksYPositions[i] + 5) {
 									ballX = secondBlockXPosition - ball.width;
@@ -1787,7 +1836,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void freezeTime(boolean b) {
-		if(isPlayingGame && pause == false && ballFreezeAbility && currentAbility.equals("Freeze")) {
+		if(isPlayingGame && pause == false && ballFreezeAbility && currentAbility.equals("Freeze") && isAbilityReloading == false) {
 			isFreezePowerOn = true;
 		}
 	}

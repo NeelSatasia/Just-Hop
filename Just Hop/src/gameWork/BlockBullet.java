@@ -5,6 +5,8 @@ import java.awt.Rectangle;
 
 public class BlockBullet extends Rectangle {
 	
+	boolean freeze = false;
+	
 	public BlockBullet(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -14,7 +16,10 @@ public class BlockBullet extends Rectangle {
 	
 	public void draw(Graphics g) {
 		g.fillPolygon(new int[] {this.x, this.x + 10, this.x + 5}, new int[] {this.y, this.y, this.y + 10}, 3); //bullet
-		this.y += 5;
+		
+		if(freeze == false) {
+			this.y += 5;
+		}
 	}
 	
 	public int getBulletXPosition() {
@@ -23,5 +28,9 @@ public class BlockBullet extends Rectangle {
 
 	public int getBulletYPosition() {
 		return this.y;
+	}
+	
+	public void freezeBullet(boolean b) {
+		freeze = b;
 	}
 }

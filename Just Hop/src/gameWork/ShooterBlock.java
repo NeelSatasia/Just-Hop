@@ -20,6 +20,8 @@ public class ShooterBlock extends Blocks {
 	HealthBooster healthBooster = null;
 	
 	int blockColorTransparency = 255;
+	
+	boolean gunFrozen = false;
 
 	public ShooterBlock(int x, int y, int w) {
 		this.x = x;
@@ -35,9 +37,13 @@ public class ShooterBlock extends Blocks {
 	@Override
 	public void draw(Graphics g) {
 		
-		gunReloadCounter++;
+		if(gunFrozen == false) {
+			gunReloadCounter++;
+		} else if(gunReloadCounter > 0) {
+			gunReloadCounter = 0;
+		}
 		
-		if(gunReloadCounter == 50 && blockColorTransparency == 255) {
+		if(gunReloadCounter == 50 && blockColorTransparency == 255 && gunFrozen == false) {
 			bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
 			gunReloadCounter = 0;
 		}
@@ -107,6 +113,22 @@ public class ShooterBlock extends Blocks {
 			coin = new Coin(randX, this.y);
 		} else {
 			coin = null;
+		}
+	}
+	
+	@Override
+	public void freezeBullets(boolean b) {
+		if(b) {
+			gunFrozen = true;
+			gunReloadCounter = 0;
+			for(int i = 0; i < bullets.size(); i++) {
+				bullets.get(i).freezeBullet(true);
+			}
+		} else if(gunFrozen) {
+			gunFrozen = false;
+			for(int i = 0; i < bullets.size(); i++) {
+				bullets.get(i).freezeBullet(false);
+			}
 		}
 	}
 }

@@ -19,7 +19,7 @@ public class Blocks extends Rectangle {
 		return false;
 	}
 	
-	public void changeTBarXPosition() {
+	public void changeTBarXPosition(boolean b) {
 	}
 	
 	public int TBarXPosition() {
@@ -57,5 +57,8 @@ public class Blocks extends Rectangle {
 	}
 
 	public void addCoin(boolean b) {
+	}
+
+	public void freezeBullets(boolean b) {
 	}
 }
