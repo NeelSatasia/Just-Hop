@@ -110,7 +110,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int abilityReloadCounter = 10000;
 	boolean isAbilityReloading = false;
 	
-	JLabel currentAbilityLabel = new JLabel("Ability: " + currentAbility);
+	JLabel currentAbilityLabel = new JLabel();
 	JProgressBar abilityProgressBar = new JProgressBar();
 	
 	boolean showBalls = false;
@@ -118,7 +118,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isPlayingGame = false;
 	boolean pause;
 	
-	JLabel gameNameLabel = new JLabel(" \"Just Hop\" ", SwingConstants.CENTER);
+	JLabel gameNameLabel = new JLabel(" Block To Block ", SwingConstants.CENTER);
 	
 	JCheckBox[] differentBlocks = new JCheckBox[differentTypesOfBlocks];
 	JCheckBox[] modes = new JCheckBox[3];
@@ -129,7 +129,6 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton abilities = new JButton("Abilities");
 	JButton upgrades = new JButton("Upgrades");
 	JButton balls = new JButton("Balls");
-	JButton music = new JButton("Music");
 	JButton exit = new JButton("Exit");
 	
 	public GamePanel() {
@@ -1386,14 +1385,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(currentAbility.equals("") == false) {
 			add(currentAbilityLabel);
-			currentAbilityLabel.setBounds(10, 110, 130, 30);
-			currentAbilityLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+			currentAbilityLabel.setBounds(10, 105, 130, 20);
+			currentAbilityLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+			currentAbilityLabel.setText(currentAbility + " Ability");
 			
 			add(abilityProgressBar);
-			abilityProgressBar.setBounds(15, 150, 100, 20);
-			abilityProgressBar.setForeground(new Color(0, 0, 204));
+			abilityProgressBar.setBounds(10, 125, 130, 15);
+			abilityProgressBar.setForeground(new Color(0, 102, 255));
 			abilityProgressBar.setBorder(null);
-			abilityProgressBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			abilityProgressBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 			abilityProgressBar.setMinimum(0);
 		}
 		
