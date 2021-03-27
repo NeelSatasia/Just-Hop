@@ -12,6 +12,7 @@ public class Ball extends Rectangle {
 	ArrayList<BallBullet> bullets = new ArrayList<BallBullet>();
 	
 	boolean shootBullets = false;
+	boolean twoBulletsAtOnce = false;
 	
 	int bulletReloadSpeedCounter = 0;
 	int bulletReloadSpeed = 50;
@@ -24,7 +25,7 @@ public class Ball extends Rectangle {
 		this.width = 16;
 		this.height = 16;
 		ballType = ballNum;
-	}	
+	}
 	
 	public void draw(Graphics g) {
 		if(ballType == 1) {
@@ -74,7 +75,12 @@ public class Ball extends Rectangle {
 		if(shootBullets) {
 			bulletReloadSpeedCounter++;
 			if(bulletReloadSpeedCounter == bulletReloadSpeed) {
-				bullets.add(new BallBullet(this.x + (this.width/2) - 5, this.y));
+				if(twoBulletsAtOnce == false) {
+					bullets.add(new BallBullet(this.x + (this.width/2) - 5, this.y - 10));
+				} else {
+					bullets.add(new BallBullet(this.x - 5, this.y - 10));
+					bullets.add(new BallBullet(this.x + (this.width - 5), this.y - 10));
+				}
 				bulletReloadSpeedCounter = 0;
 			}
 		} else if(bulletReloadSpeedCounter > 0) {
@@ -91,10 +97,6 @@ public class Ball extends Rectangle {
 				bullets.remove(i);
 			}
 		}
-	}
-	
-	public void draw(Graphics g, int ball) {
-		
 	}
 	
 	public void changeColor(Color color) {

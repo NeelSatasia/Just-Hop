@@ -77,12 +77,11 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean changedDirectionInAir;
 	
-	String currentAbility = "Freeze Time";
+	String currentAbility = "Shield";
 	
 	boolean ballFlyAbility = false;
-	boolean ballShieldAbility = false;
-	boolean ballShootsTwoBullets = false;
-	boolean ballFreezeAbility = true;
+	boolean ballShieldAbility = true;
+	boolean ballFreezeAbility = false;
 	
 	int shieldPower = 2;
 	int shieldActivationAmount = 5000;
@@ -98,15 +97,15 @@ public class GamePanel extends JPanel implements ActionListener {
 	int flyPowerUpgradePrice = 50;
 	int flyActivationAmountUpgradePrice = 70;
 	
-	int bulletReloadSpeedLevel = 0;
-	int bulletReloadSpeedUpgradePrice = 60;
+	int ballBulletReloadSpeedLevel = 0;
+	int ballBulletReloadSpeedUpgradePrice = 60;
 	
 	int freezeActivationAmount = 1500;
 	int freezeActivationAmountLevel = 1;
 	int freezeActivationAmountUpgradePrice = 60;
 	
 	boolean usingAbility = false;
-	int abilityUseCounter = freezeActivationAmount;
+	int abilityUseCounter = 0;
 	int abilityReloadCounter = 10000;
 	boolean isAbilityReloading = false;
 	
@@ -496,7 +495,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				JButton twoBulletsButton = new JButton("Two Bullets At Once");
 				add(twoBulletsButton);
 				twoBulletsButton.setBounds(340, 270, 120, 30);
-				if(totalCoins > 1000 && highScore >= 200 && ballShootsTwoBullets == false) {
+				if(totalCoins > 1000 && highScore >= 200 && ball.twoBulletsAtOnce == false) {
 					enableButton(twoBulletsButton);
 				} else {
 					disableButton(twoBulletsButton);
@@ -505,7 +504,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				twoBulletsButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						disableButton(twoBulletsButton);
-						ballShootsTwoBullets = true;
+						ball.twoBulletsAtOnce = true;
 						totalCoins -= 1000;
 						abilityInfoLabel1.setText("Bought (Permanent Ability)");
 						abilityInfoLabel1.setForeground(new Color(41, 163, 41));
@@ -519,7 +518,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				    	abilityInfoLabel1.setBounds(twoBulletsButton.getX() + twoBulletsButton.getWidth() + 5, twoBulletsButton.getY(), 200, 17);
 				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 				    	
-				    	if(ballShootsTwoBullets) {
+				    	if(ball.twoBulletsAtOnce) {
 				    		abilityInfoLabel1.setText("Bought (Permanent Ability)");
 				    	} else {
 				    		abilityInfoLabel1.setText("1000 coins");
@@ -529,19 +528,19 @@ public class GamePanel extends JPanel implements ActionListener {
 				    	abilityInfoLabel2.setBounds(twoBulletsButton.getX() + twoBulletsButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 3, 200, 17);
 				    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 				    	
-				    	if(ballShootsTwoBullets) {
+				    	if(ball.twoBulletsAtOnce) {
 				    		abilityInfoLabel2.setText("");
 				    	} else {
 				    		abilityInfoLabel2.setText("High score of 200 or more");
 				    	}
 				    	
-				    	if(ballShootsTwoBullets || (totalCoins >= 1000 && ballShootsTwoBullets == false)) {
+				    	if(ball.twoBulletsAtOnce || (totalCoins >= 1000 && ball.twoBulletsAtOnce == false)) {
 				    		abilityInfoLabel1.setForeground(new Color(41, 163, 41));
 				    	} else {
 				    		abilityInfoLabel1.setForeground(new Color(204, 0, 82));
 				    	}
 				    	
-				    	if(ballShootsTwoBullets || (highScore >= 200 && ballShootsTwoBullets == false)) {
+				    	if(ball.twoBulletsAtOnce || (highScore >= 200 && ball.twoBulletsAtOnce == false)) {
 				    		abilityInfoLabel2.setForeground(new Color(41, 163, 41));
 				    	} else {
 				    		abilityInfoLabel2.setForeground(new Color(204, 0, 82));
@@ -777,7 +776,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				JButton bulletReloadSpeedButton = new JButton("Reload Speed");
 				add(bulletReloadSpeedButton);
 				bulletReloadSpeedButton.setBounds(355, 390, 90, 30);
-				if(bulletReloadSpeedLevel < 3 && totalCoins >= bulletReloadSpeedUpgradePrice) {
+				if(ballBulletReloadSpeedLevel < 3 && totalCoins >= ballBulletReloadSpeedUpgradePrice) {
 					enableButton(bulletReloadSpeedButton);
 				} else {
 					disableButton(bulletReloadSpeedButton);
@@ -786,11 +785,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				bulletReloadSpeedButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						ball.bulletReloadSpeed -= 10;
-						totalCoins -= bulletReloadSpeedUpgradePrice;
-						bulletReloadSpeedLevel++;
-						bulletReloadSpeedUpgradePrice += 30;
+						totalCoins -= ballBulletReloadSpeedUpgradePrice;
+						ballBulletReloadSpeedLevel++;
+						ballBulletReloadSpeedUpgradePrice += 30;
 						
-						if(bulletReloadSpeedLevel == 3 || totalCoins < bulletReloadSpeedUpgradePrice) {
+						if(ballBulletReloadSpeedLevel == 3 || totalCoins < ballBulletReloadSpeedUpgradePrice) {
 							disableButton(bulletReloadSpeedButton);
 						}
 					}
@@ -801,10 +800,10 @@ public class GamePanel extends JPanel implements ActionListener {
 					JLabel abilityInfoLabel2 = new JLabel();
 					
 				    public void mouseEntered(MouseEvent e) {
-				    	if(bulletReloadSpeedLevel < 3) {
-							abilityInfoLabel1.setText("Upgrade To Level " + (bulletReloadSpeedLevel + 1));
-						} else if(bulletReloadSpeedLevel == 3) {
-							abilityInfoLabel1.setText("Reached Maximum Level: " + bulletReloadSpeedLevel);
+				    	if(ballBulletReloadSpeedLevel < 3) {
+							abilityInfoLabel1.setText("Upgrade To Level " + (ballBulletReloadSpeedLevel + 1));
+						} else if(ballBulletReloadSpeedLevel == 3) {
+							abilityInfoLabel1.setText("Reached Maximum Level: " + ballBulletReloadSpeedLevel);
 						}
 				    	
 				    	add(abilityInfoLabel1);
@@ -812,13 +811,13 @@ public class GamePanel extends JPanel implements ActionListener {
 				    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 				    	
 				    	add(abilityInfoLabel2);
-				    	if(bulletReloadSpeedLevel < 3) {
+				    	if(ballBulletReloadSpeedLevel < 3) {
 					    	abilityInfoLabel2.setBounds(bulletReloadSpeedButton.getX() + bulletReloadSpeedButton.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 1, 200, 17);
 					    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
-					    	abilityInfoLabel2.setText(bulletReloadSpeedUpgradePrice + " Coins");
+					    	abilityInfoLabel2.setText(ballBulletReloadSpeedUpgradePrice + " Coins");
 				    	}
 				    	
-				    	if(bulletReloadSpeedLevel < 3 && totalCoins >= bulletReloadSpeedUpgradePrice) {
+				    	if(ballBulletReloadSpeedLevel < 3 && totalCoins >= ballBulletReloadSpeedUpgradePrice) {
 				    		abilityInfoLabel1.setForeground(new Color(41, 163, 41));
 				    		abilityInfoLabel2.setForeground(new Color(41, 163, 41));
 				    	} else {
@@ -1232,6 +1231,10 @@ public class GamePanel extends JPanel implements ActionListener {
 			blocksYPositions[i] += blockVerticalSpeed;
 		}
 		
+		if(pause == false && isPlayingGame) {
+			
+		}
+		
 		if(collisionCheck()) {
 			changeBlockColorTransparency(currentIndex);
 			isBallFalling = false;
@@ -1317,7 +1320,15 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(blocks[i] instanceof ShooterBlock) {
 				for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
 					if(blocks[i].getBulletsList().get(j).intersects(ball)) {		
-						if(ballHealth - 10 >= 0) {
+						if(ballShieldAbility) {
+							if(10 - shieldPower >= 0) {
+								if(ballHealth - (10 - shieldPower) >= 0) {
+									ballHealth -= (10 - shieldPower);
+								} else {
+									ballHealth = 0;
+								}
+							}
+						} else if(ballHealth - 10 >= 0) {
 							ballHealth -= 10;
 						} else {
 							ballHealth = 0;
@@ -1392,7 +1403,6 @@ public class GamePanel extends JPanel implements ActionListener {
 			add(abilityProgressBar);
 			abilityProgressBar.setBounds(10, 125, 130, 15);
 			abilityProgressBar.setForeground(new Color(0, 102, 255));
-			abilityProgressBar.setBorder(null);
 			abilityProgressBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 			abilityProgressBar.setMinimum(0);
 		}
@@ -1412,6 +1422,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				abilityUseCounter = shieldActivationAmount;
 				abilityProgressBar.setMaximum(shieldActivationAmount);
 				abilityProgressBar.setValue(shieldActivationAmount);
+				abilityProgressBar.setForeground(Color.GREEN);
 				break;
 		}
 		
@@ -1755,16 +1766,27 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	public void ballLoseHealth(boolean shouldLose) {
 		if(shouldLose == true) {
-			ballHealthLabel.setForeground(Color.RED);
-			if(isBallLosingHealth == false) {
-				ballHealth -= 5;
-				ballHealthLabel.setText("Health: " + ballHealth);
-				isBallLosingHealth = true;
-			} else if(ballHealthLosingSpeed == 200) {
-				ballHealth -= 5;
-				ballHealthLabel.setText("Health: " + ballHealth);
+			if(isBallLosingHealth == false || ballHealthLosingSpeed == 200) {
+				if(ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
+					if(5 - shieldPower >= 0) {
+						if(ballHealth - (5 - shieldPower) >= 0) {
+							ballHealth -= (5 - shieldPower);
+						} else {
+							ballHealth = 0;
+						}
+					}
+				} else if(ballHealth - 5 >= 0) {
+					ballHealth -= 5;
+				} else {
+					ballHealth = 0;
+				}
 				ballHealthLosingSpeed = 0;
+				if(isBallLosingHealth == false) {
+					isBallLosingHealth = true;
+				}
 			}
+			ballHealthLabel.setForeground(Color.RED);
+			ballHealthLabel.setText("Health: " + ballHealth);
 		} else {
 			ballHealthLabel.setForeground(Color.BLACK);
 			isBallLosingHealth = false;
@@ -1879,9 +1901,13 @@ public class GamePanel extends JPanel implements ActionListener {
 		});
 	}
 
-	public void freezeTime(boolean b) {
-		if(isPlayingGame && pause == false && ballFreezeAbility && currentAbility.equals("Freeze Time") && isAbilityReloading == false) {
-			usingAbility = true;
+	public void usingAbility(boolean b) {
+		if(isPlayingGame && pause == false && isAbilityReloading == false) {
+			if(ballFreezeAbility && currentAbility.equals("Freeze Time")) {
+				usingAbility = true;
+			} else if(ballShieldAbility && currentAbility.equals("Shield")) {
+				usingAbility = true;
+			}
 		}
 	}
 }

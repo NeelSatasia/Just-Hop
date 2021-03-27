@@ -63,7 +63,7 @@ public class PlayGame {
 				}
 				
 				if(e.getKeyCode() == KeyEvent.VK_F) {
-					gamePanel.freezeTime(true);
+					gamePanel.usingAbility(true);
 				}
 			}
 
