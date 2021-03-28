@@ -40,6 +40,10 @@ public class PlayGame {
 				if(e.getKeyCode() == KeyEvent.VK_B) {
 					gamePanel.ballShootBullets(true);
 				}
+				
+				if(e.getKeyCode() == KeyEvent.VK_N) {
+					gamePanel.usingAbility(true);
+				}
 			}
 
 			@Override
@@ -62,8 +66,8 @@ public class PlayGame {
 					gamePanel.ballShootBullets(false);
 				}
 				
-				if(e.getKeyCode() == KeyEvent.VK_F) {
-					gamePanel.usingAbility(true);
+				if(e.getKeyCode() == KeyEvent.VK_N) {
+					gamePanel.usingAbility(false);
 				}
 			}
 

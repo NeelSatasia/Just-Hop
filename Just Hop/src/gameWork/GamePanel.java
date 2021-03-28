@@ -77,36 +77,38 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	boolean changedDirectionInAir;
 	
-	String currentAbility = "Shield";
+	String currentAbility = "Fly";
 	
-	boolean ballFlyAbility = false;
-	boolean ballShieldAbility = true;
+	boolean ballFlyAbility = true;
+	boolean ballShieldAbility = false;
 	boolean ballFreezeAbility = false;
 	
 	int shieldPower = 2;
-	int shieldActivationAmount = 5000;
+	int shieldActivationAmount = 300;
 	int shieldPowerLevel = 1;
 	int shieldActivationAmountLevel = 1;
 	int shieldPowerUpgradePrice = 60;
 	int shieldActivationAmountUpgradePrice = 80;
 	
-	int flyPower = -1;
-	int flyActivationAmount = 5000;
+	int flyPower = -2;
+	int flyActivationAmount = 200;
 	int flyPowerLevel = 1;
 	int flyActivationAmountLevel = 1;
 	int flyPowerUpgradePrice = 50;
 	int flyActivationAmountUpgradePrice = 70;
+	boolean isFlyingKeyPressed = false;
 	
-	int ballBulletReloadSpeedLevel = 0;
+	int ballBulletReloadSpeedLevel = 1;
 	int ballBulletReloadSpeedUpgradePrice = 60;
 	
-	int freezeActivationAmount = 1500;
+	int freezeActivationAmount = 200;
 	int freezeActivationAmountLevel = 1;
 	int freezeActivationAmountUpgradePrice = 60;
 	
 	boolean usingAbility = false;
 	int abilityUseCounter = 0;
-	int abilityReloadCounter = 10000;
+	int maxAbilityUse = 0;
+	int abilityReloadCounter = 2000;
 	boolean isAbilityReloading = false;
 	
 	JLabel currentAbilityLabel = new JLabel();
@@ -688,7 +690,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				flyActivationAmountButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						flyActivationAmount += 1000;
+						flyActivationAmount += 100;
 						totalCoins -= flyActivationAmountUpgradePrice;
 						flyActivationAmountLevel++;
 						flyActivationAmountUpgradePrice += 30;
@@ -736,7 +738,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				shieldActivationAmountButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						shieldActivationAmount += 1000;
+						shieldActivationAmount += 100;
 						totalCoins -= shieldActivationAmountUpgradePrice;
 						shieldActivationAmountLevel++;
 						shieldActivationAmountUpgradePrice += 30;
@@ -760,7 +762,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				freezeActivationAmountButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						freezeActivationAmount += 1000;
+						freezeActivationAmount += 100;
 						totalCoins -= freezeActivationAmountUpgradePrice;
 						freezeActivationAmountLevel++;
 						freezeActivationAmountUpgradePrice += 40;
@@ -776,7 +778,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				JButton bulletReloadSpeedButton = new JButton("Reload Speed");
 				add(bulletReloadSpeedButton);
 				bulletReloadSpeedButton.setBounds(355, 390, 90, 30);
-				if(ballBulletReloadSpeedLevel < 3 && totalCoins >= ballBulletReloadSpeedUpgradePrice) {
+				if(ballBulletReloadSpeedLevel < 5 && totalCoins >= ballBulletReloadSpeedUpgradePrice) {
 					enableButton(bulletReloadSpeedButton);
 				} else {
 					disableButton(bulletReloadSpeedButton);
@@ -1123,11 +1125,9 @@ public class GamePanel extends JPanel implements ActionListener {
 					
 					blocks[i].changeColorTransparency(blocksColorTransparency[i]);
 					
-					if(usingAbility) {
-						if(currentAbility.equals("Freeze Time")) {
-							blocks[i].changeTBarXPosition(false);
-							blocks[i].freezeBullets(true);
-						}
+					if(usingAbility && currentAbility.equals("Freeze Time")) {
+						blocks[i].changeTBarXPosition(false);
+						blocks[i].freezeBullets(true);
 					} else {
 						blocks[i].changeTBarXPosition(true);
 						blocks[i].freezeBullets(false);
@@ -1148,6 +1148,34 @@ public class GamePanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if(pause == false && isPlayingGame) {
+			if(usingAbility && isAbilityReloading == false) {
+				abilityUseCounter--;
+				abilityProgressBar.setValue(abilityUseCounter);
+				if(abilityUseCounter == 0) {
+					usingAbility = false;
+					isAbilityReloading = true;
+					abilityProgressBar.setMaximum(2000);
+					abilityUseCounter = maxAbilityUse;
+				}
+			}
+			if(isAbilityReloading) {
+				abilityReloadCounter++;
+				abilityProgressBar.setValue(abilityReloadCounter);
+				if(abilityReloadCounter == 2000) {
+					isAbilityReloading = false;
+					abilityReloadCounter = 0;
+					abilityProgressBar.setMaximum(maxAbilityUse);
+				}
+			}
+		}
+		
+		if(usingAbility && currentAbility.equals("Freeze Time")) {
+			blockVerticalSpeed = 0;
+		} else if(blockVerticalSpeed == 0) {
+			blockVerticalSpeed = 1;
+		}
+		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocksYPositions[i] >= 100 * blocks.length) {
 				blocksColorTransparency[i] = 255;
@@ -1202,43 +1230,17 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				blocksXPositions[i] = blockXPosition;
 			}
-			if(pause == false && isPlayingGame) {
-				if(currentAbility.equals("Freeze Time")) {
-					if(usingAbility && isAbilityReloading == false) {
-						blockVerticalSpeed = 0;
-						abilityUseCounter--;
-						abilityProgressBar.setValue(abilityUseCounter);
-						if(abilityUseCounter == 0) {
-							usingAbility = false;
-							isAbilityReloading = true;
-							abilityProgressBar.setMaximum(10000);
-							abilityUseCounter = freezeActivationAmount;
-							blockVerticalSpeed = 1;
-						}
-					}
-					if(isAbilityReloading) {
-						abilityReloadCounter++;
-						abilityProgressBar.setValue(abilityReloadCounter);
-						if(abilityReloadCounter == 10000) {
-							isAbilityReloading = false;
-							abilityReloadCounter = 0;
-							abilityProgressBar.setMaximum(freezeActivationAmount);
-						}
-					}
-				}
-			}
 			
 			blocksYPositions[i] += blockVerticalSpeed;
 		}
 		
-		if(pause == false && isPlayingGame) {
-			
-		}
-		
 		if(collisionCheck()) {
 			changeBlockColorTransparency(currentIndex);
+			
 			isBallFalling = false;
-			ballVerticalSpeed = blockVerticalSpeed;
+			if(isFlyingKeyPressed == false) {
+				ballVerticalSpeed = blockVerticalSpeed;
+			}
 			
 			if(((previousIndex == 0 && currentIndex == blocks.length - 1) || previousIndex > currentIndex) && didScore == false) {
 				score++;
@@ -1246,13 +1248,15 @@ public class GamePanel extends JPanel implements ActionListener {
 				scoreLabel.setText("Score: " + score);
 			}
 		} else if(isBallJumping == false) {
-			isBallFalling = true;
 			if(currentIndex > -1) {
 				previousIndex = currentIndex;
 				currentIndex = -1;
 			}
-			if(ballVerticalSpeed < 15) {
-				ballVerticalSpeed++;
+			if(isFlyingKeyPressed == false) {
+				isBallFalling = true;
+				if(ballVerticalSpeed < 15) {
+					ballVerticalSpeed++;
+				}
 			}
 		}
 		
@@ -1264,7 +1268,9 @@ public class GamePanel extends JPanel implements ActionListener {
 				currentBallJumpYDistance -= 5;
 			} else {
 				isBallJumping = false;
-				isBallFalling = true;
+				if(isFlyingKeyPressed == false) {
+					isBallFalling = true;
+				}
 			}
 		}
 		
@@ -1302,7 +1308,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		ballX += ballHorizontalSpeed;
-		ballY += ballVerticalSpeed;
+		if(isFlyingKeyPressed == false) {
+			ballY += ballVerticalSpeed;
+		} else {
+			ballVerticalSpeed = flyPower;
+			ballY += flyPower;
+		}
 		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
@@ -1319,8 +1330,8 @@ public class GamePanel extends JPanel implements ActionListener {
 			
 			if(blocks[i] instanceof ShooterBlock) {
 				for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
-					if(blocks[i].getBulletsList().get(j).intersects(ball)) {		
-						if(ballShieldAbility) {
+					if(blocks[i].getBulletsList().get(j).intersects(ball)) {	
+						if(pause == false && isPlayingGame && ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
 							if(10 - shieldPower >= 0) {
 								if(ballHealth - (10 - shieldPower) >= 0) {
 									ballHealth -= (10 - shieldPower);
@@ -1399,34 +1410,33 @@ public class GamePanel extends JPanel implements ActionListener {
 			currentAbilityLabel.setBounds(10, 105, 130, 20);
 			currentAbilityLabel.setFont(new Font("Arial", Font.PLAIN, 15));
 			currentAbilityLabel.setText(currentAbility + " Ability");
-			
+			abilityProgressBar.setBackground(Color.WHITE);
 			add(abilityProgressBar);
 			abilityProgressBar.setBounds(10, 125, 130, 15);
-			abilityProgressBar.setForeground(new Color(0, 102, 255));
+			
 			abilityProgressBar.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 			abilityProgressBar.setMinimum(0);
 		}
 		
 		switch(currentAbility) {
 			case "Freeze Time":
-				abilityUseCounter = freezeActivationAmount;
-				abilityProgressBar.setMaximum(freezeActivationAmount);
-				abilityProgressBar.setValue(freezeActivationAmount);
+				maxAbilityUse = freezeActivationAmount;
+				abilityProgressBar.setForeground(new Color(0, 102, 255));
 				break;
 			case "Fly":
-				abilityUseCounter = flyActivationAmount;
-				abilityProgressBar.setMaximum(flyActivationAmount);
-				abilityProgressBar.setValue(flyActivationAmount);
+				maxAbilityUse = flyActivationAmount;
+				abilityProgressBar.setForeground(Color.ORANGE);
 				break;
 			case "Shield":
-				abilityUseCounter = shieldActivationAmount;
-				abilityProgressBar.setMaximum(shieldActivationAmount);
-				abilityProgressBar.setValue(shieldActivationAmount);
+				maxAbilityUse = shieldActivationAmount;
 				abilityProgressBar.setForeground(Color.GREEN);
 				break;
 		}
 		
 		usingAbility = false;
+		abilityUseCounter = maxAbilityUse;
+		abilityProgressBar.setMaximum(maxAbilityUse);
+		abilityProgressBar.setValue(maxAbilityUse);
 		abilityReloadCounter = 0;
 		isAbilityReloading = false;
 		
@@ -1767,7 +1777,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void ballLoseHealth(boolean shouldLose) {
 		if(shouldLose == true) {
 			if(isBallLosingHealth == false || ballHealthLosingSpeed == 200) {
-				if(ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
+				if(pause == false && isPlayingGame && ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
 					if(5 - shieldPower >= 0) {
 						if(ballHealth - (5 - shieldPower) >= 0) {
 							ballHealth -= (5 - shieldPower);
@@ -1780,7 +1790,9 @@ public class GamePanel extends JPanel implements ActionListener {
 				} else {
 					ballHealth = 0;
 				}
+				
 				ballHealthLosingSpeed = 0;
+				
 				if(isBallLosingHealth == false) {
 					isBallLosingHealth = true;
 				}
@@ -1900,14 +1912,19 @@ public class GamePanel extends JPanel implements ActionListener {
 		    }
 		});
 	}
-
-	public void usingAbility(boolean b) {
+	
+	public void usingAbility(boolean isKeyPressed) {
 		if(isPlayingGame && pause == false && isAbilityReloading == false) {
 			if(ballFreezeAbility && currentAbility.equals("Freeze Time")) {
 				usingAbility = true;
 			} else if(ballShieldAbility && currentAbility.equals("Shield")) {
 				usingAbility = true;
+			} else if(ballFlyAbility && currentAbility.equals("Fly")) {
+				usingAbility = true;
+				isFlyingKeyPressed = isKeyPressed;
 			}
+		} else {
+			isFlyingKeyPressed = false;
 		}
 	}
 }
