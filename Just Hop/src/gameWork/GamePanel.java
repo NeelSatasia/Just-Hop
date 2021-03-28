@@ -21,8 +21,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int[] totalBalls = new int[4];
 	int[] ballsPrice = new int[totalBalls.length];
 	
-	int ballNum = 1;
-	Ball ball = new Ball(ballNum, ballX, ballY);
+	Ball ball = new Ball(ballX, ballY);
 	
 	Blocks[] blocks = new Blocks[10];
 	int[] blocksXPositions = new int[blocks.length];
@@ -40,6 +39,8 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isBallJumping;
 	boolean isBallFalling;
 	
+	boolean ballIntersectionUnderBlock = false;
+	
 	int currentBallJumpYDistance;
 	double ballJumpSpeed;
 	
@@ -48,13 +49,13 @@ public class GamePanel extends JPanel implements ActionListener {
 	int currentIndex;
 	private int previousIndex;
 	
-	int highScore = 0;
+	int highScore = 1000;
 	boolean didScore;
 	int score;
 	JLabel scoreLabel = new JLabel("Score: " + score);
 	JLabel highScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
 	
-	int totalCoins;
+	int totalCoins = 15000;
 	int coins;
 	int coinWorth = 0;
 	JLabel coinsLabel = new JLabel("Current Coins: " + coins);
@@ -90,13 +91,12 @@ public class GamePanel extends JPanel implements ActionListener {
 	int shieldPowerUpgradePrice = 60;
 	int shieldActivationAmountUpgradePrice = 80;
 	
-	int flyPower = -2;
+	int flyPower = -1;
 	int flyActivationAmount = 200;
 	int flyPowerLevel = 1;
 	int flyActivationAmountLevel = 1;
 	int flyPowerUpgradePrice = 50;
 	int flyActivationAmountUpgradePrice = 70;
-	boolean isFlyingKeyPressed = false;
 	
 	int ballBulletReloadSpeedLevel = 1;
 	int ballBulletReloadSpeedUpgradePrice = 60;
@@ -119,7 +119,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isPlayingGame = false;
 	boolean pause;
 	
-	JLabel gameNameLabel = new JLabel(" Block To Block ", SwingConstants.CENTER);
+	JLabel gameNameLabel = new JLabel("Block To Block", SwingConstants.CENTER);
 	
 	JCheckBox[] differentBlocks = new JCheckBox[differentTypesOfBlocks];
 	JCheckBox[] modes = new JCheckBox[3];
@@ -417,7 +417,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				});
 				
 				
-				if(totalCoins > 800 && highScore >= 150 && ballShieldAbility == false) {
+				if((totalCoins > 800 && highScore >= 150 && ballShieldAbility == false) || (ballShieldAbility && currentAbility.equals("Shield") == false)) {
 					enableButton(shieldButton);
 				} else {
 					disableButton(shieldButton);
@@ -558,7 +558,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				});
 				
 				
-				if(totalCoins >= 1200 && ballFreezeAbility == false) {
+				if((totalCoins >= 1200 && ballFreezeAbility == false) || (ballFreezeAbility && currentAbility.equals("Freeze Time") == false)) {
 					enableButton(freezeAbilityButton);
 				} else {
 					disableButton(freezeAbilityButton);
@@ -664,6 +664,9 @@ public class GamePanel extends JPanel implements ActionListener {
 					disableButton(flyPowerButton);
 				}
 				
+				JLabel upgradeInfoLabel1 = new JLabel("");
+				JLabel upgradeInfoLabel2 = new JLabel("");
+				
 				flyPowerButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						totalCoins -= flyPowerUpgradePrice;
@@ -677,7 +680,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				});
 				
-				upgradeButtonHover(flyPowerButton, ballFlyAbility, flyPowerLevel, 4, flyPowerUpgradePrice);
+				upgradeButtonHover(flyPowerButton, ballFlyAbility, flyPowerLevel, 4, flyPowerUpgradePrice, upgradeInfoLabel1, upgradeInfoLabel2);
 				
 				JButton flyActivationAmountButton = new JButton("Fly Time");
 				add(flyActivationAmountButton);
@@ -701,7 +704,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				});
 				
-				upgradeButtonHover(flyActivationAmountButton, ballFlyAbility, flyActivationAmountLevel, 3, flyActivationAmountUpgradePrice);
+				upgradeButtonHover(flyActivationAmountButton, ballFlyAbility, flyActivationAmountLevel, 3, flyActivationAmountUpgradePrice, upgradeInfoLabel1, upgradeInfoLabel2);
 				
 				JButton shieldPowerButton = new JButton("Shield Power");
 				add(shieldPowerButton);
@@ -725,7 +728,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				});
 				
-				upgradeButtonHover(shieldPowerButton, ballShieldAbility, shieldPowerLevel, 5, shieldPowerUpgradePrice);
+				upgradeButtonHover(shieldPowerButton, ballShieldAbility, shieldPowerLevel, 5, shieldPowerUpgradePrice, upgradeInfoLabel1, upgradeInfoLabel2);
 				
 				JButton shieldActivationAmountButton = new JButton("Shield Time");
 				add(shieldActivationAmountButton);
@@ -749,7 +752,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				});
 				
-				upgradeButtonHover(shieldActivationAmountButton, ballShieldAbility, shieldActivationAmountLevel, 5, shieldActivationAmountUpgradePrice);
+				upgradeButtonHover(shieldActivationAmountButton, ballShieldAbility, shieldActivationAmountLevel, 5, shieldActivationAmountUpgradePrice, upgradeInfoLabel1, upgradeInfoLabel2);
 				
 				JButton freezeActivationAmountButton = new JButton("Freeze Time");
 				add(freezeActivationAmountButton);
@@ -773,7 +776,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 				});
 				
-				upgradeButtonHover(freezeActivationAmountButton, ballFreezeAbility, freezeActivationAmountLevel, 5, freezeActivationAmountUpgradePrice);
+				upgradeButtonHover(freezeActivationAmountButton, ballFreezeAbility, freezeActivationAmountLevel, 5, freezeActivationAmountUpgradePrice, upgradeInfoLabel1, upgradeInfoLabel2);
 				
 				JButton bulletReloadSpeedButton = new JButton("Reload Speed");
 				add(bulletReloadSpeedButton);
@@ -893,10 +896,10 @@ public class GamePanel extends JPanel implements ActionListener {
 					buttonY += 30;
 					if(totalCoins >= ballsPrice[i] && totalBalls[i] == 0) {
 						enableButton(ballsButtons[i]);
-					} else if(totalBalls[i] > 0 && ballNum != totalBalls[i]) {
+					} else if(totalBalls[i] > 0 && ball.type != totalBalls[i]) {
 						ballsButtons[i].setText("Equip");
 						enableButton(ballsButtons[i]);
-					} else if(totalBalls[i] > 0 && ballNum == totalBalls[i]) {
+					} else if(totalBalls[i] > 0 && ball.type == totalBalls[i]) {
 						ballsButtons[i].setText("Equipped");
 						disableButton(ballsButtons[i]);
 					} else {
@@ -913,11 +916,10 @@ public class GamePanel extends JPanel implements ActionListener {
 								ballInfoLabel1.setText("");
 								ballsButtons[j].setText("Equip");
 							} else {
-								enableButton(ballsButtons[ballNum - 1]);
-								ballsButtons[ballNum - 1].setText("Equip");
+								enableButton(ballsButtons[ball.type - 1]);
+								ballsButtons[ball.type - 1].setText("Equip");
 								
-								ballNum = totalBalls[j];
-								ball = new Ball(ballNum, ballX, ballY);
+								ball.type = totalBalls[j];
 								disableButton(ballsButtons[j]);
 								ballsButtons[j].setText("Equipped");
 							}
@@ -1156,6 +1158,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					usingAbility = false;
 					isAbilityReloading = true;
 					abilityProgressBar.setMaximum(2000);
+					abilityProgressBar.setForeground(Color.RED);
 					abilityUseCounter = maxAbilityUse;
 				}
 			}
@@ -1166,10 +1169,10 @@ public class GamePanel extends JPanel implements ActionListener {
 					isAbilityReloading = false;
 					abilityReloadCounter = 0;
 					abilityProgressBar.setMaximum(maxAbilityUse);
+					abilityProgressBar.setForeground(Color.GREEN);
 				}
 			}
 		}
-		
 		if(usingAbility && currentAbility.equals("Freeze Time")) {
 			blockVerticalSpeed = 0;
 		} else if(blockVerticalSpeed == 0) {
@@ -1238,9 +1241,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			changeBlockColorTransparency(currentIndex);
 			
 			isBallFalling = false;
-			if(isFlyingKeyPressed == false) {
-				ballVerticalSpeed = blockVerticalSpeed;
-			}
+			ballVerticalSpeed = blockVerticalSpeed;
 			
 			if(((previousIndex == 0 && currentIndex == blocks.length - 1) || previousIndex > currentIndex) && didScore == false) {
 				score++;
@@ -1252,23 +1253,23 @@ public class GamePanel extends JPanel implements ActionListener {
 				previousIndex = currentIndex;
 				currentIndex = -1;
 			}
-			if(isFlyingKeyPressed == false) {
-				isBallFalling = true;
-				if(ballVerticalSpeed < 15) {
-					ballVerticalSpeed++;
-				}
+			isBallFalling = true;
+			if(ballVerticalSpeed < 15) {
+				ballVerticalSpeed++;
 			}
 		}
 		
 		if(isBallJumping == true) {
-			if(currentBallJumpYDistance > 0) {
-				if(currentBallJumpYDistance <= 45) {
-					ballVerticalSpeed++;
-				}
-				currentBallJumpYDistance -= 5;
-			} else {
+			if(ball.isFlying) {
 				isBallJumping = false;
-				if(isFlyingKeyPressed == false) {
+			} else {
+				if(currentBallJumpYDistance > 0) {
+					if(currentBallJumpYDistance <= 45) {
+						ballVerticalSpeed++;
+					}
+					currentBallJumpYDistance -= 5;
+				} else {
+					isBallJumping = false;
 					isBallFalling = true;
 				}
 			}
@@ -1308,12 +1309,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 		
 		ballX += ballHorizontalSpeed;
-		if(isFlyingKeyPressed == false) {
-			ballY += ballVerticalSpeed;
-		} else {
+		
+		if(usingAbility && ball.isFlying && ballIntersectionUnderBlock == false) {
 			ballVerticalSpeed = flyPower;
-			ballY += flyPower;
 		}
+		ballY += ballVerticalSpeed;
 		
 		for(int i = 0; i < blocks.length; i++) {
 			if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
@@ -1359,6 +1359,12 @@ public class GamePanel extends JPanel implements ActionListener {
 						break;
 					}
 				}
+			}
+			
+			if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball)) {
+				blocks[i].addCoin(false);
+				coins += coinWorth;
+				coinsLabel.setText("Coins: " + coins);
 			}
 			
 			int j = 0;
@@ -1411,6 +1417,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			currentAbilityLabel.setFont(new Font("Arial", Font.PLAIN, 15));
 			currentAbilityLabel.setText(currentAbility + " Ability");
 			abilityProgressBar.setBackground(Color.WHITE);
+			abilityProgressBar.setForeground(Color.GREEN);
 			add(abilityProgressBar);
 			abilityProgressBar.setBounds(10, 125, 130, 15);
 			
@@ -1421,15 +1428,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		switch(currentAbility) {
 			case "Freeze Time":
 				maxAbilityUse = freezeActivationAmount;
-				abilityProgressBar.setForeground(new Color(0, 102, 255));
 				break;
 			case "Fly":
 				maxAbilityUse = flyActivationAmount;
-				abilityProgressBar.setForeground(Color.ORANGE);
 				break;
 			case "Shield":
 				maxAbilityUse = shieldActivationAmount;
-				abilityProgressBar.setForeground(Color.GREEN);
 				break;
 		}
 		
@@ -1454,6 +1458,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		stopBallSlowly = false;
 		didScore = false;
 		changedDirectionInAir = false;
+		ball.isFlying = false;
+		ballIntersectionUnderBlock = false;
 		
 		isRightKeyDown = false;
 		isLeftKeyDown = false;
@@ -1545,17 +1551,11 @@ public class GamePanel extends JPanel implements ActionListener {
 						ballHorizontalSpeed = 0;
 					}
 				}
-				if(isBallJumping) {
-					int num = previousIndex - 1;
-					if(num < 0) {
-						num = blocks.length - 1;
-					}
-					if(ballX + ball.getWidth() + ballHorizontalSpeed > blocksXPositions[num] && ballX + ballHorizontalSpeed < blocksXPositions[num] + blocksWidth[num]) {
-						if(blocksYPositions[num] + 5 + blockVerticalSpeed <= ballY + ballVerticalSpeed) {
-							isBallJumping = false;
-							ballVerticalSpeed = 4;
-							return false;
-						}
+				if(isBallJumping || ball.isFlying) {
+					if(ball.intersects(blocks[i])) {
+						ballY = blocksYPositions[i] + blocks[i].height;
+						ballIntersectionUnderBlock = true;
+						return true;
 					}
 				}
 				if(blocks[i] instanceof RegularBlock || blocks[i] instanceof HalfRedBlock) {
@@ -1578,10 +1578,9 @@ public class GamePanel extends JPanel implements ActionListener {
 					if(ballY + ball.height + ballVerticalSpeed > blocks[i].y - blocks[i].TBarHeight() && ballY + ball.height <= blocks[i].y) {
 						if(ballX >= TBarXPosition + 5 && ballX + ballHorizontalSpeed <= TBarXPosition + 5) {
 							ballHorizontalSpeed = 0;
-							if(usingAbility) {
+							if(usingAbility && currentAbility.equals("Freeze Time")) {
 								ballX = TBarXPosition + 5;
-							}
-							else {
+							} else {
 								if(blocks[i].isTBarRight() == false && TBarXPosition > blocksXPositions[i]) {
 									if(isLeftKeyDown) {
 										if(TBarXPosition + 5 - 1 < blocksXPositions[i] + blocksWidth[i] - 1) {
@@ -1594,7 +1593,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							}
 						} else if(ballX + ball.width <= TBarXPosition && ballX + ball.width + ballHorizontalSpeed >= TBarXPosition) {
 							ballHorizontalSpeed = 0;
-							if(usingAbility) {
+							if(usingAbility && currentAbility.equals("Freeze Time")) {
 								ballX = TBarXPosition - ball.width;
 							} else {
 								if(blocks[i].isTBarRight() && TBarXPosition + 5 < blocksXPositions[i] + blocksWidth[i]) {
@@ -1649,6 +1648,10 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		if(isBallLosingHealth == true) {
 			ballLoseHealth(false);
+		}
+		
+		if(ballIntersectionUnderBlock) {
+			ballIntersectionUnderBlock = false;
 		}
 		
 		return false;
@@ -1712,7 +1715,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void makeBallJump() {
-		if(isBallJumping == false && isBallFalling == false && pause == false) {
+		if(isBallJumping == false && isBallFalling == false && pause == false && ball.isFlying == false) {
 			isBallJumping = true;
 			
 			switch(blockVerticalSpeed) {
@@ -1869,45 +1872,44 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 	
-	public void upgradeButtonHover(JButton button, boolean ability, int abilityLevel, int maxLevel, int abilityUpgradePrice) {
+	public void upgradeButtonHover(JButton button, boolean ability, int abilityLevel, int maxLevel, int abilityUpgradePrice, JLabel upgradeInfoLabel1, JLabel upgradeInfoLabel2) {
 		button.addMouseListener(new MouseAdapter() {
-			JLabel abilityInfoLabel1 = new JLabel();
-			JLabel abilityInfoLabel2 = new JLabel();
+			//JLabel abilityInfoLabel2 = new JLabel();
 			
 		    public void mouseEntered(MouseEvent e) {
 		    	if(ability && abilityLevel < maxLevel) {
-					abilityInfoLabel1.setText("Upgrade To Level " + (abilityLevel + 1));
+		    		upgradeInfoLabel1.setText("Upgrade To Level " + (abilityLevel + 1));
 				} else if(ability && abilityLevel == maxLevel) {
-					abilityInfoLabel1.setText("Reached Maximum Level: " + abilityLevel);
+					upgradeInfoLabel1.setText("Reached Maximum Level: " + abilityLevel);
 				} else {
-					abilityInfoLabel1.setText("Unlock The Ability");
+					upgradeInfoLabel1.setText("Unlock The Ability");
 				}
 		    	
-		    	add(abilityInfoLabel1);
-		    	abilityInfoLabel1.setBounds(button.getX() + button.getWidth() + 5, button.getY(), 200, 17);
-		    	abilityInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+		    	add(upgradeInfoLabel1);
+		    	upgradeInfoLabel1.setBounds(button.getX() + button.getWidth() + 5, button.getY(), 200, 17);
+		    	upgradeInfoLabel1.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 		    	
-		    	add(abilityInfoLabel2);
+		    	add(upgradeInfoLabel2);
 		    	if(ability && abilityLevel < maxLevel) {
-			    	abilityInfoLabel2.setBounds(button.getX() + button.getWidth() + 5, abilityInfoLabel1.getY() + abilityInfoLabel1.getHeight() + 1, 200, 17);
-			    	abilityInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
-			    	abilityInfoLabel2.setText(abilityUpgradePrice + " Coins");
+		    		upgradeInfoLabel2.setBounds(button.getX() + button.getWidth() + 5, upgradeInfoLabel1.getY() + upgradeInfoLabel1.getHeight() + 1, 200, 17);
+		    		upgradeInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+		    		upgradeInfoLabel2.setText(abilityUpgradePrice + " Coins");
 		    	}
 		    	
 		    	if(ability && abilityLevel < maxLevel && totalCoins >= abilityUpgradePrice) {
-		    		abilityInfoLabel1.setForeground(new Color(41, 163, 41));
-		    		abilityInfoLabel2.setForeground(new Color(41, 163, 41));
+		    		upgradeInfoLabel1.setForeground(new Color(41, 163, 41));
+		    		upgradeInfoLabel2.setForeground(new Color(41, 163, 41));
 		    	} else {
-		    		abilityInfoLabel1.setForeground(new Color(204, 0, 82));
-		    		abilityInfoLabel2.setForeground(new Color(204, 0, 82));
+		    		upgradeInfoLabel1.setForeground(new Color(204, 0, 82));
+		    		upgradeInfoLabel2.setForeground(new Color(204, 0, 82));
 		    	}
 		    	
 		    	repaint();
 		    }
 
 		    public void mouseExited(MouseEvent e) {
-		        remove(abilityInfoLabel1);
-		        remove(abilityInfoLabel2);
+		        remove(upgradeInfoLabel1);
+		        remove(upgradeInfoLabel2);
 		        repaint();
 		    }
 		});
@@ -1921,10 +1923,10 @@ public class GamePanel extends JPanel implements ActionListener {
 				usingAbility = true;
 			} else if(ballFlyAbility && currentAbility.equals("Fly")) {
 				usingAbility = true;
-				isFlyingKeyPressed = isKeyPressed;
+				ball.isFlying = isKeyPressed;
 			}
-		} else {
-			isFlyingKeyPressed = false;
+		} else if(ball.isFlying) {
+			ball.isFlying = false;
 		}
 	}
 }
