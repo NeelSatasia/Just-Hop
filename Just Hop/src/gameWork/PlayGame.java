@@ -11,7 +11,7 @@ public class PlayGame {
 	private KeyListener ballControlKeys;
 	
 	public PlayGame() {
-		gameFrame = new JFrame("Just Hop");
+		gameFrame = new JFrame("Block To Block");
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gameFrame.setBounds(50, 50, 800, 600);
 		gameFrame.setVisible(true);
