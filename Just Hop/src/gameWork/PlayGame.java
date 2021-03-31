@@ -4,20 +4,19 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class PlayGame {
+public class PlayGame extends JFrame {
 	
-	private JFrame gameFrame;
-	private GamePanel gamePanel;
-	private KeyListener ballControlKeys;
+	GamePanel gamePanel;
+	KeyListener ballControlKeys;
 	
 	public PlayGame() {
-		gameFrame = new JFrame("Block To Block");
-		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		gameFrame.setBounds(50, 50, 800, 600);
-		gameFrame.setVisible(true);
+		new JFrame("Block To Block");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(50, 50, 800, 600);
+		setVisible(true);
 		
 		gamePanel = new GamePanel();
-		gameFrame.add(gamePanel);
+		add(gamePanel);
 		
 		gamePanel.revalidate();
 		gamePanel.repaint();
@@ -78,8 +77,8 @@ public class PlayGame {
 			
 		};
 		
-		gameFrame.addKeyListener(ballControlKeys);
+		addKeyListener(ballControlKeys);
 		
-		gameFrame.setResizable(false);
+		setResizable(false);
 	}
 }

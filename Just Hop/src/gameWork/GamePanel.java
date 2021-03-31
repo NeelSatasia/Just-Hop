@@ -7,7 +7,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.swing.*;
 
@@ -52,7 +59,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int differentTypesOfBlocks = 5;
 	ArrayList<String> differentBlocksInGame = new ArrayList<String>();
 	
-	int highScore = 1000;
+	int highScore;
 	boolean didScore;
 	int score;
 	int scoreWorth = 1;
@@ -105,7 +112,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int flyActivationAmountUpgradePrice = 70;
 	
 	int ballBulletReloadSpeedLevel = 1;
-	int ballBulletReloadSpeedMaxLevel = 3;
+	int ballBulletReloadSpeedMaxLevel = 4;
 	int ballBulletReloadSpeedUpgradePrice = 60;
 	
 	int freezeActivationAmount = 200;
@@ -140,10 +147,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton balls = new JButton("Balls");
 	JButton exit = new JButton("Exit");
 	
+	File file = new File("gameData.txt");
+	
 	public GamePanel() {
 		
 		setLayout(null);
 		setBackground(new Color(220, 220, 220));
+		
+		loadData();
 		
 		int ballPrice = 40;
 		for(int i = 0; i < totalBalls.length; i++) {
@@ -1203,9 +1214,11 @@ public class GamePanel extends JPanel implements ActionListener {
 				    	
 				    	add(upgradeInfoLabel2);
 				    	if(ballBulletReloadSpeedLevel < ballBulletReloadSpeedMaxLevel) {
-				    		upgradeInfoLabel2.setBounds(bulletReloadSpeedButton.getX() + bulletReloadSpeedButton.getWidth() + 5, upgradeInfoLabel1.getY() + upgradeInfoLabel2.getHeight() + 1, 200, 17);
+				    		upgradeInfoLabel2.setBounds(bulletReloadSpeedButton.getX() + bulletReloadSpeedButton.getWidth() + 5, upgradeInfoLabel1.getY() + upgradeInfoLabel1.getHeight() + 1, 200, 17);
 				    		upgradeInfoLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 16));
 				    		upgradeInfoLabel2.setText(ballBulletReloadSpeedUpgradePrice + " Coins");
+				    	} else {
+				    		upgradeInfoLabel2.setText("");
 				    	}
 				    	
 				    	if(ballBulletReloadSpeedLevel < ballBulletReloadSpeedMaxLevel && totalCoins >= ballBulletReloadSpeedUpgradePrice) {
@@ -1435,6 +1448,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(score > highScore) {
 				highScore = score;
 				highScoreLabel.setText("High Score: " + highScore);
+				saveData();
 			}
 			
 			JLabel newHighScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
@@ -2273,6 +2287,33 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		} else if(ball.isFlying) {
 			ball.isFlying = false;
+		}
+	}
+	
+	public void saveData() {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("gameData.txt"));
+			writer.write(highScore + "");
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadData() {
+		try {
+			if(file.exists()) {
+			Scanner reader = new Scanner(new FileReader("gameData.txt"));
+				String data = "";
+				while(reader.hasNextLine()) {
+					data = reader.nextLine();
+					highScore = Integer.parseInt(data);
+					highScoreLabel.setText("High Score: " + highScore);
+				}
+				reader.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
