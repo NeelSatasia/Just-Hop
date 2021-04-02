@@ -49,8 +49,14 @@ public class PlayGame extends JFrame {
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
 					gamePanel.isRightKeyDown = false;
+					if(gamePanel.ball.isFlying) {
+						gamePanel.ballHorizontalSpeed = 0;
+					}
 				} else if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
 					gamePanel.isLeftKeyDown = false;
+					if(gamePanel.ball.isFlying) {
+						gamePanel.ballHorizontalSpeed = 0;
+					}
 				}
 				
 				if(e.getKeyCode() == KeyEvent.VK_SPACE) {

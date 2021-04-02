@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -151,7 +152,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public GamePanel() {
 		
 		setLayout(null);
-		setBackground(new Color(220, 220, 220));
+		setBackground(new Color(248, 248, 255));
 		
 		int ballPrice = 40;
 		for(int i = 0; i < totalBalls.length; i++) {
@@ -172,11 +173,11 @@ public class GamePanel extends JPanel implements ActionListener {
 		blocksCoinValue[3] = 2;
 		blocksCoinValue[4] = 3;
 		
-		differentBlocks[0] = new JCheckBox("Regular Blocks");
-		differentBlocks[1] = new JCheckBox("HalfRed Blocks");
-		differentBlocks[2] = new JCheckBox("Wiper Blocks");
-		differentBlocks[3] = new JCheckBox("Split Blocks");
-		differentBlocks[4] = new JCheckBox("Shooter Blocks");
+		differentBlocks[0] = new JCheckBox("Regular");
+		differentBlocks[1] = new JCheckBox("HalfRed");
+		differentBlocks[2] = new JCheckBox("Wiper");
+		differentBlocks[3] = new JCheckBox("Split");
+		differentBlocks[4] = new JCheckBox("Shooter");
 		
 		for(int i = 0; i < modes.length; i++) {
 			modes[i].setFocusable(false);
@@ -194,6 +195,7 @@ public class GamePanel extends JPanel implements ActionListener {
 							modes[j].setSelected(false);
 							scoreWorth -= 2;
 						}
+						saveData();
 					}
 				}
 			});
@@ -242,6 +244,7 @@ public class GamePanel extends JPanel implements ActionListener {
 								differentBlocks[j].setSelected(true);
 							}
 						}
+						saveData();
 					}
 				}
 			});
@@ -297,10 +300,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		startgame.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				startgame.setBounds(360, startgame.getY() - 1, 80, 32);
+				startgame.setBorder(new LineBorder(Color.BLACK, 1));
 			}
 			
 			public void mouseExited(MouseEvent e) {
 				startgame.setBounds(365, 290, 70, 30);
+				startgame.setBorder(null);
 			}
 		});
 		
@@ -333,7 +338,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				
 				for(int i = 0; i < differentBlocks.length; i++) {
 					add(differentBlocks[i]);
-					differentBlocks[i].setBounds(150, y, 180, 20);
+					differentBlocks[i].setBounds(180, y, 110, 20);
 					
 					if(i < modes.length) {
 						add(modes[i]);
@@ -366,10 +371,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		customize.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				customize.setBounds(360, customize.getY() - 1, 80, 32);
+				customize.setBorder(new LineBorder(Color.BLACK, 1));
 			}
 			
 			public void mouseExited(MouseEvent e) {
 				customize.setBounds(365, 330, 70, 30);
+				customize.setBorder(null);
 			}
 		});
 		
@@ -404,10 +411,12 @@ public class GamePanel extends JPanel implements ActionListener {
 		store.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				store.setBounds(360, store.getY() - 1, 80, 32);
+				store.setBorder(new LineBorder(Color.BLACK, 1));
 			}
 			
 			public void mouseExited(MouseEvent e) {
 				store.setBounds(365, 370, 70, 30);
+				store.setBorder(null);
 			}
 		});
 		
@@ -465,6 +474,7 @@ public class GamePanel extends JPanel implements ActionListener {
 								enableButton(freezeAbilityButton);
 							}
 						}
+						saveData();
 					}
 				});
 				
@@ -543,6 +553,7 @@ public class GamePanel extends JPanel implements ActionListener {
 								enableButton(freezeAbilityButton);
 							}
 						}
+						saveData();
 					}
 				});
 				
@@ -611,6 +622,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						abilityInfoLabel1.setText("Bought (Permanent Ability)");
 						abilityInfoLabel1.setForeground(new Color(41, 163, 41));
 						abilityInfoLabel2.setText("");
+						saveData();
 					}
 				});
 				
@@ -683,6 +695,7 @@ public class GamePanel extends JPanel implements ActionListener {
 								enableButton(shieldButton);
 							}
 						}
+						saveData();
 					}
 				});
 				
@@ -794,6 +807,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballFlyAbility == false || flyPowerLevel == flyPowerMaxLevel || totalCoins < flyPowerUpgradePrice) {
 							disableButton(flyPowerButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -874,6 +888,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballFlyAbility == false || flyActivationAmountLevel == flyActivationAmountMaxLevel || totalCoins < flyActivationAmountUpgradePrice) {
 							disableButton(flyActivationAmountButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -954,6 +969,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballShieldAbility == false || shieldPowerLevel == shieldPowerMaxLevel || totalCoins < shieldPowerUpgradePrice) {
 							disableButton(shieldPowerButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -1034,6 +1050,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballShieldAbility == false || shieldActivationAmountLevel == shieldActivationAmountMaxLevel || totalCoins < shieldActivationAmountUpgradePrice) {
 							disableButton(shieldActivationAmountButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -1114,6 +1131,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballFreezeAbility == false || freezeActivationAmountLevel == freezeActivationAmountMaxLevel || totalCoins < freezeActivationAmountUpgradePrice) {
 							disableButton(freezeActivationAmountButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -1194,6 +1212,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						if(ballBulletReloadSpeedLevel == ballBulletReloadSpeedMaxLevel || totalCoins < ballBulletReloadSpeedUpgradePrice) {
 							disableButton(bulletReloadSpeedButton);
 						}
+						saveData();
 					}
 				});
 				
@@ -1319,6 +1338,7 @@ public class GamePanel extends JPanel implements ActionListener {
 								disableButton(ballsButtons[j]);
 								ballsButtons[j].setText("Equipped");
 							}
+							saveData();
 						}
 					});
 					
@@ -1447,8 +1467,9 @@ public class GamePanel extends JPanel implements ActionListener {
 			if(score > highScore) {
 				highScore = score;
 				highScoreLabel.setText("High Score: " + highScore);
-				saveData();
 			}
+			
+			saveData();
 			
 			JLabel newHighScoreLabel = new JLabel("High Score: " + highScore, SwingConstants.CENTER);
 			add(newHighScoreLabel);
@@ -2122,7 +2143,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			
 			switch(blockVerticalSpeed) {
 				case 0:
-					currentBallJumpYDistance = 175;
+					currentBallJumpYDistance = 170;
 					break;
 				case 1:
 					currentBallJumpYDistance = 150;
@@ -2145,19 +2166,19 @@ public class GamePanel extends JPanel implements ActionListener {
 		for(int i = 0; i < differentBlocksInGame.size(); i++) {
 			if(i == randBlock) {
 				switch(differentBlocksInGame.get(i)) {
-					case "Regular Blocks":
+					case "Regular":
 						blocks[index] = new RegularBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
 						break;
-					case "HalfRed Blocks":
+					case "HalfRed":
 						blocks[index] = new HalfRedBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
 						break;
-					case "Wiper Blocks":
+					case "Wiper":
 						blocks[index] = new WiperBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
 						break;
-					case "Split Blocks":
+					case "Split":
 						blocks[index] = new SplitBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index], (int) ball.getWidth());
 						break;
-					case "Shooter Blocks":
+					case "Shooter":
 						blocks[index] = new ShooterBlock(blocksXPositions[index], blocksYPositions[index], blocksWidth[index]);
 						break;
 				}
@@ -2292,13 +2313,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void saveData() {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("gameData.txt"));
-			/*
-			 
-			 */
 			writer.write(highScore + "");
-			writer.append("\n" + totalCoins + "");
-			writer.append("\n" + coinWorth + "");
-			writer.append("\n" + scoreWorth + "");
+			writer.append("\n" + totalCoins);
+			writer.append("\n" + coinWorth);
+			writer.append("\n" + scoreWorth);
 			
 			writer.append("\n" + currentAbility);
 			
@@ -2307,24 +2325,24 @@ public class GamePanel extends JPanel implements ActionListener {
 			} else {
 				writer.append("\nfalse");
 			}
-			writer.append("\n" + flyPower + "");
-			writer.append("\n" + flyActivationAmount + "");
+			writer.append("\n" + flyPower);
+			writer.append("\n" + flyActivationAmount);
 			writer.append("\n" + flyPowerLevel + "");
-			writer.append("\n" + flyActivationAmountLevel + "");
-			writer.append("\n" + flyPowerUpgradePrice + "");
-			writer.append("\n" + flyActivationAmountUpgradePrice + "");
+			writer.append("\n" + flyActivationAmountLevel);
+			writer.append("\n" + flyPowerUpgradePrice);
+			writer.append("\n" + flyActivationAmountUpgradePrice);
 			
 			if(ballShieldAbility) {
 				writer.append("\ntrue");
 			} else {
 				writer.append("\nfalse");
 			}
-			writer.append("\n" + shieldPower + "");
-			writer.append("\n" + shieldActivationAmount + "");
-			writer.append("\n" + shieldPowerLevel + "");
-			writer.append("\n" + shieldActivationAmountLevel + "");
-			writer.append("\n" + shieldPowerUpgradePrice + "");
-			writer.append("\n" + shieldActivationAmountUpgradePrice + "");
+			writer.append("\n" + shieldPower);
+			writer.append("\n" + shieldActivationAmount);
+			writer.append("\n" + shieldPowerLevel);
+			writer.append("\n" + shieldActivationAmountLevel);
+			writer.append("\n" + shieldPowerUpgradePrice);
+			writer.append("\n" + shieldActivationAmountUpgradePrice);
 			
 			
 			if(ballFreezeAbility) {
@@ -2332,22 +2350,53 @@ public class GamePanel extends JPanel implements ActionListener {
 			} else {
 				writer.append("\nfalse");
 			}
-			writer.append("\n" + freezeActivationAmount + "");
-			writer.append("\n" + freezeActivationAmountLevel + "");
-			writer.append("\n" + freezeActivationAmountUpgradePrice + "");
+			writer.append("\n" + freezeActivationAmount);
+			writer.append("\n" + freezeActivationAmountLevel);
+			writer.append("\n" + freezeActivationAmountUpgradePrice);
 			
 			if(ball.twoBulletsAtOnce) {
 				writer.append("\ntrue");
 			} else {
 				writer.append("\nfalse");
 			}
-			writer.append("\n" + ballBulletReloadSpeedLevel + "");
-			writer.append("\n" + ballBulletReloadSpeedUpgradePrice + "");
+			writer.append("\n" + ballBulletReloadSpeedLevel);
+			writer.append("\n" + ballBulletReloadSpeedUpgradePrice);
 			
-			writer.append("\n" + ball.type + "");
-			writer.append("\n" + ball.bulletReloadSpeed + "");
+			writer.append("\n" + ball.type);
+			writer.append("\n" + ball.bulletReloadSpeed + "\n");
 			
+			for(int i = 0; i < modes.length; i++) {
+				String space = " ";
+				if(i == modes.length - 1) {
+					space = "\n";
+				}
+				if(modes[i].isSelected()) {
+					writer.append("true" + space);
+				} else {
+					writer.append("false" + space);
+				}
+			}
 			
+			for(int i = 0; i < differentBlocks.length; i++) {
+				String space = " ";
+				if(i == differentBlocks.length - 1) {
+					space = "\n";
+				}
+				if(differentBlocks[i].isSelected()) {
+					writer.append("true" + space);
+				} else {
+					writer.append("false" + space);
+				}
+			}
+			
+			for(int i = 0; i < differentBlocksInGame.size(); i++) {
+				String blockName = differentBlocksInGame.get(i);
+				String space = " ";
+				if(i == differentBlocksInGame.size() - 1) {
+					space = "";
+				}
+				writer.append(blockName + space);
+			}
 			
 			writer.close();
 		} catch (IOException e) {
@@ -2363,49 +2412,75 @@ public class GamePanel extends JPanel implements ActionListener {
 				while(reader.hasNextLine()) {
 					dataList.add(reader.nextLine());
 				}
-				
-				highScore = Integer.parseInt(dataList.get(0));
-				highScoreLabel.setText("High Score: " + highScore);
-				totalCoins = Integer.parseInt(dataList.get(1));
-				totalCoinsLabel.setText("Total Coins: " + totalCoins);
-				coinWorth = Integer.parseInt(dataList.get(2));
-				scoreWorth = Integer.parseInt(dataList.get(3));
-				
-				currentAbility = dataList.get(4);
-				
-				if(dataList.get(5).equals("true")) {
-					ballFlyAbility = true;
+				if(dataList.size() == 31) {
+					highScore = Integer.parseInt(dataList.get(0));
+					highScoreLabel.setText("High Score: " + highScore);
+					totalCoins = Integer.parseInt(dataList.get(1));
+					totalCoinsLabel.setText("Total Coins: " + totalCoins);
+					coinWorth = Integer.parseInt(dataList.get(2));
+					scoreWorth = Integer.parseInt(dataList.get(3));
+					
+					currentAbility = dataList.get(4);
+					
+					if(dataList.get(5).equals("true")) {
+						ballFlyAbility = true;
+					}
+					flyPower = Integer.parseInt(dataList.get(6));
+					flyActivationAmount = Integer.parseInt(dataList.get(7));
+					flyPowerLevel = Integer.parseInt(dataList.get(8));
+					flyActivationAmountLevel = Integer.parseInt(dataList.get(9));
+					flyPowerUpgradePrice = Integer.parseInt(dataList.get(10));
+					flyActivationAmountUpgradePrice = Integer.parseInt(dataList.get(11));
+					
+					if(dataList.get(12).equals("true")) {
+						ballShieldAbility = true;
+					}
+					shieldPower = Integer.parseInt(dataList.get(13));
+					shieldActivationAmount = Integer.parseInt(dataList.get(14));
+					shieldPowerLevel = Integer.parseInt(dataList.get(15));
+					shieldActivationAmountLevel = Integer.parseInt(dataList.get(16));
+					shieldPowerUpgradePrice = Integer.parseInt(dataList.get(17));
+					shieldActivationAmountUpgradePrice = Integer.parseInt(dataList.get(18));
+					
+					if(dataList.get(19).equals("true")) {
+						ballFreezeAbility = true;
+					}
+					freezeActivationAmount = Integer.parseInt(dataList.get(20));
+					freezeActivationAmountLevel = Integer.parseInt(dataList.get(21));
+					freezeActivationAmountUpgradePrice = Integer.parseInt(dataList.get(22));
+					
+					if(dataList.get(23).equals("true")) {
+						ball.twoBulletsAtOnce = true;
+					}
+					ballBulletReloadSpeedLevel = Integer.parseInt(dataList.get(24));
+					ballBulletReloadSpeedUpgradePrice = Integer.parseInt(dataList.get(25));
+					ball.type = Integer.parseInt(dataList.get(26));
+					ball.bulletReloadSpeed = Integer.parseInt(dataList.get(27));
+					
+					String[] modesData = dataList.get(28).split(" ");
+					for(int i = 0; i < modes.length; i++) {
+						if(modesData[i].equals("true")) {
+							modes[i].setSelected(true);
+						} else {
+							modes[i].setSelected(false);
+						}
+					}
+					
+					String[] differentBlocksData = dataList.get(29).split(" ");
+					for(int i = 0; i < differentBlocks.length; i++) {
+						if(differentBlocksData[i].equals("true")) {
+							differentBlocks[i].setSelected(true);
+						} else {
+							differentBlocks[i].setSelected(false);
+						}
+					}
+					
+					differentBlocksInGame.clear();
+					String[] differentBlocksInGameData = dataList.get(30).split(" ");
+					for(int i = 0; i < differentBlocksInGameData.length; i++) {
+						differentBlocksInGame.add(differentBlocksInGameData[i]);
+					}
 				}
-				flyPower = Integer.parseInt(dataList.get(6));
-				flyActivationAmount = Integer.parseInt(dataList.get(7));
-				flyPowerLevel = Integer.parseInt(dataList.get(8));
-				flyActivationAmountLevel = Integer.parseInt(dataList.get(9));
-				flyPowerUpgradePrice = Integer.parseInt(dataList.get(10));
-				flyActivationAmountUpgradePrice = Integer.parseInt(dataList.get(11));
-				
-				if(dataList.get(12).equals("true")) {
-					ballShieldAbility = true;
-				}
-				shieldPower = Integer.parseInt(dataList.get(13));
-				shieldActivationAmount = Integer.parseInt(dataList.get(14));
-				shieldPowerLevel = Integer.parseInt(dataList.get(15));
-				shieldActivationAmountLevel = Integer.parseInt(dataList.get(16));
-				shieldPowerUpgradePrice = Integer.parseInt(dataList.get(17));
-				shieldActivationAmountUpgradePrice = Integer.parseInt(dataList.get(18));
-				
-				if(dataList.get(19).equals("true")) {
-					ballFreezeAbility = true;
-				}
-				freezeActivationAmount = Integer.parseInt(dataList.get(20));
-				freezeActivationAmountLevel = Integer.parseInt(dataList.get(21));
-				freezeActivationAmountUpgradePrice = Integer.parseInt(dataList.get(22));
-				
-				if(dataList.get(23).equals("true")) {
-					ball.twoBulletsAtOnce = true;
-				}
-				ballBulletReloadSpeedUpgradePrice = Integer.parseInt(dataList.get(24));
-				
-				ball.type = Integer.parseInt(dataList.get(24));
 				
 				reader.close();
 			}
