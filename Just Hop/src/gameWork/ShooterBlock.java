@@ -22,6 +22,10 @@ public class ShooterBlock extends Blocks {
 	int blockColorTransparency = 255;
 	
 	boolean gunFrozen = false;
+	
+	int gunMovingHorizontallyChance = (int)(Math.random() * 21);
+	boolean isGunMovingLeftRight = false;
+	boolean isGunMovingRight = true;
 
 	public ShooterBlock(int x, int y, int w) {
 		this.x = x;
@@ -29,13 +33,37 @@ public class ShooterBlock extends Blocks {
 		this.width = w;
 		this.height = 5;
 		
-		gunXPosition = this.x + ((this.width/2) - 10) + 5;
+		gunXPosition = this.x + ((this.width/2) - 10);
 		
 		bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
+		
+		if(gunMovingHorizontallyChance > 10) {
+			isGunMovingLeftRight = true;
+		}
 	}
 	
 	@Override
 	public void draw(Graphics g) {
+		g.setColor(blockColor);
+		g.fillRect(this.x, this.y, this.width, this.height);
+		
+		g.setColor(blockColor);
+		g.fillRect(gunXPosition, this.y + this.height, 20, 15);
+		g.fillRect(gunXPosition + 5, this.y + this.height + 15, 10, 5);
+		
+		if(isGunMovingLeftRight && gunFrozen == false) {
+			if(isGunMovingRight) {
+				gunXPosition++;
+			} else {
+				gunXPosition--;
+			}
+			
+			if(gunXPosition == this.x + (this.width - 20)) {
+				isGunMovingRight = false;
+			} else if(gunXPosition == this.x) {
+				isGunMovingRight = true;
+			}
+		}
 		
 		if(gunFrozen == false) {
 			gunReloadCounter++;
@@ -44,7 +72,7 @@ public class ShooterBlock extends Blocks {
 		}
 		
 		if(gunReloadCounter == 50 && blockColorTransparency == 255 && gunFrozen == false) {
-			bullets.add(new BlockBullet(this.x + ((this.width/2) - 10) + 5, this.y + this.height));
+			bullets.add(new BlockBullet(gunXPosition + 5, this.y + this.height + 15));
 			gunReloadCounter = 0;
 		}
 		
@@ -52,13 +80,6 @@ public class ShooterBlock extends Blocks {
 			g.setColor(blockColor);
 			bullet.draw(g);
 		}
-		
-		g.setColor(blockColor);
-		g.fillRect(this.x, this.y, this.width, this.height);
-		
-		g.setColor(blockColor);
-		g.fillRect(this.x + ((this.width/2) - 10), this.y + this.height, 20, 15);
-		g.fillRect(gunXPosition, this.y + this.height + 15, 10, 5);
 		
 		if(coin != null) {
 			coin.changeYPosition(this.y);
@@ -120,12 +141,14 @@ public class ShooterBlock extends Blocks {
 	public void freezeBullets(boolean b) {
 		if(b) {
 			gunFrozen = true;
+			isGunMovingLeftRight = false;
 			gunReloadCounter = 0;
 			for(int i = 0; i < bullets.size(); i++) {
 				bullets.get(i).freezeBullet(true);
 			}
 		} else if(gunFrozen) {
 			gunFrozen = false;
+			isGunMovingLeftRight = true;
 			for(int i = 0; i < bullets.size(); i++) {
 				bullets.get(i).freezeBullet(false);
 			}

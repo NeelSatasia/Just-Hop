@@ -142,6 +142,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton startgame = new JButton("Play");
 	JButton customize = new JButton("Customize");
 	JButton store = new JButton("Store");
+	JButton instructions = new JButton("Instructions");
 	JButton abilities = new JButton("Abilities");
 	JButton upgrades = new JButton("Upgrades");
 	JButton balls = new JButton("Balls");
@@ -290,6 +291,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		startgame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				startgame.setBounds(365, 290, 70, 30);
+				startgame.setBorder(null);
 				menuPage(false);
 				
 				startGame();
@@ -317,6 +319,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		customize.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				customize.setBounds(365, 330, 70, 30);
+				customize.setBorder(null);
 				menuPage(false);
 				add(exit);
 				
@@ -388,6 +391,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		store.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				store.setBounds(365, 370, 70, 30);
+				store.setBorder(null);
 				menuPage(false);
 				add(exit);
 				
@@ -1397,6 +1401,87 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		});
 		
+		add(instructions);
+		instructions.setBounds(360, 410, 80, 30);
+		enableButton(instructions);
+		instructions.setBackground(new Color(0, 128, 128));
+		
+		instructions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				instructions.setBounds(360, 410, 80, 30);
+				instructions.setBorder(null);
+				menuPage(false);
+				add(exit);
+				
+				JLabel controlKeysLabel = new JLabel("Control Keys", SwingConstants.CENTER);
+				add(controlKeysLabel);
+				controlKeysLabel.setBounds(355, 150, 110, 40);
+				controlKeysLabel.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+				controlKeysLabel.setOpaque(true);
+				controlKeysLabel.setBackground(Color.ORANGE);
+				
+				JLabel leftKeysLabel = new JLabel("Left Direction (Press Left Arrow Key or A)", SwingConstants.CENTER);
+				add(leftKeysLabel);
+				leftKeysLabel.setBounds(260, 200, 280, 20);
+				leftKeysLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				JLabel rightKeysLabel = new JLabel("Right Direction (Press Right Arrow Key or D)", SwingConstants.CENTER);
+				add(rightKeysLabel);
+				rightKeysLabel.setBounds(260, 230, 280, 20);
+				rightKeysLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				JLabel jumpKeysLabel = new JLabel("Jump (Press Up Arrow Key or W)", SwingConstants.CENTER);
+				add(jumpKeysLabel);
+				jumpKeysLabel.setBounds(260, 260, 280, 20);
+				jumpKeysLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				JLabel shootKeyLabel = new JLabel("Shoot Bullets (Press B For Few Seconds)", SwingConstants.CENTER);
+				add(shootKeyLabel);
+				shootKeyLabel.setBounds(260, 290, 280, 20);
+				shootKeyLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				JLabel abilityKeyLabel = new JLabel("Use Ability (Press N)", SwingConstants.CENTER);
+				add(abilityKeyLabel);
+				abilityKeyLabel.setBounds(260, 320, 280, 20);
+				abilityKeyLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				JLabel pauseKeyLabel = new JLabel("Pause Game (Press Up Spacebar)", SwingConstants.CENTER);
+				add(pauseKeyLabel);
+				pauseKeyLabel.setBounds(260, 350, 280, 20);
+				pauseKeyLabel.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+				
+				exit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						remove(controlKeysLabel);
+						remove(leftKeysLabel);
+						remove(rightKeysLabel);
+						remove(jumpKeysLabel);
+						remove(shootKeyLabel);
+						remove(abilityKeyLabel);
+						remove(pauseKeyLabel);
+						remove(exit);
+						
+						menuPage(true);
+						repaint();
+					}
+				});
+				
+				repaint();
+			}
+		});
+		
+		instructions.addMouseListener(new MouseAdapter() {
+			public void mouseEntered(MouseEvent e ) {
+				instructions.setBounds(355, instructions.getY() - 1, 90, 32);
+				instructions.setBorder(new LineBorder(Color.BLACK, 1));
+			}
+			
+			public void mouseExited(MouseEvent e ) {
+				instructions.setBounds(360, 410, 80, 30);
+				instructions.setBorder(null);
+			}
+		});
+		
 		exit.setBounds(15, 15, 60, 30);
 		enableButton(exit);
 		exit.setBackground(new Color(204, 0, 0));
@@ -2256,6 +2341,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			remove(startgame);
 			remove(customize);
 			remove(store);
+			remove(instructions);
 		} else {
 			add(gameNameLabel);
 			add(highScoreLabel);
@@ -2265,6 +2351,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			add(startgame);
 			add(customize);
 			add(store);
+			add(instructions);
 		}
 	}
 	
