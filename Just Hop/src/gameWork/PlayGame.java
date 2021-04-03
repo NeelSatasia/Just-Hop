@@ -10,7 +10,7 @@ public class PlayGame extends JFrame {
 	KeyListener ballControlKeys;
 	
 	public PlayGame() {
-		new JFrame("Block To Block");
+		new JFrame("Just Hop");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(50, 50, 800, 600);
 		setVisible(true);

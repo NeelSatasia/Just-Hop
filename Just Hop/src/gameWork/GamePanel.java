@@ -59,7 +59,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int differentTypesOfBlocks = 5;
 	ArrayList<String> differentBlocksInGame = new ArrayList<String>();
 	
-	int highScore;
+	int highScore = 0;
 	boolean didScore;
 	int score;
 	int scoreWorth = 1;
@@ -134,7 +134,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean isPlayingGame = false;
 	boolean pause = false;
 	
-	JLabel gameNameLabel = new JLabel("Block To Block", SwingConstants.CENTER);
+	JLabel gameNameLabel = new JLabel("Just Hop", SwingConstants.CENTER);
 	
 	JCheckBox[] differentBlocks = new JCheckBox[differentTypesOfBlocks];
 	JCheckBox[] modes = new JCheckBox[3];
@@ -148,12 +148,14 @@ public class GamePanel extends JPanel implements ActionListener {
 	JButton balls = new JButton("Balls");
 	JButton exit = new JButton("Exit");
 	
+	boolean gameBackgroundAffect = true;
+	
 	File file = new File("gameData.txt");
 	
 	public GamePanel() {
 		
 		setLayout(null);
-		setBackground(new Color(248, 248, 255));
+		setBackground(Color.WHITE);
 		
 		int ballPrice = 40;
 		for(int i = 0; i < totalBalls.length; i++) {
@@ -612,7 +614,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				JButton twoBulletsButton = new JButton("Two Bullets At Once");
 				add(twoBulletsButton);
 				twoBulletsButton.setBounds(340, 270, 120, 30);
-				if(totalCoins > 1000 && highScore >= 200 && ball.twoBulletsAtOnce == false) {
+				if(totalCoins >= 1000 && highScore >= 200 && ball.twoBulletsAtOnce == false) {
 					enableButton(twoBulletsButton);
 				} else {
 					disableButton(twoBulletsButton);
@@ -1602,13 +1604,13 @@ public class GamePanel extends JPanel implements ActionListener {
 					remove(newTotalCoinsLabel);
 					remove(tryAgainButton);
 					remove(exit);
-					
+					setBackground(new Color(133, 173, 173));
 					menuPage(true);
 					repaint();
 				}
 			});
 			
-		} else if(timer.isRunning() && pause == false) {
+		} else if(timer.isRunning() && isPlayingGame && pause == false) {
 			ball.setLocation(ballX, ballY);
 			ball.draw(g);
 			
@@ -1644,254 +1646,259 @@ public class GamePanel extends JPanel implements ActionListener {
 				blocks[i].draw(g);
 			}
 		} else if(pause) {
+			ball.draw(g);
+			for(Blocks block: blocks) {
+				block.draw(g);
+			}
 			timer.stop();
 			
-			g.setFont(new Font("Times New Roman", Font.PLAIN, 50));
-			g.drawString("Paused", 340, 260);
-			g.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-			g.drawString("(Press Spacebar To Unpause)", 305, 285);
+			//g.setFont(new Font("Times New Roman", Font.PLAIN, 50));
+			//g.drawString("Paused", 340, 260);
+			//g.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+			//g.drawString("(Press Spacebar To Unpause)", 305, 285);
 		}
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(pause == false && isPlayingGame) {
-			if(usingAbility && isAbilityReloading == false) {
-				abilityUseCounter--;
-				abilityProgressBar.setValue(abilityUseCounter);
-				if(abilityUseCounter == 0) {
-					usingAbility = false;
-					isAbilityReloading = true;
-					abilityProgressBar.setMaximum(2000);
-					abilityProgressBar.setForeground(Color.RED);
-					abilityUseCounter = maxAbilityUse;
-				}
-			}
-			if(isAbilityReloading) {
-				abilityReloadCounter++;
-				abilityProgressBar.setValue(abilityReloadCounter);
-				if(abilityReloadCounter == 2000) {
-					isAbilityReloading = false;
-					abilityReloadCounter = 0;
-					abilityProgressBar.setMaximum(maxAbilityUse);
-					abilityProgressBar.setForeground(Color.GREEN);
-				}
-			}
-		}
-		if(usingAbility && currentAbility.equals("Freeze Time")) {
-			blockVerticalSpeed = 0;
-		} else if(blockVerticalSpeed == 0) {
-			blockVerticalSpeed = 1;
-		}
-		
-		for(int i = 0; i < blocks.length; i++) {
-			if(blocksYPositions[i] >= 100 * blocks.length) {
-				blocksColorTransparency[i] = 255;
-				
-				changeBlocksSpeedTimer++;
-				if(changeBlocksSpeedTimer == 10) {
-					//blockFallingSpeed = (int)(Math.random() * 2) + 1;
-					changeBlocksSpeedTimer = 0;
-				}
-				
-				blocksYPositions[i] = -25;
-				
-				int blockXPosition = (int)(Math.random() * 3);
-				
-				switch(blockXPosition) {
-					case 0:
-						blockXPosition = 200;
-						break;
-					case 1:
-						blockXPosition = 350;
-						break;
-					case 2:
-						blockXPosition = 500;
-						break;
-				}
-				if((i + 1 == blocksYPositions.length && blocksXPositions[0] == blockXPosition) || (i + 1 < blocksXPositions.length && blocksXPositions[i+1] == blockXPosition)) {
-					if(blockXPosition == 200) {
-						blockXPosition += 150;
-					} else if(blockXPosition == 500) {
-						blockXPosition -= 150;
-					} else {
-						int randNum = (int)(Math.random() * 2);
-						switch(randNum) {
-							case 0:
-								blockXPosition -= 150;
-								break;
-							case 1:
-								blockXPosition += 150;
-								break;
-						}
+		if(timer.isRunning()) {
+			if(pause == false && isPlayingGame) {
+				if(usingAbility && isAbilityReloading == false) {
+					abilityUseCounter--;
+					abilityProgressBar.setValue(abilityUseCounter);
+					if(abilityUseCounter == 0) {
+						usingAbility = false;
+						isAbilityReloading = true;
+						abilityProgressBar.setMaximum(2000);
+						abilityProgressBar.setForeground(Color.RED);
+						abilityUseCounter = maxAbilityUse;
 					}
-				} 
-				if((i + 1 == blocks.length && (blockXPosition != 350 && blocksXPositions[0] != 350)) || (i + 1 < blocks.length && (blockXPosition != 350 && blocksXPositions[i+1] != 350))) {
-					blockXPosition = 350;
 				}
-				
-				if(modes[0].isSelected()) {
-					int brickWidthSize = (int)(Math.random() * 16) + 45;
-					blocksWidth[i] = brickWidthSize;
-					blocks[i].setSize(brickWidthSize, 5);
-				}
-				
-				blocksXPositions[i] = blockXPosition;
-			}
-			
-			blocksYPositions[i] += blockVerticalSpeed;
-		}
-		
-		if(collisionCheck()) {
-			changeBlockColorTransparency(currentIndex);
-			
-			isBallFalling = false;
-			ballVerticalSpeed = blockVerticalSpeed;
-			
-			if(((previousIndex == 0 && currentIndex == blocks.length - 1) || previousIndex > currentIndex) && didScore == false) {
-				score += scoreWorth;
-				didScore = true;
-				scoreLabel.setText("Score: " + score);
-			}
-		} else if(isBallJumping == false) {
-			if(currentIndex > -1) {
-				previousIndex = currentIndex;
-				currentIndex = -1;
-			}
-			isBallFalling = true;
-			if(ballVerticalSpeed < 15) {
-				ballVerticalSpeed++;
-			}
-		}
-		
-		if(isBallJumping == true) {
-			if(ball.isFlying) {
-				isBallJumping = false;
-			} else {
-				if(currentBallJumpYDistance > 0) {
-					if(currentBallJumpYDistance <= 45) {
-						ballVerticalSpeed++;
+				if(isAbilityReloading) {
+					abilityReloadCounter++;
+					abilityProgressBar.setValue(abilityReloadCounter);
+					if(abilityReloadCounter == 2000) {
+						isAbilityReloading = false;
+						abilityReloadCounter = 0;
+						abilityProgressBar.setMaximum(maxAbilityUse);
+						abilityProgressBar.setForeground(Color.GREEN);
 					}
-					currentBallJumpYDistance -= 5;
-				} else {
-					isBallJumping = false;
-					isBallFalling = true;
 				}
 			}
-		}
-		
-		if(isBallJumping == false && isBallFalling == false) {
-			if(changedDirectionInAir) {
-				changedDirectionInAir = false;
-			}
-			if(modes[1].isSelected() && isLeftKeyDown == false && isRightKeyDown == false) {
-				stopBallSlowly = true;
-			} else if(isLeftKeyDown == false && isRightKeyDown == false) {
-				ballHorizontalSpeed = 0;
-			}
-		}
-		
-		if(stopBallSlowly) {
-			if(isBallJumping == false && isBallFalling == false) {
-				slowingDownSpeed += 0.5;
-				if(ballHorizontalSpeed > 0) {
-					ballHorizontalSpeed -= (int) slowingDownSpeed;
-				} else if(ballHorizontalSpeed < 0) {
-					ballHorizontalSpeed += (int) slowingDownSpeed;
-				}
-				if(slowingDownSpeed == 1.0) {
-					slowingDownSpeed = 0.0;
-				}
-				if(ballHorizontalSpeed == 0) {
-					stopBallSlowly = false;
-					slowingDownSpeed = 0.0;
-				}
-			}
-		}
-		
-		if(isBallLosingHealth) {
-			ballHealthLosingSpeed += 5;
-		}
-		
-		ballX += ballHorizontalSpeed;
-		
-		if(usingAbility && ball.isFlying && ballIntersectionUnderBlock == false) {
-			ballVerticalSpeed = flyPower;
-		}
-		ballY += ballVerticalSpeed;
-		
-		for(int i = 0; i < blocks.length; i++) {
-			if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
-				blocks[i].addHealthBooster(false);
-				
-				if(ballHealth + 5 > 100) {
-					ballHealth = 100;
-				} else {
-					ballHealth += 5;
-				}
-				
-				ballHealthLabel.setText("Health: " + ballHealth);
+			if(usingAbility && currentAbility.equals("Freeze Time")) {
+				blockVerticalSpeed = 0;
+			} else if(blockVerticalSpeed == 0) {
+				blockVerticalSpeed = 1;
 			}
 			
-			if(blocks[i] instanceof ShooterBlock) {
-				for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
-					if(blocks[i].getBulletsList().get(j).intersects(ball)) {	
-						if(pause == false && isPlayingGame && ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
-							if(10 - shieldPower >= 0) {
-								if(ballHealth - (10 - shieldPower) >= 0) {
-									ballHealth -= (10 - shieldPower);
-								} else {
-									ballHealth = 0;
-								}
-							}
-						} else if(ballHealth - 10 >= 0) {
-							ballHealth -= 10;
+			for(int i = 0; i < blocks.length; i++) {
+				if(blocksYPositions[i] >= 100 * blocks.length) {
+					blocksColorTransparency[i] = 255;
+					
+					changeBlocksSpeedTimer++;
+					if(changeBlocksSpeedTimer == 10) {
+						blockVerticalSpeed = (int)(Math.random() * 2) + 1;
+						changeBlocksSpeedTimer = 0;
+					}
+					
+					blocksYPositions[i] = -25;
+					
+					int blockXPosition = (int)(Math.random() * 3);
+					
+					switch(blockXPosition) {
+						case 0:
+							blockXPosition = 200;
+							break;
+						case 1:
+							blockXPosition = 350;
+							break;
+						case 2:
+							blockXPosition = 500;
+							break;
+					}
+					if((i + 1 == blocksYPositions.length && blocksXPositions[0] == blockXPosition) || (i + 1 < blocksXPositions.length && blocksXPositions[i+1] == blockXPosition)) {
+						if(blockXPosition == 200) {
+							blockXPosition += 150;
+						} else if(blockXPosition == 500) {
+							blockXPosition -= 150;
 						} else {
-							ballHealth = 0;
+							int randNum = (int)(Math.random() * 2);
+							switch(randNum) {
+								case 0:
+									blockXPosition -= 150;
+									break;
+								case 1:
+									blockXPosition += 150;
+									break;
+							}
 						}
-						
-						ballHealthLabel.setText("Health: " + ballHealth);
-						
-						blocks[i].removeBullet(j);
-						break;
+					} 
+					if((i + 1 == blocks.length && (blockXPosition != 350 && blocksXPositions[0] != 350)) || (i + 1 < blocks.length && (blockXPosition != 350 && blocksXPositions[i+1] != 350))) {
+						blockXPosition = 350;
 					}
-					if(blocks[i].getBulletsList().get(j).getBulletYPosition() >= 600) {
-						blocks[i].removeBullet(j);
-						break;
+					
+					if(modes[0].isSelected()) {
+						int brickWidthSize = (int)(Math.random() * 16) + 45;
+						blocksWidth[i] = brickWidthSize;
+						blocks[i].setSize(brickWidthSize, 5);
 					}
-					if(ballY + ball.getHeight() <= blocksYPositions[i] && blocks[i].getBulletsList().get(j).getBulletYPosition() <= blocksYPositions[i] + blocks[i].getHeight() + 15) {
-						blocks[i].removeBullet(j);
-						break;
+					
+					blocksXPositions[i] = blockXPosition;
+				}
+				
+				blocksYPositions[i] += blockVerticalSpeed;
+			}
+			
+			if(collisionCheck()) {
+				changeBlockColorTransparency(currentIndex);
+				
+				isBallFalling = false;
+				ballVerticalSpeed = blockVerticalSpeed;
+				
+				if(((previousIndex == 0 && currentIndex == blocks.length - 1) || previousIndex > currentIndex) && didScore == false) {
+					score += scoreWorth;
+					didScore = true;
+					scoreLabel.setText("Score: " + score);
+				}
+			} else if(isBallJumping == false) {
+				if(currentIndex > -1) {
+					previousIndex = currentIndex;
+					currentIndex = -1;
+				}
+				isBallFalling = true;
+				if(ballVerticalSpeed < 15) {
+					ballVerticalSpeed++;
+				}
+			}
+			
+			if(isBallJumping == true) {
+				if(ball.isFlying) {
+					isBallJumping = false;
+				} else {
+					if(currentBallJumpYDistance > 0) {
+						if(currentBallJumpYDistance <= 45) {
+							ballVerticalSpeed++;
+						}
+						currentBallJumpYDistance -= 5;
+					} else {
+						isBallJumping = false;
+						isBallFalling = true;
 					}
 				}
 			}
 			
-			if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball)) {
-				blocks[i].addCoin(false);
-				coins += coinWorth;
-				coinsLabel.setText("Coins: " + coins);
+			if(isBallJumping == false && isBallFalling == false) {
+				if(changedDirectionInAir) {
+					changedDirectionInAir = false;
+				}
+				if(modes[1].isSelected() && isLeftKeyDown == false && isRightKeyDown == false) {
+					stopBallSlowly = true;
+				} else if(isLeftKeyDown == false && isRightKeyDown == false) {
+					ballHorizontalSpeed = 0;
+				}
 			}
 			
-			int j = 0;
-			while(j < ball.bullets.size()) {
-				if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball.bullets.get(j))) {
-					ball.bullets.remove(j);
+			if(stopBallSlowly) {
+				if(isBallJumping == false && isBallFalling == false) {
+					slowingDownSpeed += 0.5;
+					if(ballHorizontalSpeed > 0) {
+						ballHorizontalSpeed -= (int) slowingDownSpeed;
+					} else if(ballHorizontalSpeed < 0) {
+						ballHorizontalSpeed += (int) slowingDownSpeed;
+					}
+					if(slowingDownSpeed == 1.0) {
+						slowingDownSpeed = 0.0;
+					}
+					if(ballHorizontalSpeed == 0) {
+						stopBallSlowly = false;
+						slowingDownSpeed = 0.0;
+					}
+				}
+			}
+			
+			if(isBallLosingHealth) {
+				ballHealthLosingSpeed += 5;
+			}
+			
+			ballX += ballHorizontalSpeed;
+			
+			if(usingAbility && ball.isFlying && ballIntersectionUnderBlock == false) {
+				ballVerticalSpeed = flyPower;
+			}
+			ballY += ballVerticalSpeed;
+			
+			for(int i = 0; i < blocks.length; i++) {
+				if(blocks[i].getHealthBooster() != null && blocks[i].getHealthBooster().intersects(ball)) {
+					blocks[i].addHealthBooster(false);
+					
+					if(ballHealth + 5 > 100) {
+						ballHealth = 100;
+					} else {
+						ballHealth += 5;
+					}
+					
+					ballHealthLabel.setText("Health: " + ballHealth);
+				}
+				
+				if(blocks[i] instanceof ShooterBlock) {
+					for(int j = 0; j < blocks[i].getBulletsList().size(); j++) {
+						if(blocks[i].getBulletsList().get(j).intersects(ball)) {	
+							if(pause == false && isPlayingGame && ballShieldAbility && usingAbility && currentAbility.equals("Shield")) {
+								if(10 - shieldPower >= 0) {
+									if(ballHealth - (10 - shieldPower) >= 0) {
+										ballHealth -= (10 - shieldPower);
+									} else {
+										ballHealth = 0;
+									}
+								}
+							} else if(ballHealth - 10 >= 0) {
+								ballHealth -= 10;
+							} else {
+								ballHealth = 0;
+							}
+							
+							ballHealthLabel.setText("Health: " + ballHealth);
+							
+							blocks[i].removeBullet(j);
+							break;
+						}
+						if(blocks[i].getBulletsList().get(j).getBulletYPosition() >= 600) {
+							blocks[i].removeBullet(j);
+							break;
+						}
+						if(ballY + ball.getHeight() <= blocksYPositions[i] && blocks[i].getBulletsList().get(j).getBulletYPosition() <= blocksYPositions[i] + blocks[i].getHeight() + 15) {
+							blocks[i].removeBullet(j);
+							break;
+						}
+					}
+				}
+				
+				if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball)) {
 					blocks[i].addCoin(false);
 					coins += coinWorth;
 					coinsLabel.setText("Coins: " + coins);
-				} else if(blocks[i].intersects(ball.bullets.get(j))) {
-					ball.bullets.remove(j);
-				} else {
-					j++;
+				}
+				
+				int j = 0;
+				while(j < ball.bullets.size()) {
+					if(blocks[i].getCoin() != null && blocks[i].getCoin().intersects(ball.bullets.get(j))) {
+						ball.bullets.remove(j);
+						blocks[i].addCoin(false);
+						coins += coinWorth;
+						coinsLabel.setText("Coins: " + coins);
+					} else if(blocks[i].intersects(ball.bullets.get(j))) {
+						ball.bullets.remove(j);
+					} else {
+						j++;
+					}
 				}
 			}
+			
+			if(ballY > 600) {
+				ballHealth = 0;
+				ballHealthLabel.setText("Health: " + ballHealth);
+			}
 		}
-		
-		if(ballY > 600) {
-			ballHealth = 0;
-			ballHealthLabel.setText("Health: " + ballHealth);
-		}
-		
 		repaint();
 	}
 	
@@ -2274,7 +2281,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void changeBlockColorTransparency(int index) {
-		if(modes[2].isSelected()) {
+		if(modes[2].isSelected() && (currentAbility.equals("Freeze Time") == false || (currentAbility.equals("Freeze Time") && usingAbility == false))) {
 			if(blockVerticalSpeed == 1 && blocksColorTransparency[index] - 2 >= 0) {
 				blocksColorTransparency[index] -= 2;
 			} else if(blockVerticalSpeed == 2 && blocksColorTransparency[index] - 7 >= 0) {
@@ -2449,7 +2456,16 @@ public class GamePanel extends JPanel implements ActionListener {
 			writer.append("\n" + ballBulletReloadSpeedLevel);
 			writer.append("\n" + ballBulletReloadSpeedUpgradePrice);
 			
-			writer.append("\n" + ball.type);
+			writer.append("\n" + ball.type + "\n");
+			
+			for(int i = 0; i < totalBalls.length; i++) {
+				String space = " ";
+				if(i == totalBalls.length - 1) {
+					space = "";
+				}
+				
+				writer.append(totalBalls[i] + space);
+			}
 			writer.append("\n" + ball.bulletReloadSpeed + "\n");
 			
 			for(int i = 0; i < modes.length; i++) {
@@ -2499,7 +2515,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				while(reader.hasNextLine()) {
 					dataList.add(reader.nextLine());
 				}
-				if(dataList.size() == 31) {
+				if(dataList.size() == 32) {
 					highScore = Integer.parseInt(dataList.get(0));
 					highScoreLabel.setText("High Score: " + highScore);
 					totalCoins = Integer.parseInt(dataList.get(1));
@@ -2542,9 +2558,15 @@ public class GamePanel extends JPanel implements ActionListener {
 					ballBulletReloadSpeedLevel = Integer.parseInt(dataList.get(24));
 					ballBulletReloadSpeedUpgradePrice = Integer.parseInt(dataList.get(25));
 					ball.type = Integer.parseInt(dataList.get(26));
-					ball.bulletReloadSpeed = Integer.parseInt(dataList.get(27));
 					
-					String[] modesData = dataList.get(28).split(" ");
+					String[] totalBallsData = dataList.get(27).split(" ");
+					for(int i = 0; i < totalBalls.length; i++) {
+						totalBalls[i] = Integer.parseInt(totalBallsData[i]);
+					}
+					
+					ball.bulletReloadSpeed = Integer.parseInt(dataList.get(28));
+					
+					String[] modesData = dataList.get(29).split(" ");
 					for(int i = 0; i < modes.length; i++) {
 						if(modesData[i].equals("true")) {
 							modes[i].setSelected(true);
@@ -2553,7 +2575,7 @@ public class GamePanel extends JPanel implements ActionListener {
 						}
 					}
 					
-					String[] differentBlocksData = dataList.get(29).split(" ");
+					String[] differentBlocksData = dataList.get(30).split(" ");
 					for(int i = 0; i < differentBlocks.length; i++) {
 						if(differentBlocksData[i].equals("true")) {
 							differentBlocks[i].setSelected(true);
@@ -2563,7 +2585,7 @@ public class GamePanel extends JPanel implements ActionListener {
 					}
 					
 					differentBlocksInGame.clear();
-					String[] differentBlocksInGameData = dataList.get(30).split(" ");
+					String[] differentBlocksInGameData = dataList.get(31).split(" ");
 					for(int i = 0; i < differentBlocksInGameData.length; i++) {
 						differentBlocksInGame.add(differentBlocksInGameData[i]);
 					}

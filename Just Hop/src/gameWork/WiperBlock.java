@@ -7,7 +7,7 @@ public class WiperBlock extends Blocks {
 	
 	Color blockColor;
 	
-	int TBarXPosition = 0;
+	int TBarXPosition;
 	
 	boolean isTBarRight = true;
 	
